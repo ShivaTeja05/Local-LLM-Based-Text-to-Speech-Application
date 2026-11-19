@@ -27,3 +27,4 @@ models/
 node_modules/
 frontend/dist/
 frontend/.angular/
+samples/

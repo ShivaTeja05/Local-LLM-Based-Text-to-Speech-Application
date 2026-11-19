@@ -201,13 +201,24 @@ Speak naturally, as in a relaxed spoken conversation.
 - Use British English spelling and expressions (colour, lovely, cheers).
 - Keep replies short: one to three sentences.
 - Plain text only: no markdown, lists, emoji or stage directions.
-- You are an AI, so do not invent personal experiences; be honest if unsure.
+- Respond to small talk warmly and naturally, like a person would; if asked how you are, say you are well.
+- Do not invent specific personal stories or activities, and be honest if you are unsure about facts.
 - Usually end with a friendly question to keep the conversation going.
 ```
 
-We add **one few-shot pair** taken from the task example
-(`"How are you?"` → `"I'm very well, thank you. How are you?"`). This sets the tone and length.
-Without it, llama3.2:3b sometimes makes up stories ("just got back from a lovely walk in the park").
+We add **one example exchange** (`"Good morning!"` → `"Good morning! Lovely to hear from you.
+What are you up to today?"`) to set the tone and length. Lessons from testing prompts against
+the real model:
+
+- **The example must not be a question users are likely to ask.** Our first version used the
+  brief's own `"How are you?"` pair. The model then answered a real "How are you?" with *"Same as
+  last time!"*, because it saw the question as a repeat.
+- **"You are an AI, don't invent experiences" was too strong.** It gave robotic small talk
+  (*"I'm just a computer program, so I don't really get feelings…"*). The small-talk rule fixes
+  that and still discourages made-up stories.
+- **Known limit:** a 3B model can still state wrong facts confidently (for example a slightly wrong
+  London "fun fact"). That's fine for a conversational demo. It is the main argument for a bigger
+  model or retrieval (RAG) in a production system.
 
 ### Generation settings
 
@@ -260,7 +271,7 @@ strategy is designed to keep the start the same for as many turns as possible.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐ num_ctx = 4,096
-│ PINNED   system prompt + persona + few-shot pair   ~250 tok  │ never dropped
+│ PINNED   system prompt + persona + example pair    ~250 tok  │ never dropped
 │ PINNED   memory summary (optional, Tier 3)         ≤150 tok  │ updated rarely
 │ HISTORY  recent user/assistant turns             ≤3,000 tok  │ trimmed in chunks
 │ REPLY    reserved for generation (num_predict)     ~200 tok  │
@@ -274,15 +285,29 @@ Ellie's replies are 1–3 sentences, so 3,000 tokens of history holds about **20
 
 ```mermaid
 flowchart TB
-  A["history[] from browser"] --> B["Validate<br/>≤ 500 chars per message · ≤ 40 messages<br/>roles must alternate user/assistant"]
-  B --> C["Group into turns<br/>(user + assistant pairs)"]
-  C --> D{"estimated tokens<br/>≤ HISTORY_TOKEN_BUDGET?"}
-  D -- yes --> F["messages = pinned + history"]
-  D -- no --> E["Drop the OLDEST 25% of turns at once<br/>(not one at a time → start stays stable,<br/>so the KV cache is reused on later turns)"]
-  E --> D
+  A["full transcript from browser<br/>(≤ 400 messages, roles user/assistant only)"] --> B["Validate latest user message (≤ 500 chars → else 422)<br/>truncate older messages · drop empty ones"]
+  B --> C["Group into turns<br/>(a user message + the replies after it)"]
+  C --> D["k_min = fewest oldest turns to drop<br/>so the rest fits HISTORY_TOKEN_BUDGET"]
+  D --> E["dropped = round k_min UP to a multiple of TRIM_CHUNK_TURNS (6)<br/>→ the same turns are dropped for ~6 requests in a row<br/>→ the prompt start stays identical → KV cache hit"]
+  E --> F["messages = pinned + turns[dropped:] + latest"]
   F --> G["send to Ollama with num_ctx=4096"]
-  G --> H["log prompt_eval_count<br/>(checks the token estimate)"]
+  G --> H["log prompt_eval_count · prompt_eval_ms<br/>(checks the estimate and cache hits)"]
 ```
+
+Because the backend keeps no state, `dropped` is a **pure function of the transcript**. Two
+consecutive requests from the same conversation give the same answer until the history grows past
+the next chunk boundary. No session storage is needed for cache-friendly trimming.
+
+**Measured end to end** (real `/api/chat`, 60–67-turn conversation, M3 Pro):
+
+| Turn | Turns dropped | Prompt tokens | Prompt processing | Total |
+|---|---|---|---|---|
+| 61 | 18 (trim) | 2,848 | 4,368 ms | 5.4 s |
+| 62–66 | 18 (same) | 2,910–3,158 | **~182 ms** | **~1.4 s** |
+| 67 | 24 (trim) | 2,848 | 4,387 ms | 6.1 s |
+
+Five of every six turns hit the cache, so they are about 24× faster at prompt processing.
+Below about 45 turns nothing is ever dropped, so every turn after the first hits the cache.
 
 - **Token estimate:** `ceil(chars / 4) + 4` per message. Cheap and slightly cautious, and the
   500-token margin absorbs any error. We check it against Ollama's real `prompt_eval_count` in the logs.
@@ -294,7 +319,7 @@ flowchart TB
 | Where | What | Why |
 |---|---|---|
 | **Browser** (`ChatService` signal + `sessionStorage`) | Full transcript for display | Survives a page refresh. "New conversation" clears it. |
-| **Request body** | Recent turns (front end sends at most 40 messages) | Keeps the payload small |
+| **Request body** | The whole transcript (≤ 400 messages, a few hundred KB at most) | The backend needs the full history to trim the same way every time. If the front end sent only the "last N", the start would change on every turn. |
 | **Backend** (`context.py`) | Final validation and token-budget trimming | Does not trust the client. The backend keeps no state, so no database. |
 
 ### Rolling memory summary (Tier 3, optional)
@@ -310,18 +335,19 @@ window, and because the summary changes rarely, it doesn't break the cache.
 ```env
 NUM_CTX=4096
 HISTORY_TOKEN_BUDGET=3000
-MAX_TURN_CHARS=500
-MAX_MESSAGES=40
-TRIM_FRACTION=0.25
+MAX_USER_CHARS=500           # latest user message; older ones are truncated
+MAX_ASSISTANT_CHARS=1000
+TRIM_CHUNK_TURNS=6
 OLLAMA_KEEP_ALIVE=30m        # model stays loaded, so the KV cache survives between turns
 ```
 
 ### Tests (`backend/tests/test_context.py`)
 
-- The system prompt and few-shot pair are always present.
-- Turns stay paired and the output stays within budget.
-- The start of the conversation is identical between two consecutive turns when no trim happens.
-- After a trim, the next ~25% of turns reuse the same start.
+- The system prompt and example exchange are always first, and the latest user message is always last.
+- Turns stay paired and the history stays within budget.
+- The number of dropped turns is always a whole number of chunks.
+- At least 80% of consecutive requests share an identical prompt start.
+- Invalid history is rejected: empty, not ending with a user message, or the latest message too long.
 
 ---
 
