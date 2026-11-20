@@ -2,7 +2,7 @@
 
 Builds the message list sent to the LLM:
 
-    [pinned system prompt + few-shot]  +  [recent history turns]  +  [latest user message]
+    [pinned system prompt (persona + style example)]  +  [recent history turns]  +  [latest user message]
 
 History is trimmed to a token budget by dropping the *oldest whole turns*, in fixed-size
 chunks. The backend is stateless, so the number of dropped turns is a pure function of the

@@ -82,6 +82,16 @@ Then play `reply.wav` (on macOS: `afplay reply.wav`).
 cd backend && .venv/bin/python -m pytest -q
 ```
 
+- **Unit and API tests** use fake LLM/TTS back ends, so they need no model.
+- **End-to-end tests** (`tests/test_e2e.py`) run the real chain: Ollama → API → Piper → WAV.
+  They check reply style, memory, context trimming, every voice, the full sentence-by-sentence
+  pipeline, concurrency and the Ollama-down fallback. They skip themselves if Ollama or the
+  voices are missing. To run only these with a latency report:
+
+```bash
+cd backend && .venv/bin/python -m pytest tests/test_e2e.py -v -s
+```
+
 ---
 
 ## API

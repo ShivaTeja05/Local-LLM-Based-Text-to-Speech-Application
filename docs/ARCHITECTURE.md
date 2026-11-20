@@ -150,7 +150,7 @@ backend/app/
   llm/
     base.py                   class LLMAdapter(Protocol): stream_chat, chat, health, warm_up
     ollama_adapter.py         async httpx streaming client for Ollama
-    prompt.py                 system prompt, persona, few-shot examples
+    prompt.py                 system prompt: persona rules + style example
     context.py                token budget and chunked history trimming (§4)
     postprocess.py            removes markdown and emoji, keeps spoken style
   stt/                        optional voice input (§8)
@@ -182,7 +182,7 @@ scripts/download_voices.sh    fetches en_GB voices from rhasspy/piper-voices (Hu
 flowchart TB
   IN["Incoming request<br/>messages[] from browser"] --> V["Validate<br/>max 500 chars/turn · max 20 turns"]
   V --> H["Context builder<br/>pinned prompt + history ≤ 3,000 tokens<br/>chunked trimming (see §4)"]
-  H --> P["Prompt builder<br/>system persona + few-shot + history"]
+  H --> P["Prompt builder<br/>system prompt (persona + style example) + history"]
   P --> C["LLMAdapter → OllamaAdapter (async httpx)<br/>POST /api/chat stream=true"]
   subgraph Ollama["Ollama server (local)"]
     M["llama3.2:3b Q4_K_M<br/>llama.cpp · Metal / CPU"]
@@ -195,30 +195,47 @@ flowchart TB
 
 ### Prompt design (what makes the replies sound British and spoken)
 
+The whole prompt is **one system message** (`backend/app/llm/prompt.py`). The style example
+sits inside it and is labelled as a style guide:
+
 ```text
 You are Ellie, a warm, friendly conversational partner from England.
 Speak naturally, as in a relaxed spoken conversation.
-- Use British English spelling and expressions (colour, lovely, cheers).
+- Use British English spelling and expressions (colour, cheers, brilliant), and vary your
+  wording rather than repeating the same words such as "lovely".
 - Keep replies short: one to three sentences.
 - Plain text only: no markdown, lists, emoji or stage directions.
-- Respond to small talk warmly and naturally, like a person would; if asked how you are, say you are well.
-- Do not invent specific personal stories or activities, and be honest if you are unsure about facts.
+- Respond to small talk warmly and naturally; if asked how you are, say you are very well, thank you.
+- You are an AI, so never claim to have done things, been places or have a home, family or daily routine.
+- Be honest if you are unsure about facts.
 - Usually end with a friendly question to keep the conversation going.
+
+Example of the tone and length to aim for (a style guide only, not part of this conversation):
+User: What did you get up to at the weekend?
+Ellie: Oh, I don't really have weekends, being an AI, but I'd love to hear about yours.
+Did you get up to anything nice?
 ```
 
-We add **one example exchange** (`"Good morning!"` → `"Good morning! Lovely to hear from you.
-What are you up to today?"`) to set the tone and length. Lessons from testing prompts against
-the real model:
+**How we got here.** We ran three rounds of prompt testing against the real model, sampling
+each prompt several times because replies vary:
 
-- **The example must not be a question users are likely to ask.** Our first version used the
-  brief's own `"How are you?"` pair. The model then answered a real "How are you?" with *"Same as
-  last time!"*, because it saw the question as a repeat.
-- **"You are an AI, don't invent experiences" was too strong.** It gave robotic small talk
-  (*"I'm just a computer program, so I don't really get feelings…"*). The small-talk rule fixes
-  that and still discourages made-up stories.
-- **Known limit:** a 3B model can still state wrong facts confidently (for example a slightly wrong
-  London "fun fact"). That's fine for a conversational demo. It is the main argument for a bigger
-  model or retrieval (RAG) in a production system.
+| Version | Problem found | Fix |
+|---|---|---|
+| v1: brief's `"How are you?"` pair given as fake earlier turns | A real "How are you?" got *"Same as last time!"* | Use a different example |
+| v2: `"Good morning!"` pair as fake earlier turns | Greetings treated as repeats: *"Hello again!"*, *"Morning again!"* (3 of 24 replies). Robotic or invented small talk. | Move the example **into the system prompt**, labelled as a style guide |
+| **v3 (current)** | **0 of 36** repeats, 0 robotic replies. "How are you?" gets *"I'm very well, thank you for asking…"*, almost the brief's example. | The example shows how to be honest about being an AI *and* warm |
+
+Two lessons worth noting:
+1. Small models take example turns given as earlier conversation **literally, as history**.
+2. An instruction alone ("don't invent experiences") makes replies robotic. One example of the
+   desired behaviour works better.
+
+Regression tests in `tests/test_e2e.py` check greetings are not treated as repeats (sampled
+several times) and that small talk is neither robotic nor invented.
+
+**Known limit:** a 3B model can still state facts wrongly with confidence (for example a slightly
+wrong London "fun fact"). That's fine for a conversational demo. It is the main argument for a
+bigger model or retrieval (RAG) in a production system.
 
 ### Generation settings
 
@@ -271,7 +288,7 @@ strategy is designed to keep the start the same for as many turns as possible.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐ num_ctx = 4,096
-│ PINNED   system prompt + persona + example pair    ~250 tok  │ never dropped
+│ PINNED   system prompt: persona + style example   ~300 tok  │ never dropped
 │ PINNED   memory summary (optional, Tier 3)         ≤150 tok  │ updated rarely
 │ HISTORY  recent user/assistant turns             ≤3,000 tok  │ trimmed in chunks
 │ REPLY    reserved for generation (num_predict)     ~200 tok  │
@@ -343,7 +360,7 @@ OLLAMA_KEEP_ALIVE=30m        # model stays loaded, so the KV cache survives betw
 
 ### Tests (`backend/tests/test_context.py`)
 
-- The system prompt and example exchange are always first, and the latest user message is always last.
+- The system prompt is always first, and the latest user message is always last.
 - Turns stay paired and the history stays within budget.
 - The number of dropped turns is always a whole number of chunks.
 - At least 80% of consecutive requests share an identical prompt start.
