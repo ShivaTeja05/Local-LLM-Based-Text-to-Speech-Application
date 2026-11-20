@@ -18,7 +18,7 @@ Design goals, in order of priority:
 
 | Layer | Choice | Why |
 |---|---|---|
-| Front end | **Angular 19** (standalone components, signals), TypeScript, SCSS | The task names Angular. Signals keep the chat and audio state simple. |
+| Front end | **Angular 21 LTS** (standalone components, signals, zoneless), TypeScript, SCSS; Vitest for unit tests, Playwright for end-to-end | The task names Angular. Signals keep the chat and audio state simple. 21 is the LTS line and runs on Node ≥ 24.0 (Angular 22 needs Node ≥ 24.15). |
 | Avatar | Inline **SVG** in an Angular component, driven by the **Web Audio API** (`AnalyserNode`) | No 3D assets are needed. The lip-sync follows the real audio, so it stays in sync. |
 | Back end | **Python 3.11 + FastAPI + Uvicorn** | Piper is a native Python library. FastAPI does async streaming (SSE) well. We already used this stack in *Speech-to-Speech-model*. |
 | LLM runtime | **Ollama** (llama.cpp underneath, Metal on Mac and CPU/CUDA on a server) | A one-command model install, a stable HTTP API, streaming, and `keep_alive` to keep the model warm. |
@@ -47,7 +47,7 @@ A cold model load takes 2–7 s, so the back end **pre-loads the model at start-
 
 ```mermaid
 flowchart LR
-  subgraph Browser["Browser — Angular 19 SPA"]
+  subgraph Browser["Browser — Angular 21 SPA"]
     UI["ChatPage<br/>input bar · message list<br/>speech on/off toggle · ▶ replay"]
     CS["ChatService<br/>SSE client + history"]
     SS["SentenceSplitter"]
@@ -125,17 +125,31 @@ sequenceDiagram
 
 ```
 frontend/src/app/
-  core/
-    chat.service.ts           SSE via fetch + ReadableStream, holds the history signal
-    tts.service.ts            POST /api/tts → Blob, per-message cache
-    audio-queue.service.ts    AudioContext, gapless queue, AnalyserNode, stop/replay
-    sentence-splitter.ts      splits the token stream at . ! ? (handles "Mr." and "e.g.")
-    settings.service.ts       speechEnabled, voice, avatarEnabled (localStorage)
-  features/
-    chat/                     chat-page, message-list, message-bubble, input-bar
-    avatar/                   avatar.component (SVG), expression.ts
-  app.config.ts, app.routes.ts
+  core/                         logic, no UI (unit-tested with Vitest)
+    api.service.ts              fetch client: /api/chat/stream (SSE), /api/tts, /api/health, /api/voices
+    sse-parser.ts               incremental SSE parser (fetch, because EventSource cannot POST)
+    sentence-splitter.ts        token stream → sentences (decimals, "Dr.", "e.g.", initials, long runs)
+    conversation.service.ts     orchestrator: stream reply, speak per sentence, per-voice audio cache,
+                                stop, retry, sessionStorage history
+    audio-player.service.ts     Web Audio queue (order-preserving), AnalyserNode → lip-sync level
+    settings.service.ts         speech on/off, voice, theme (localStorage)
+    status.service.ts           polls /api/health, loads voices
+    expression.ts               reply tone → avatar expression (rule-based)
+  ui/
+    avatar.*                    SVG face: mouth from live loudness, blink, brows, gaze, head bob
+    conversation.*              message list, ▶/■ per reply, starters, composer (Enter / Shift+Enter)
+    settings-panel.*            brand, new conversation, voice picker + preview, speech switch, theme, status
+    icon.ts                     one outline icon set
+  app.*                         shell: sidebar frame, white sheet, greeting, 4/8 grid, phone top bar + sheet
+frontend/e2e/                   Playwright tests against the real backend (desktop + phone)
 ```
+
+**Design.** Built with the *tasteskill* app-screen rules (style "editorial greeting", dealt by its
+`draw.mjs`): a warm tinted frame around a white sheet, tonal panels, one near-black pill primary,
+and a deep-teal accent kept under 2% of the screen (the voice-level meter and focus). Instrument
+Sans throughout, Instrument Serif only for the greeting. Fonts are self-hosted, so the app makes no
+CDN calls. Checked with the skill's `lint.mjs --app` (0 FAIL, 0 WARN) and `inspect.mjs --app` at
+1440/768/390 (0 FAIL, 1 WARN kept on purpose: the 48px serif greeting is the style's signature).
 
 ### Back-end structure
 
@@ -519,7 +533,7 @@ flowchart LR
 flowchart TB
   user(["User"])
 
-  subgraph client["Browser — Angular 19 SPA"]
+  subgraph client["Browser — Angular 21 SPA"]
     ui["Chat UI<br/>input · messages · speech toggle · ▶ replay"]
     avatar["SVG Avatar<br/>lip-sync + expressions"]
     svc["ChatService (SSE) · SentenceSplitter<br/>TtsService · AudioQueue (Web Audio)"]
@@ -566,6 +580,7 @@ flowchart TB
 | Environment | How |
 |---|---|
 | **Local dev** | Ollama runs natively (uses the Metal GPU on Mac). `uvicorn app.main:app --reload`. `ng serve` with `proxy.conf.json` → `:8000`. |
+| **Single port (simplest demo)** | `ng build`, then `uvicorn` alone: FastAPI serves the Angular build at `/` and the API at `/api` on port 8000 (it mounts `frontend/dist/frontend/browser` when it exists). |
 | **Server** | `docker compose up -d` → `nginx`, `backend`, `ollama` (with a volume for models). On Linux with an NVIDIA GPU, add `deploy.resources` for GPU access. |
 | **Demo link for submission** | Either (a) a small cloud VM (4 vCPU / 8 GB with `llama3.2:1b`–`3b`) running the compose stack, or (b) the dev machine exposed through a Cloudflare Tunnel during the review window. Both still count as a *locally running* model, because the model runs on our own host. |
 

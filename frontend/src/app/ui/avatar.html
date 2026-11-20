@@ -1,0 +1,37 @@
+<svg class="face" viewBox="0 0 240 240" role="img" aria-label="Ellie, your conversation partner">
+  <g class="head">
+    <!-- jumper and neck -->
+    <path class="jumper" d="M34 240 C42 200 76 186 120 186 C164 186 198 200 206 240 Z" />
+    <path class="collar" d="M98 188 Q120 206 142 188" />
+    <rect class="neck" x="104" y="150" width="32" height="44" rx="12" />
+
+    <!-- hair (back), ears, face -->
+    <path class="hair" d="M52 112 C52 62 82 36 120 36 C158 36 188 62 188 112 L190 166 C178 176 166 174 158 168 L82 168 C74 174 62 176 50 166 Z" />
+    <ellipse class="ear" cx="72" cy="122" rx="7" ry="11" />
+    <ellipse class="ear" cx="168" cy="122" rx="7" ry="11" />
+    <ellipse class="skin" cx="120" cy="118" rx="48" ry="56" />
+
+    <!-- fringe -->
+    <path class="hair" d="M70 116 C66 72 92 50 124 50 C154 50 176 70 174 104 C160 86 138 76 112 78 C94 80 80 92 74 116 Z" />
+
+    <!-- cheeks -->
+    <circle class="cheek" cx="92" cy="138" r="9" [attr.opacity]="cheek()" />
+    <circle class="cheek" cx="148" cy="138" r="9" [attr.opacity]="cheek()" />
+
+    <!-- brows -->
+    <path class="brow" d="M92 100 Q102 94 112 98" [attr.transform]="leftBrow()" />
+    <path class="brow" d="M128 98 Q138 94 148 100" [attr.transform]="rightBrow()" />
+
+    <!-- eyes -->
+    <g class="eyes" [class.closed]="blinking()" [attr.transform]="gaze()">
+      <ellipse class="eye" cx="102" cy="116" rx="5" ry="6.5" />
+      <ellipse class="eye" cx="138" cy="116" rx="5" ry="6.5" />
+      <circle class="glint" cx="103.6" cy="113.6" r="1.6" />
+      <circle class="glint" cx="139.6" cy="113.6" r="1.6" />
+    </g>
+
+    <!-- nose and mouth -->
+    <path class="nose" d="M120 122 Q116 134 121 136" />
+    <path class="mouth" [attr.d]="mouth()" />
+  </g>
+</svg>

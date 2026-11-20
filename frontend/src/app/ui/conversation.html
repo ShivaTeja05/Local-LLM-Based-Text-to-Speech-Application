@@ -1,0 +1,84 @@
+<h2 class="visually-hidden">Conversation</h2>
+
+<div class="scroller" #scroller (scroll)="onScroll()">
+  @if (chat.messages().length === 0) {
+    <div class="empty">
+      <p class="empty-title">Say hello to start</p>
+      <p class="empty-text">
+        Type anything you like. Ellie answers in writing{{ settings.speechEnabled() ? ' and out loud, in British English' : '. Speech is off, so she will not speak' }}.
+      </p>
+      <div class="starters">
+        @for (s of starters; track s) {
+          <button type="button" class="btn btn-quiet btn-small" [disabled]="chat.generating()" (click)="submit(s)">{{ s }}</button>
+        }
+      </div>
+    </div>
+  } @else {
+    <ol class="messages" aria-live="polite" [attr.aria-busy]="chat.generating()">
+      @for (m of chat.messages(); track m.id) {
+        @if (m.role === 'user') {
+          <li class="msg user"><p class="bubble">{{ m.text }}</p></li>
+        } @else {
+          <li class="msg ellie" [class.is-error]="m.state === 'error'" [attr.data-state]="m.state">
+            @if (m.state === 'streaming' && !m.text) {
+              <p class="thinking">Ellie is thinking…</p>
+            } @else {
+              <p class="reply">{{ m.text }}@if (m.state === 'streaming') {<span class="caret" aria-hidden="true"></span>}</p>
+            }
+
+            @if (m.state === 'error') {
+              <div class="actions">
+                <button type="button" class="btn btn-quiet btn-small" (click)="chat.retry(m.id)">
+                  <app-icon name="retry" [size]="14" />
+                  Try again
+                </button>
+              </div>
+            } @else if (m.state !== 'streaming' && m.text) {
+              <div class="actions">
+                <button type="button" class="btn btn-quiet btn-small play"
+                        [class.on]="player.speakingId() === m.id"
+                        [attr.aria-label]="playLabel(m.id) + ' this reply'"
+                        (click)="chat.togglePlay(m.id)">
+                  <app-icon [name]="player.speakingId() === m.id ? 'stop' : 'play'" [size]="12" />
+                  {{ playLabel(m.id) }}
+                </button>
+                @if (player.speakingId() === m.id) {
+                  <span class="speaking">{{ player.sounding() ? 'Speaking' : 'Preparing speech…' }}</span>
+                } @else if (m.state === 'stopped') {
+                  <span class="note">Stopped</span>
+                }
+              </div>
+            }
+          </li>
+        }
+      }
+    </ol>
+  }
+</div>
+
+<form class="composer" (submit)="$event.preventDefault(); submit()">
+  <label class="visually-hidden" for="message">Message Ellie</label>
+  <textarea
+    #field
+    id="message"
+    rows="1"
+    placeholder="Message Ellie"
+    [attr.maxlength]="max"
+    [attr.aria-describedby]="remaining() < 100 ? 'count' : null"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"></textarea>
+  @if (remaining() < 100) {
+    <span id="count" class="count num" [class.low]="remaining() < 20">{{ remaining() }} left</span>
+  }
+  @if (chat.generating()) {
+    <button type="button" class="btn btn-quiet send" (click)="chat.stopGenerating()">
+      <app-icon name="stop" [size]="12" />
+      Stop
+    </button>
+  } @else {
+    <button type="submit" class="btn btn-primary send" [disabled]="!canSend()">
+      <app-icon name="send" />
+      Send
+    </button>
+  }
+</form>

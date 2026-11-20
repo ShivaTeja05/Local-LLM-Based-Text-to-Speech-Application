@@ -1,0 +1,61 @@
+// The portrait keeps its own fixed colours in both themes (it is a picture, not chrome).
+:host {
+  display: block;
+  aspect-ratio: 1;
+}
+
+.face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.jumper { fill: #34413e; }
+.collar { fill: none; stroke: #263230; stroke-width: 3; stroke-linecap: round; }
+.neck { fill: #dcb092; }
+.hair { fill: #3a2a22; }
+.ear { fill: #e3b797; }
+.skin { fill: #edc9ac; }
+.cheek { fill: #e59a8a; transition: opacity 400ms ease; }
+.brow {
+  fill: none;
+  stroke: #3a2a22;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.eye { fill: #2a211c; }
+.glint { fill: #ffffff; }
+.nose { fill: none; stroke: #c99a7c; stroke-width: 2.2; stroke-linecap: round; }
+.mouth { fill: #7c3a33; }
+
+.eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.eyes.closed .eye { transform: scaleY(0.12); }
+.eyes.closed .glint { opacity: 0; }
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 70ms ease-out;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :host(.is-speaking) .head { animation: bob 2.4s ease-in-out infinite; }
+  :host(.is-thinking) .head { animation: tilt 3.2s ease-in-out infinite; }
+}
+
+.head { transform-origin: 120px 200px; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+@keyframes tilt {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-2deg); }
+}

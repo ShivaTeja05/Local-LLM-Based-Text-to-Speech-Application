@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     tts_max_chars: int = 1000
     tts_cache_size: int = 256
 
+    # --- Frontend ---------------------------------------------------------
+    # If the Angular production build exists, the API also serves it at "/", so the whole
+    # app runs on one port (e.g. for a demo link). In development, `ng serve` proxies instead.
+    frontend_dist: Path = BACKEND_DIR.parent / "frontend" / "dist" / "frontend" / "browser"
+
 
 @lru_cache
 def get_settings() -> Settings:

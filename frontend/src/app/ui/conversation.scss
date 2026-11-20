@@ -1,0 +1,122 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+p { margin: 0; }
+
+/* Content sits at the foot, next to the composer, and grows upwards (the chat convention).
+   margin-top: auto on the only child keeps scrolling intact, unlike justify-content: flex-end. */
+.scroller {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 28px 28px 20px;
+  scrollbar-gutter: stable;
+}
+.scroller > * { margin-top: auto; }
+
+/* Empty state: keeps the frame, says what to do, offers real first lines. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 520px;
+  padding-top: 8px;
+}
+.empty-title { font-size: 18px; font-weight: 500; line-height: 24px; }
+.empty-text { font-size: var(--fs-read); line-height: 24px; color: var(--muted); }
+.starters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.msg.user { display: flex; justify-content: flex-end; }
+.bubble {
+  max-width: min(78%, 560px);
+  padding: 10px 16px;
+  border-radius: 20px 20px 6px 20px;
+  background: var(--bubble);
+  font-size: var(--fs-read);
+  line-height: 24px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.msg.ellie { max-width: 62ch; }
+.reply {
+  font-size: var(--fs-read);
+  line-height: 26px;
+  overflow-wrap: anywhere;
+}
+.thinking { font-size: var(--fs-read); line-height: 26px; color: var(--muted); }
+.msg.is-error .reply { color: var(--pill-negative-ink); }
+
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 18px;
+  margin-left: 2px;
+  vertical-align: -3px;
+  background: var(--text);
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.play.on { border-color: var(--text); }
+.speaking, .note { font-size: var(--fs-small); color: var(--muted); }
+.speaking { color: var(--accent); font-weight: 500; }
+
+/* Composer: the field and its one action on a raised strip at the panel's foot. */
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 0 16px 16px;
+  padding: 7px 7px 7px 18px;
+  border: 1px solid var(--control);
+  border-radius: 26px;
+  background: var(--raised);
+  transition: border-color 160ms var(--ease);
+}
+.composer:focus-within { border-color: var(--muted); }
+textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  max-height: 140px;
+  padding: 8px 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: none;
+  font-size: var(--fs-read);
+  line-height: 22px;
+}
+textarea::placeholder { color: var(--muted); }
+.count { align-self: center; font-size: var(--fs-small); color: var(--muted); white-space: nowrap; }
+.count.low { color: var(--negative); }
+.send { flex: none; }
+
+@media (max-width: 767px) {
+  .scroller { padding: 20px 16px 8px; }
+  .composer { margin: 0 12px 12px; }
+  .msg.ellie { max-width: none; }
+  .bubble { max-width: 86%; }
+  .send { width: var(--control-height); padding: 0; font-size: 0; gap: 0; }
+}

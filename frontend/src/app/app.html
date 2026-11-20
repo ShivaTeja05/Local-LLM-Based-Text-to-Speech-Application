@@ -1,0 +1,56 @@
+<div class="shell">
+  <aside class="sidebar" aria-label="Settings">
+    <app-settings-panel />
+  </aside>
+
+  <header class="topbar">
+    <button type="button" class="btn btn-icon" aria-label="Open settings" (click)="openSheet()">
+      <app-icon name="menu" [size]="20" />
+    </button>
+    <p class="topbar-title">Ellie</p>
+    <button type="button" class="btn btn-icon" role="switch" [attr.aria-checked]="settings.speechEnabled()"
+            aria-label="Speak replies aloud" (click)="toggleSpeech()">
+      <app-icon [name]="settings.speechEnabled() ? 'speaker' : 'mute'" [size]="20" />
+    </button>
+  </header>
+
+  <main class="sheet">
+    <div class="column">
+      <header class="title-row">
+        <h1>{{ greeting() }}</h1>
+        <p class="subline" [attr.data-connection]="status.connection()">{{ subline() }}</p>
+      </header>
+
+      <div class="grid">
+        <section class="stage panel" aria-label="Ellie">
+          <app-avatar class="portrait" [state]="avatarState()" [expression]="expression()" [level]="player.level()" />
+          <div class="stage-foot">
+            <p id="stage-line" class="stage-line" aria-live="polite">{{ stageLine() }}</p>
+            <div class="meter" aria-hidden="true">
+              <span [style.transform]="'scaleX(' + player.level() + ')'"></span>
+            </div>
+            @if (player.isSpeaking()) {
+              <button type="button" class="btn btn-quiet btn-small stop" (click)="player.stop()">
+                <app-icon name="stop" [size]="12" />
+                Stop speaking
+              </button>
+            }
+          </div>
+        </section>
+
+        <app-conversation class="talk panel" (drafting)="drafting.set($event)" />
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog #sheet class="menu-sheet" aria-label="Settings" (click)="onSheetClick($event)" (close)="sheetOpen.set(false)">
+  @if (sheetOpen()) {
+    <div class="menu-inner">
+      <button type="button" class="btn btn-icon close" aria-label="Close settings" (click)="closeSheet()">
+        <app-icon name="close" [size]="20" />
+      </button>
+      <app-settings-panel (done)="closeSheet()" />
+    </div>
+  }
+</dialog>

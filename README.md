@@ -6,13 +6,46 @@ lip-syncs to the speech. Nothing is sent to a cloud AI service.
 
 | Part | Technology |
 |---|---|
-| Front end | Angular 19 (TypeScript), Web Audio API, SVG avatar *(in progress)* |
+| Front end | Angular 21 LTS (TypeScript, signals), Web Audio API, animated SVG avatar |
 | Back end | Python 3.11, FastAPI, Server-Sent Events |
 | LLM (local) | Ollama + `llama3.2:3b` |
 | TTS (local) | Piper, British voice `en_GB-cori-high` (+ 3 more UK voices) |
-| Deployment | Docker Compose (nginx + backend + Ollama) *(planned)* |
+| Deployment | One port: FastAPI serves the API and the Angular build. Docker Compose *(planned)* |
 
 📐 **Architecture, design decisions and delivery plan:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+### What it does
+
+- Type a message (Enter sends, Shift+Enter adds a line) or tap a starter prompt.
+- Ellie's reply **streams in word by word** and is **spoken in British English as it is written**,
+  one sentence at a time, with a local Piper voice.
+- **▶ Play / ■ Stop** on every reply (replays from a cache, no new synthesis). **Stop** while
+  she is writing keeps the partial reply.
+- **Speak replies aloud** switch, **voice picker** (4 UK voices, each with a ▶ preview), light,
+  dark or system **theme**. All remembered in the browser.
+- **Animated avatar** whose mouth follows the real loudness of the speech (60 fps lip-sync),
+  with blinking, a thinking look, and happy or concerned expressions read from the reply.
+- **Conversation memory:** follow-up questions work. The chat survives a page refresh, and
+  **New conversation** clears it.
+- Honest states: a live status (model and voice), a clear message and **Try again** if the
+  backend is down, and text chat keeps working if speech fails.
+- Works on desktop, tablet and phone (the sidebar folds into a top bar and a menu sheet).
+
+---
+
+## Quick start (everything on one port)
+
+With Ollama running and the backend installed (below):
+
+```bash
+cd frontend && npm install && npm run build && cd ..
+```
+
+```bash
+cd backend && .venv/bin/uvicorn app.main:app --port 8000
+```
+
+Open <http://localhost:8000>.
 
 ---
 
@@ -94,6 +127,65 @@ cd backend && .venv/bin/python -m pytest tests/test_e2e.py -v -s
 
 ---
 
+## Frontend: install and run
+
+### Prerequisites
+
+- **Node.js 20.19+, 22.12+ or 24+** (Angular 21 LTS)
+- The backend running on port 8000 (above)
+
+### Install
+
+```bash
+cd frontend
+npm install
+```
+
+### Develop
+
+```bash
+npm start
+```
+
+Open <http://localhost:4200>. The dev server proxies `/api` to `localhost:8000` (`proxy.conf.json`).
+
+### Production build
+
+```bash
+npm run build
+```
+
+The output is in `frontend/dist/frontend/browser`. When that folder exists, the backend serves it
+at `/`, so the whole app runs from <http://localhost:8000>.
+
+### Tests
+
+Unit tests (Vitest, no backend needed): the SSE parser, the sentence splitter, tone detection and
+every path of the conversation service, using fakes for the API and the audio player.
+
+```bash
+npm test
+```
+
+End-to-end tests (Playwright) against the **real** stack, on desktop and phone sizes. They start
+the backend and the dev server themselves if they are not already running.
+
+```bash
+npx playwright install chromium
+```
+
+```bash
+npm run e2e
+```
+
+They cover:
+- the brief's "How are you?" example, written and spoken sentence by sentence, with lip-sync checked at 60 fps;
+- replay from the cache, speech off, voice choice and preview;
+- memory across turns, keyboard use, reload and New conversation;
+- backend down and speech failing, the 500-character limit, themes, and the tablet and phone layouts.
+
+---
+
 ## API
 
 | Method | Path | Body | Returns |
@@ -116,6 +208,7 @@ itself, in a way that keeps Ollama's prompt cache effective
 | Speech for one sentence (Piper) | 0.2–0.4 s |
 | Repeated phrase (TTS cache) | ~1 ms |
 | Long conversation: prompt processing, cache hit vs trim turn | ~0.18 s vs ~4.4 s |
+| Frontend production bundle (transfer size) | ~53 KB |
 
 ## Known limitations
 

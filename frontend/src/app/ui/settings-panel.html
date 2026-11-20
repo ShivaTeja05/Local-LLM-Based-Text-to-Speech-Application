@@ -1,0 +1,71 @@
+<div class="brand">
+  <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="16" />
+    <path d="M10 13v6M14 9.5v13M18 11.5v9M22 14v4" />
+  </svg>
+  <div>
+    <p class="brand-name">Ellie</p>
+    <p class="brand-scope">Local voice companion</p>
+  </div>
+</div>
+
+<button type="button" class="btn btn-quiet new" (click)="newConversation()">
+  <app-icon name="plus" />
+  New conversation
+</button>
+
+<section class="group" [attr.aria-labelledby]="uid + '-voice'">
+  <h2 [id]="uid + '-voice'" class="group-title">Voice</h2>
+  @if (status.voices().length) {
+    <div class="voices" role="radiogroup" [attr.aria-labelledby]="uid + '-voice'">
+      @for (v of status.voices(); track v.id) {
+        <div class="voice" [class.selected]="selectedVoice() === v.id">
+          <button type="button" class="voice-pick" role="radio" [attr.aria-checked]="selectedVoice() === v.id"
+                  (click)="chooseVoice(v.id)">
+            <span class="voice-name">{{ name(v.label) }}</span>
+            <span class="voice-accent">{{ accent(v.label) }}</span>
+          </button>
+          <button type="button" class="voice-preview btn-icon"
+                  [attr.aria-label]="(player.speakingId() === 'preview:' + v.id ? 'Stop preview of ' : 'Preview ') + name(v.label)"
+                  (click)="preview(v.id, v.label, $event)">
+            <app-icon [name]="player.speakingId() === 'preview:' + v.id ? 'stop' : 'play'" [size]="14" />
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty">{{ status.connection() === 'checking' ? 'Loading voices…' : 'No voices available.' }}</p>
+  }
+</section>
+
+<section class="group" [attr.aria-labelledby]="uid + '-speech'">
+  <h2 [id]="uid + '-speech'" class="group-title">Speech</h2>
+  <button type="button" class="switch-row" role="switch" [attr.aria-checked]="settings.speechEnabled()"
+          (click)="toggleSpeech()">
+    <span>Speak replies aloud</span>
+    <span class="switch" aria-hidden="true"><span class="knob"></span></span>
+  </button>
+</section>
+
+<section class="group" [attr.aria-labelledby]="uid + '-theme'">
+  <h2 [id]="uid + '-theme'" class="group-title">Appearance</h2>
+  <div class="segmented" role="radiogroup" [attr.aria-labelledby]="uid + '-theme'">
+    @for (t of themes; track t.id) {
+      <button type="button" role="radio" [attr.aria-checked]="settings.theme() === t.id"
+              (click)="settings.theme.set(t.id)">{{ t.label }}</button>
+    }
+  </div>
+</section>
+
+<div class="status" [attr.data-connection]="status.connection()" aria-live="polite">
+  <span class="dot" aria-hidden="true"></span>
+  <div class="status-text">
+    <p class="status-line">{{ statusLine() }}</p>
+    @if (statusDetail()) {
+      <p class="status-detail">{{ statusDetail() }}</p>
+    }
+  </div>
+  @if (status.connection() === 'offline' || status.connection() === 'degraded') {
+    <button type="button" class="retry" (click)="status.refresh()">Retry</button>
+  }
+</div>

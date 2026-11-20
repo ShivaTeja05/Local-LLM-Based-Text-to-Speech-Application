@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api import chat, health, tts
 from app.config import Settings, get_settings
@@ -64,6 +65,10 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(chat.router)
     app.include_router(tts.router)
+    if (settings.frontend_dist / "index.html").exists():
+        # Mounted last, so /api/* routes always win.
+        app.mount("/", StaticFiles(directory=settings.frontend_dist, html=True), name="frontend")
+        log.info("Serving the frontend build from %s", settings.frontend_dist)
     return app
 
 
