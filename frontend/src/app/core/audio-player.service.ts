@@ -49,6 +49,8 @@ export class AudioPlayerService {
   /** Smoothed loudness 0..1 for lip-sync. */
   readonly level = signal(0);
   readonly isSpeaking = computed(() => this.speakingId() !== null);
+  /** The sentence that is sounding now; `n` counts up, so a repeated sentence is still new. */
+  readonly sentence = signal<{ text: string; n: number } | null>(null);
 
   private ctx: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
@@ -123,6 +125,7 @@ export class AudioPlayerService {
     this.speakingId.set(null);
     this.sounding.set(false);
     this.level.set(0);
+    this.sentence.set(null);
     cancelAnimationFrame(this.raf);
   }
 
@@ -145,7 +148,7 @@ export class AudioPlayerService {
         await this.breathe(previous, next.text, gen);
         if (gen !== this.generation) return;
       }
-      await this.playBuffer(buffer, gen);
+      await this.playBuffer(buffer, gen, next.text);
       previous = { text: next.text, endedAt: performance.now() };
     }
     if (gen !== this.generation) return;
@@ -184,7 +187,7 @@ export class AudioPlayerService {
     src.start(this.ctx.currentTime + lead);
   }
 
-  private playBuffer(buffer: AudioBuffer, gen: number): Promise<void> {
+  private playBuffer(buffer: AudioBuffer, gen: number, text: string): Promise<void> {
     return new Promise((resolve) => {
       if (!this.ctx || !this.analyser) return resolve();
       const src = this.ctx.createBufferSource();
@@ -196,6 +199,7 @@ export class AudioPlayerService {
       };
       this.source = src;
       src.start();
+      this.sentence.set({ text, n: (this.sentence()?.n ?? 0) + 1 });
       this.sounding.set(true);
       this.meter(gen);
     });

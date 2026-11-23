@@ -88,3 +88,47 @@
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-2deg); }
 }
+
+// --- Body language -------------------------------------------------------------------------
+.nodder { transform-box: view-box; transform-origin: 120px 200px; }
+
+.arm { transform-box: view-box; transform-origin: 204px 180px; transform: translateY(150px); }
+.sleeve { fill: var(--top); }
+.cuff { fill: color-mix(in srgb, var(--top) 80%, black); }
+.hand rect { fill: var(--skin); stroke: var(--ear); stroke-width: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  // A small nod as each sentence starts, tilting one way then the other so it doesn't look looped.
+  :host(.nod-a) .nodder { animation: nod-a 520ms ease-out; }
+  :host(.nod-b) .nodder { animation: nod-b 520ms ease-out; }
+  :host(.waving) .arm { animation: wave 1.8s ease-in-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :host(.waving) .arm { animation: raise 1.8s ease-in-out; }
+}
+
+@keyframes nod-a {
+  0% { transform: none; }
+  35% { transform: translateY(2.5px) rotate(1.4deg); }
+  100% { transform: none; }
+}
+@keyframes nod-b {
+  0% { transform: none; }
+  35% { transform: translateY(2.5px) rotate(-1.4deg); }
+  100% { transform: none; }
+}
+@keyframes wave {
+  0% { transform: translateY(150px); }
+  16% { transform: translateY(0) rotate(0deg); }
+  28% { transform: rotate(16deg); }
+  40% { transform: rotate(-10deg); }
+  52% { transform: rotate(16deg); }
+  64% { transform: rotate(-10deg); }
+  76% { transform: rotate(6deg); }
+  86% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(150px); }
+}
+@keyframes raise {
+  0%, 100% { transform: translateY(150px); }
+  15%, 85% { transform: translateY(0); }
+}

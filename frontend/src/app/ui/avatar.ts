@@ -1,8 +1,10 @@
 import {
-  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, booleanAttribute, computed, inject, input, signal,
+  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, booleanAttribute, computed, effect, inject, input, signal,
+  untracked,
 } from '@angular/core';
 
 import { AvatarState, Expression } from '../core/models';
+import { isGreeting, isQuestion } from './gesture';
 import { lookFor, paletteStyle } from './looks';
 
 /**
@@ -16,13 +18,17 @@ import { lookFor, paletteStyle } from './looks';
  *
  * Each voice has its own character (looks.ts): hair, clothes, extras and colours change, while the
  * face that talks, blinks and watches stays the same.
+ *
+ * Body language while speaking: a small nod (alternately tilting left and right) as each sentence
+ * starts, raised brows while asking a question, and a wave on hello or goodbye. She also waves
+ * when the page opens and when a new conversation starts.
  */
 @Component({
   selector: 'app-avatar',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './avatar.html',
   styleUrl: './avatar.scss',
-  host: { '[class]': '"is-" + state() + " feels-" + expression()', '[style]': 'palette()' },
+  host: { '[class]': 'hostClass()', '[style]': 'palette()' },
 })
 export class Avatar {
   readonly state = input<AvatarState>('idle');
@@ -33,6 +39,24 @@ export class Avatar {
   readonly voice = input<string | null>(null);
   /** A still picture (e.g. in the voice list): no blinking, no watching. */
   readonly still = input(false, { transform: booleanAttribute });
+  /** The sentence being spoken (AudioPlayerService.sentence): drives nods, brows and waves. */
+  readonly sentence = input<{ text: string; n: number } | null>(null);
+  /** Increase to make her wave hello (e.g. on New conversation). */
+  readonly waveCue = input(0);
+
+  /** Which nod animation runs: alternating names restart the animation for every sentence. */
+  protected readonly nod = signal<'nod-a' | 'nod-b' | null>(null);
+  protected readonly waving = signal(false);
+  protected readonly hostClass = computed(() =>
+    ['is-' + this.state(), 'feels-' + this.expression(), this.nod(), this.waving() ? 'waving' : null]
+      .filter(Boolean).join(' '));
+  /** Asking a question right now: brows up. */
+  private readonly asking = computed(() => {
+    const s = this.sentence();
+    return this.state() === 'speaking' && !!s && isQuestion(s.text);
+  });
+  private lastWave = -Infinity;
+  private waveTimer: ReturnType<typeof setTimeout> | undefined;
 
   protected readonly look = computed(() => lookFor(this.voice()));
   protected readonly palette = computed(() => paletteStyle(this.look()));
@@ -89,6 +113,22 @@ export class Avatar {
     };
     schedule();
 
+    // Body language from the sentence being spoken.
+    effect(() => {
+      const s = this.sentence();
+      if (!s) return;
+      untracked(() => {
+        if (this.still()) return;
+        this.nod.set(s.n % 2 ? 'nod-a' : 'nod-b');
+        if (isGreeting(s.text)) this.wave();
+      });
+    });
+    effect(() => {
+      if (this.waveCue() > 0) untracked(() => this.wave());
+    });
+    // A hello wave when the page opens.
+    const hello = setTimeout(() => this.wave(), 700);
+
     // Follow the pointer and typing, at most once per frame.
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
     let target: Point | null = null;
@@ -118,6 +158,8 @@ export class Avatar {
 
     inject(DestroyRef).onDestroy(() => {
       clearTimeout(this.timer);
+      clearTimeout(hello);
+      clearTimeout(this.waveTimer);
       cancelAnimationFrame(frame);
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener('pointerdown', onPointer);
@@ -127,8 +169,19 @@ export class Avatar {
     });
   }
 
+  /** Wave (at most every few seconds, so two greetings in a row get one wave). */
+  private wave(): void {
+    const now = performance.now();
+    if (this.still() || now - this.lastWave < 2500) return;
+    this.lastWave = now;
+    this.waving.set(true);
+    clearTimeout(this.waveTimer);
+    this.waveTimer = setTimeout(() => this.waving.set(false), 1900);
+  }
+
   private brow(side: -1 | 1): string {
     const pivot = side < 0 ? '92 100' : '148 100';
+    if (this.asking()) return 'translate(0 -4.5)';
     if (this.expression() === 'concerned') return `rotate(${side * 9} ${pivot})`;
     if (this.state() === 'thinking') return 'translate(0 -3)';
     if (this.state() === 'listening' || this.expression() === 'happy') return 'translate(0 -1.5)';

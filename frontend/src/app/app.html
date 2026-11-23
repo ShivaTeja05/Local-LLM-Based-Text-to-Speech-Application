@@ -24,7 +24,7 @@
       <div class="grid">
         <section class="stage panel" aria-label="Ellie">
           <app-avatar class="portrait" [state]="avatarState()" [expression]="expression()" [level]="player.level()"
-                      [voice]="voiceId()" />
+                      [voice]="voiceId()" [sentence]="player.sentence()" [waveCue]="chat.fresh()" />
           <div class="stage-foot">
             <p id="stage-line" class="stage-line" aria-live="polite">{{ stageLine() }}</p>
             <div class="meter" aria-hidden="true">

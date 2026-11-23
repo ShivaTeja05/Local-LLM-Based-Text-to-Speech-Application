@@ -93,6 +93,7 @@
       }
     }
   </g>
+  <g class="nodder">
   <g class="head">
     <!-- clothes -->
     <path class="top" d="M34 240 C42 200 76 186 120 186 C164 186 198 200 206 240 Z" />
@@ -244,5 +245,22 @@
     <!-- nose and mouth -->
     <path class="nose" d="M120 122 Q116 134 121 136" />
     <path class="mouth" [attr.d]="mouth()" />
+  </g>
+  </g>
+
+  <!-- a waving hand, raised beside the face -->
+  <g class="arm-clip" [attr.clip-path]="'url(#' + faceClip + '-card)'">
+    <g class="arm">
+      <path class="sleeve" d="M196 250 L224 250 L214 176 L194 176 Z" />
+      <path class="cuff" d="M193.5 176 L214.5 176 L215.5 184 L192.5 184 Z" />
+      <g class="hand">
+        <rect x="190" y="140" width="24" height="38" rx="10" />
+        <rect x="190" y="122" width="5.5" height="26" rx="2.75" />
+        <rect x="196" y="117" width="5.5" height="30" rx="2.75" />
+        <rect x="202" y="118" width="5.5" height="29" rx="2.75" />
+        <rect x="208" y="124" width="5.2" height="24" rx="2.6" />
+        <rect x="181" y="146" width="16" height="7" rx="3.5" transform="rotate(-38 189 150)" />
+      </g>
+    </g>
   </g>
 </svg>

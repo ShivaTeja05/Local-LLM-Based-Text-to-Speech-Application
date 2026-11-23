@@ -29,6 +29,8 @@ export class ConversationService {
   readonly messages = signal<ChatMessage[]>(restore());
   /** Rolling note of turns the model can no longer see (kept here: the backend is stateless). */
   readonly memory = signal<Memory>(restoreMemory());
+  /** Counts fresh starts (New conversation), so the avatar can wave hello. */
+  readonly fresh = signal(0);
   /** True while a reply is being generated. */
   readonly generating = signal(false);
   /** Id of the reply whose speech is being prepared for replay. */
@@ -168,6 +170,7 @@ export class ConversationService {
     this.messages.set([]);
     this.memory.set(NO_MEMORY);
     this.persist();
+    this.fresh.update((n) => n + 1);
   }
 
   private find(id: string): ChatMessage | undefined {
