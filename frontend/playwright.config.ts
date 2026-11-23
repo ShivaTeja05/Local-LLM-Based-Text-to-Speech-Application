@@ -7,7 +7,12 @@ import { defineConfig, devices } from '@playwright/test';
  *
  *   npx playwright test            # headless
  *   npx playwright test --ui       # watch it run
+ *
+ * To test a running deployment instead (Docker, a demo server), point at it; no servers are started:
+ *   E2E_BASE_URL=http://localhost:8080 npx playwright test
  */
+const target = process.env['E2E_BASE_URL'];
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 60_000,
@@ -17,7 +22,7 @@ export default defineConfig({
   retries: 0,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   use: {
-    baseURL: 'http://localhost:4200',
+    baseURL: target ?? 'http://localhost:4200',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] },
@@ -30,9 +35,10 @@ export default defineConfig({
     },
     { name: 'phone', use: { ...devices['Pixel 7'] }, testMatch: /mobile\.spec\.ts/ },
   ],
-  webServer: [
+  webServer: target ? [] : [
     {
-      command: '../backend/.venv/bin/uvicorn app.main:app --app-dir ../backend --port 8000',
+      // The suite sends many messages a minute from one address, so rate limits are off here.
+      command: 'RATE_LIMITS=false ../backend/.venv/bin/uvicorn app.main:app --app-dir ../backend --port 8000',
       url: 'http://localhost:8000/api/health',
       reuseExistingServer: true,
       timeout: 60_000,

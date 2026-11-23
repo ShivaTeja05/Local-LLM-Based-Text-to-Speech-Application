@@ -3,9 +3,11 @@ import { TestBed } from '@angular/core/testing';
 
 import { ApiService } from './api.service';
 import { AudioPlayerService } from './audio-player.service';
-import { ConversationService, OFFLINE_REPLY } from './conversation.service';
-import { ChatEvent, ChatMessage } from './models';
+import { BUSY_REPLY, ConversationService, OFFLINE_REPLY } from './conversation.service';
+import { ApiError } from './api.service';
+import { ChatEvent, ChatMessage, Memory } from './models';
 import { SettingsService } from './settings.service';
+import { StatusService } from './status.service';
 
 type Script = (signal: AbortSignal) => AsyncGenerator<ChatEvent>;
 
@@ -18,10 +20,19 @@ class FakeApi {
   };
   ttsCalls: { text: string; voice: string | null }[] = [];
   histories: Pick<ChatMessage, 'role' | 'text'>[][] = [];
+  memoriesSent: (Memory | undefined)[] = [];
+  modelsSent: (string | null | undefined)[] = [];
+  memoryCalls: { memory: Memory; upto: number }[] = [];
 
-  streamChat(history: Pick<ChatMessage, 'role' | 'text'>[], signal: AbortSignal) {
+  streamChat(history: Pick<ChatMessage, 'role' | 'text'>[], signal: AbortSignal, memory?: Memory, model?: string | null) {
     this.histories.push(history);
+    this.memoriesSent.push(memory);
+    this.modelsSent.push(model);
     return this.script(signal);
+  }
+  memory(_history: unknown, memory: Memory, upto: number) {
+    this.memoryCalls.push({ memory, upto });
+    return Promise.resolve({ note: `The user said ${upto} things.`, turns: upto });
   }
   tts(text: string, voice: string | null) {
     this.ttsCalls.push({ text, voice });
@@ -122,6 +133,14 @@ describe('ConversationService', () => {
     expect(replies()[0]).toMatchObject({ state: 'error', text: OFFLINE_REPLY });
   });
 
+  it('says so when rate limited, instead of the offline message', async () => {
+    api.script = async function* () {
+      throw new ApiError('Too many requests: please wait a moment and try again.', 429);
+    };
+    await service.send('Hi');
+    expect(replies()[0]).toMatchObject({ state: 'error', text: BUSY_REPLY });
+  });
+
   it('stop keeps the partial reply and marks it stopped', async () => {
     api.script = async function* (signal) {
       yield { type: 'token', text: 'Well, let me think' };
@@ -192,6 +211,46 @@ describe('ConversationService', () => {
   it('caps a message at 500 characters', async () => {
     await service.send('x'.repeat(600));
     expect(service.messages()[0].text.length).toBe(500);
+  });
+
+  it('sends the chosen model only while the server offers it', async () => {
+    const status = TestBed.inject(StatusService);
+    const health = (models: string[]) => ({
+      status: 'ok' as const,
+      llm: { ok: true, backend: 'ollama', model: 'llama3.2:3b', models },
+      tts: { ok: true, engine: 'piper', voices: 4 },
+    });
+    settings.model.set('ellie-british');
+    status.health.set(health(['llama3.2:3b', 'ellie-british']));
+    await service.send('Hello');
+    status.health.set(health(['llama3.2:3b'])); // the fine-tune was removed
+    await service.send('Hello again');
+    expect(api.modelsSent).toEqual(['ellie-british', null]);
+  });
+
+  it('makes no memory note while nothing has been dropped', async () => {
+    await service.send('How are you?');
+    expect(api.memoryCalls).toEqual([]);
+    expect(service.memory()).toEqual({ note: '', turns: 0 });
+  });
+
+  it('folds dropped turns into the memory note, then sends the note with later messages', async () => {
+    const dropping = (n: number) => async function* () {
+      yield { type: 'done' as const, text: 'Right you are.', truncated: false, model: 'm', turnsDropped: n };
+    };
+    api.script = dropping(6);
+    await service.send('Tell me more');
+    await new Promise((r) => setTimeout(r));
+    expect(api.memoryCalls).toEqual([{ memory: { note: '', turns: 0 }, upto: 6 }]);
+    expect(service.memory()).toEqual({ note: 'The user said 6 things.', turns: 6 });
+
+    await service.send('And then?'); // still 6 dropped: note reused, no new memory call
+    await new Promise((r) => setTimeout(r));
+    expect(api.memoriesSent.at(-1)).toEqual({ note: 'The user said 6 things.', turns: 6 });
+    expect(api.memoryCalls.length).toBe(1);
+
+    service.reset();
+    expect(service.memory()).toEqual({ note: '', turns: 0 });
   });
 
   it('keeps the conversation across a page refresh, and new conversation clears it', async () => {

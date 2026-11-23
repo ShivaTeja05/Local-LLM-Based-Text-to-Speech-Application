@@ -18,6 +18,7 @@ venv/
 # Models and generated audio (downloaded by scripts, never committed)
 backend/voices/*.onnx
 backend/voices/*.onnx.json
+backend/voices/kokoro/
 models/
 *.gguf
 *.safetensors
@@ -31,3 +32,15 @@ samples/
 .claude/
 .taste-skill/inspect/
 .playwright-cli/
+training/.venv/
+training/data/raw/
+training/data/out/*.log
+training/kaggle/build*/
+training/kaggle/output*/
+training/kaggle/*.log
+training/ollama/build/
+training/colab/ellie-colab-bundle.zip
+training/colab/output*/
+training/colab/train.log
+training/colab/run.log
+training/colab/wait.log

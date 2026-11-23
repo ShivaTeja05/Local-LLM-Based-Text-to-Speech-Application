@@ -19,9 +19,20 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["chat"])
 
 
-def _context(req: ChatRequest, settings: Settings) -> ContextResult:
+def _model(req: ChatRequest, settings: Settings) -> str:
+    """The model for this request: the default, or one of the allowed alternatives."""
+    if req.model is None or req.model == settings.llm_model:
+        return settings.llm_model
+    if req.model not in settings.llm_alt_models:
+        raise HTTPException(status_code=422, detail=f"Model '{req.model}' is not available on this server")
+    return req.model
+
+
+def _context(req: ChatRequest, settings: Settings, model: str) -> ContextResult:
     try:
-        return build_messages([m.model_dump() for m in req.messages], settings)
+        note = req.memory.note if req.memory else None
+        return build_messages([m.model_dump() for m in req.messages], settings, note,
+                              short=model in settings.short_prompt_models)
     except ContextError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -30,11 +41,11 @@ def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
-def _log_turn(llm: LLMAdapter, ctx: ContextResult, stats: StreamStats, started: float) -> None:
+def _log_turn(model: str, ctx: ContextResult, stats: StreamStats, started: float) -> None:
     log.info(
         "chat model=%s turns=%d dropped=%d est_hist_tokens=%d prompt_tokens=%s completion_tokens=%s "
         "prompt_eval_ms=%s total_ms=%d truncated=%s",
-        llm.model, ctx.turns_total, ctx.turns_dropped, ctx.est_history_tokens, stats.prompt_tokens,
+        model, ctx.turns_total, ctx.turns_dropped, ctx.est_history_tokens, stats.prompt_tokens,
         stats.completion_tokens, stats.extra.get("prompt_eval_ms"),
         (time.perf_counter() - started) * 1000, stats.truncated,
     )
@@ -50,13 +61,14 @@ async def chat_stream(
     - ``event: done``  ``data: {"text": final_text, "truncated": bool, ...}``
     - ``event: error`` ``data: {"code": "...", "message": fallback_text}``
     """
-    ctx = _context(req, settings)
+    model = _model(req, settings)
+    ctx = _context(req, settings, model)
     llm: LLMAdapter = request.app.state.llm
 
     async def events() -> AsyncIterator[str]:
         stats, parts, started = StreamStats(), [], time.perf_counter()
         try:
-            async for delta in llm.stream_chat(ctx.messages, stats):
+            async for delta in llm.stream_chat(ctx.messages, stats, model=model):
                 cleaned = clean_delta(delta)
                 if cleaned:
                     parts.append(cleaned)
@@ -71,11 +83,11 @@ async def chat_stream(
         if not text:
             yield _sse("error", {"code": "empty_reply", "message": FALLBACK_REPLY})
             return
-        _log_turn(llm, ctx, stats, started)
+        _log_turn(model, ctx, stats, started)
         yield _sse("done", {
             "text": text,
             "truncated": stats.truncated,
-            "model": llm.model,
+            "model": model,
             "turns_dropped": ctx.turns_dropped,
             "prompt_tokens": stats.prompt_tokens,
         })
@@ -90,11 +102,12 @@ async def chat_stream(
 @router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest, request: Request, settings: Settings = Depends(get_settings)) -> ChatResponse:
     """Non-streaming fallback: same pipeline, whole reply in one JSON response."""
-    ctx = _context(req, settings)
+    model = _model(req, settings)
+    ctx = _context(req, settings, model)
     llm: LLMAdapter = request.app.state.llm
     stats, parts, started = StreamStats(), [], time.perf_counter()
     try:
-        async for delta in llm.stream_chat(ctx.messages, stats):
+        async for delta in llm.stream_chat(ctx.messages, stats, model=model):
             parts.append(clean_delta(delta))
     except LLMError as exc:
         log.warning("chat failed: %s", exc)
@@ -103,8 +116,8 @@ async def chat(req: ChatRequest, request: Request, settings: Settings = Depends(
     text = finalize("".join(parts), stats.truncated)
     if not text:
         raise HTTPException(status_code=503, detail=FALLBACK_REPLY)
-    _log_turn(llm, ctx, stats, started)
+    _log_turn(model, ctx, stats, started)
     return ChatResponse(
-        reply=text, model=llm.model, truncated=stats.truncated,
+        reply=text, model=model, truncated=stats.truncated,
         turns_dropped=ctx.turns_dropped, prompt_tokens=stats.prompt_tokens,
     )

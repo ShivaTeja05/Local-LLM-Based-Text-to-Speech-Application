@@ -1,0 +1,32 @@
+{
+  "adapter-short": {
+    "correct_%": 50.0,
+    "replies": 40,
+    "clean_%": 92.5,
+    "american_%": 0.0,
+    "too_long_%": 7.5,
+    "markdown_%": 0.0,
+    "emoji_%": 0.0,
+    "invented_life_%": 0.0,
+    "robotic_%": 0.0,
+    "cut_off_%": 0.0,
+    "ends_question_%": 87.5,
+    "avg_words": 35.1,
+    "lovely_per_reply": 0.4
+  },
+  "base-short": {
+    "correct_%": 100.0,
+    "replies": 40,
+    "clean_%": 2.5,
+    "american_%": 2.5,
+    "too_long_%": 97.5,
+    "markdown_%": 15.0,
+    "emoji_%": 0.0,
+    "invented_life_%": 12.5,
+    "robotic_%": 2.5,
+    "cut_off_%": 37.5,
+    "ends_question_%": 47.5,
+    "avg_words": 92.3,
+    "lovely_per_reply": 0.72
+  }
+}

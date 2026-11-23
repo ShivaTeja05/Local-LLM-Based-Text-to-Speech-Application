@@ -19,6 +19,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.config import Settings, get_settings
+from app.tts.piper_engine import REGIONAL
 from app.llm.ollama_adapter import OllamaAdapter
 from app.llm.prompt import FALLBACK_REPLY
 from app.main import create_app
@@ -39,7 +40,7 @@ pytestmark = [
     pytest.mark.integration,
     pytest.mark.skipif(not _ollama_ready(), reason=f"Ollama with {settings.llm_model} not available"),
     pytest.mark.skipif(
-        not (settings.voices_dir / f"{settings.default_voice}.onnx").exists(),
+        not (settings.voices_dir / f"{REGIONAL[settings.default_voice].model}.onnx").exists(),
         reason="run scripts/download_voices.sh first",
     ),
 ]
@@ -121,12 +122,18 @@ def test_first_greeting_is_not_treated_as_a_repeat(client, greeting):
 
 
 def test_no_invented_life_or_robotic_small_talk(client):
+    """Sampled replies vary, so this checks rates over 6 replies, not one: never an invented life,
+    and robotic phrasing at most twice. The base model's measured robotic rate is ~8%, so allowing
+    one would fail ~8% of runs by chance; two keeps false alarms near 1% (training/README.md)."""
+    robotic = 0
     for prompt in ("How are you?", "What did you do this morning?"):
-        _, done = chat_stream(client, [{"role": "user", "content": prompt}])
-        print(f"\n  {prompt} → {done['text']}")
-        text = done["text"].lower()
-        assert "computer program" not in text and "don't have feelings" not in text
-        assert not re.search(r"\b(just got back|went for a walk|i live in)\b", text), done["text"]
+        for _ in range(3):
+            _, done = chat_stream(client, [{"role": "user", "content": prompt}])
+            print(f"\n  {prompt} → {done['text']}")
+            text = done["text"].lower()
+            robotic += bool(re.search(r"computer program|don't have feelings|collection of code", text))
+            assert not re.search(r"\b(just got back|went for a walk|i live in)\b", text), done["text"]
+    assert robotic <= 2, f"{robotic} of 6 replies sounded robotic"
 
 
 @pytest.mark.parametrize("prompt", [
@@ -171,6 +178,32 @@ def test_long_conversation_is_trimmed_within_context(client):
     assert done2["turns_dropped"] == done["turns_dropped"]
 
 
+def test_rolling_memory_keeps_facts_from_dropped_turns(client):
+    """Turn 0 is pushed out of the context window; the memory note brings its facts back."""
+    history = [{"role": "user", "content": "Hi, I'm Priyanka and my spaniel is called Biscuit."},
+               {"role": "assistant", "content": "Lovely to meet you, Priyanka, and Biscuit too!"}]
+    filler = "Tell me something about British tea culture and afternoon traditions please."
+    for i in range(70):
+        history += [{"role": "user", "content": f"Turn {i}. {filler}"},
+                    {"role": "assistant", "content": f"In turn {i}, scones with clotted cream. Milk in yours?"}]
+    history.append({"role": "user", "content": "Remind me: what's my name, and what's my dog called?"})
+
+    _, done = chat_stream(client, history)
+    dropped = done["turns_dropped"]
+    assert dropped > 1  # turn 0 is no longer in the window...
+    assert "biscuit" not in done["text"].lower()  # ...so without a note the model cannot know
+
+    r = timed("memory: fold dropped turns into the note",
+              lambda: client.post("/api/memory", json={"messages": history, "upto": dropped}))
+    assert r.status_code == 200, r.text
+    memory = r.json()
+    assert memory["turns"] == dropped and "priyanka" in memory["note"].lower(), memory
+
+    r = client.post("/api/chat/stream", json={"messages": history, "memory": memory})
+    text = parse_sse(r.text)[-1][1]["text"].lower()
+    assert "priyanka" in text and "biscuit" in text, text
+
+
 # --- 3. TTS layer ---------------------------------------------------------------
 
 def test_every_installed_voice_speaks(client):
@@ -181,7 +214,7 @@ def test_every_installed_voice_speaks(client):
             "/api/tts", json={"text": "Good afternoon, lovely to meet you.", "voice": v["id"]}))
         assert r.status_code == 200 and r.headers["content-type"] == "audio/wav"
         rate, seconds = wav_info(r.content)
-        assert rate in (16000, 22050) and 1.0 < seconds < 5.0, (v["id"], rate, seconds)
+        assert rate in (16000, 22050, 24000) and 1.0 < seconds < 5.0, (v["id"], rate, seconds)  # Kokoro: 24 kHz
 
 
 def test_tts_normalisation_changes_audio(client):

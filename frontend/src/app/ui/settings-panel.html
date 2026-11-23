@@ -17,8 +17,13 @@
 <section class="group" [attr.aria-labelledby]="uid + '-voice'">
   <h2 [id]="uid + '-voice'" class="group-title">Voice</h2>
   @if (status.voices().length) {
-    <div class="voices" role="radiogroup" [attr.aria-labelledby]="uid + '-voice'">
-      @for (v of status.voices(); track v.id) {
+    @for (g of voiceGroups(); track g.id) {
+    @if (voiceGroups().length > 1) {
+      <h3 class="voice-group" [id]="uid + '-voice-' + g.id">{{ g.title }}</h3>
+    }
+    <div class="voices" role="radiogroup"
+         [attr.aria-labelledby]="voiceGroups().length > 1 ? uid + '-voice ' + uid + '-voice-' + g.id : uid + '-voice'">
+      @for (v of g.voices; track v.id) {
         <div class="voice" [class.selected]="selectedVoice() === v.id">
           <button type="button" class="voice-pick" role="radio" [attr.aria-checked]="selectedVoice() === v.id"
                   (click)="chooseVoice(v.id)">
@@ -33,6 +38,7 @@
         </div>
       }
     </div>
+    }
   } @else {
     <p class="empty">{{ status.connection() === 'checking' ? 'Loading voices…' : 'No voices available.' }}</p>
   }
@@ -45,7 +51,25 @@
     <span>Speak replies aloud</span>
     <span class="switch" aria-hidden="true"><span class="knob"></span></span>
   </button>
+  <button type="button" class="switch-row" role="switch" [attr.aria-checked]="settings.naturalPauses()"
+          [disabled]="!settings.speechEnabled()" (click)="settings.naturalPauses.set(!settings.naturalPauses())">
+    <span>Natural pauses and breaths</span>
+    <span class="switch" aria-hidden="true"><span class="knob"></span></span>
+  </button>
 </section>
+
+@if (status.models().length > 1) {
+  <section class="group" [attr.aria-labelledby]="uid + '-model'">
+    <h2 [id]="uid + '-model'" class="group-title">Model</h2>
+    <div class="segmented" role="radiogroup" [attr.aria-labelledby]="uid + '-model'">
+      @for (m of status.models(); track m) {
+        <button type="button" role="radio" [attr.aria-checked]="selectedModel() === m" [title]="m"
+                (click)="chooseModel(m)">{{ modelLabel(m) }}</button>
+      }
+    </div>
+    <p class="hint">{{ modelHint() }}</p>
+  </section>
+}
 
 <section class="group" [attr.aria-labelledby]="uid + '-theme'">
   <h2 [id]="uid + '-theme'" class="group-title">Appearance</h2>

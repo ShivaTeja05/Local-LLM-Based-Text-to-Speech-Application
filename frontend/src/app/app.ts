@@ -6,6 +6,7 @@ import { expressionFor } from './core/expression';
 import { AvatarState } from './core/models';
 import { SettingsService } from './core/settings.service';
 import { StatusService } from './core/status.service';
+import { VoiceInputService } from './core/voice-input.service';
 import { Avatar } from './ui/avatar';
 import { Conversation } from './ui/conversation';
 import { Icon } from './ui/icon';
@@ -23,6 +24,7 @@ export class App {
   protected readonly player = inject(AudioPlayerService);
   protected readonly settings = inject(SettingsService);
   protected readonly status = inject(StatusService);
+  protected readonly voice = inject(VoiceInputService);
 
   private readonly sheet = viewChild.required<ElementRef<HTMLDialogElement>>('sheet');
   protected readonly drafting = signal(false);
@@ -40,22 +42,26 @@ export class App {
     const h = this.status.health();
     switch (this.status.connection()) {
       case 'checking':
-        return 'Connecting to the local model…';
+        return this.status.waking()
+          ? 'Waking Ellie up… after a quiet spell, the first visit takes up to a minute.'
+          : 'Connecting to the local model…';
       case 'offline':
-        return "Ellie can't reach her backend. Start it on port 8000, then try again.";
+        return "Ellie can't reach her backend just now. Please try again in a minute.";
       case 'degraded':
         return h?.llm.ok
           ? `Ellie can write with ${h.llm.model}, but speech is unavailable.`
           : "Ellie's language model isn't available right now.";
       default:
-        return `Ellie runs on this computer, with ${h?.llm.model} and the ${this.status.voiceLabel(this.settings.voiceId())} voice.`;
+        return `Ellie runs privately, with ${h?.llm.model} and the ${this.status.voiceLabel(this.settings.voiceId())} voice, with no cloud AI services.`;
     }
   });
 
   protected readonly avatarState = computed<AvatarState>(() => {
+    if (this.voice.state() === 'recording') return 'listening';
     if (this.player.sounding()) return 'speaking';
     if (this.chat.generating() || this.player.isSpeaking() || this.chat.preparingId()) return 'thinking';
     if (this.chat.lastAssistant()?.state === 'error') return 'error';
+    if (this.voice.state() === 'transcribing') return 'thinking';
     if (this.drafting()) return 'listening';
     return 'idle';
   });
@@ -67,8 +73,10 @@ export class App {
   protected readonly stageLine = computed(() => {
     switch (this.avatarState()) {
       case 'speaking': return 'Speaking';
-      case 'thinking': return this.chat.generating() ? 'Thinking…' : 'Getting ready to speak…';
-      case 'listening': return 'Listening';
+      case 'thinking':
+        if (this.voice.state() === 'transcribing') return 'Writing down what you said…';
+        return this.chat.generating() ? 'Thinking…' : 'Getting ready to speak…';
+      case 'listening': return this.voice.state() === 'recording' ? 'Listening to you…' : 'Listening';
       case 'error': return 'Something went wrong';
       default: return this.settings.speechEnabled() ? 'Ready when you are' : 'Ready · speech is off';
     }

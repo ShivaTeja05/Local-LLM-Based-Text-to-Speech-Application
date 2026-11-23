@@ -1,0 +1,586 @@
+[     0s] GPU: Tesla T4 (compute 7.5) -> Unsloth
+[     0s] $ pip install -q unsloth==2026.11.9 unsloth-zoo==2026.11.9
+W1122 17:55:35.816000 565 torch/utils/_pytree.py:630] <enum 'KernelPreference'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+W1122 17:55:35.857000 565 torch/utils/_pytree.py:630] <enum 'ScaleCalculationMode'> is an Enum subclass and is now natively supported by torch.compile as an opaque value type. Calling register_constant() on Enum subclasses is deprecated and will be an error in a future release.
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+Unsloth: xformers is installed but cannot load with torch 2.14.1+cu130, so PyTorch attention is used instead.
+To install a matching xformers, run `unsloth install-kernels xformers`, or `pip uninstall xformers` to hide this. UNSLOTH_ENABLE_LOGGING=1 shows the full error.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+[    85s] torch 2.14.1+cu130 (CUDA 13.0), GPU: Tesla T4
+[    85s] data: 855 train, 94 val conversations
+==((====))==  Unsloth 2026.11.9: Fast Llama patching. Transformers: 5.17.0.
+   \\   /|    Tesla T4. Num GPUs = 1. Max memory: 14.563 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.14.1+cu130. CUDA: 7.5. CUDA Toolkit: 13.0. Triton: 3.8.0
+\        /    Bfloat16 = FALSE. FA [Xformers = None. FA2 = False]
+ "-____-"     Free license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+/usr/local/lib/python3.13/dist-packages/huggingface_hub/constants.py:302: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/usr/local/lib/python3.13/dist-packages/huggingface_hub/constants.py:302: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:   0%|          | 1/254 [00:06<26:00,  6.17s/it]Loading weights:  30%|███       | 77/254 [00:06<00:10, 17.36it/s]Loading weights:  48%|████▊     | 121/254 [00:09<00:08, 15.99it/s]Loading weights:  57%|█████▋    | 146/254 [00:11<00:07, 14.88it/s]Loading weights:  64%|██████▍   | 162/254 [00:12<00:06, 13.73it/s]Loading weights:  68%|██████▊   | 173/254 [00:13<00:05, 13.70it/s]Loading weights:  71%|███████▏  | 181/254 [00:14<00:05, 12.38it/s]Loading weights:  74%|███████▎  | 187/254 [00:15<00:06, 10.83it/s]Loading weights:  76%|███████▌  | 192/254 [00:16<00:05, 10.94it/s]Loading weights:  77%|███████▋  | 195/254 [00:16<00:05, 10.69it/s]Loading weights:  79%|███████▉  | 201/254 [00:16<00:04, 11.48it/s]Loading weights:  80%|████████  | 204/254 [00:17<00:04, 10.69it/s]Loading weights:  83%|████████▎ | 210/254 [00:17<00:03, 11.52it/s]Loading weights:  83%|████████▎ | 212/254 [00:18<00:04,  9.99it/s]Loading weights:  86%|████████▌ | 219/254 [00:18<00:02, 11.82it/s]Loading weights:  87%|████████▋ | 221/254 [00:18<00:03, 10.15it/s]Loading weights:  90%|████████▉ | 228/254 [00:19<00:02, 12.15it/s]Loading weights:  91%|█████████ | 230/254 [00:19<00:02, 10.27it/s]Loading weights:  93%|█████████▎| 237/254 [00:19<00:01, 12.34it/s]Loading weights:  94%|█████████▍| 239/254 [00:20<00:01, 10.33it/s]Loading weights:  97%|█████████▋| 246/254 [00:20<00:00, 12.34it/s]Loading weights:  98%|█████████▊| 248/254 [00:21<00:00, 10.08it/s]Loading weights: 100%|██████████| 254/254 [00:21<00:00, 11.97it/s]
+Unsloth: Will load unsloth/Llama-3.2-3B-Instruct as a legacy tokenizer.
+Unsloth 2026.11.9 patched 28 layers with 28 QKV layers, 28 O layers and 28 MLP layers.
+Unsloth: compiling each transformer block as one region (LlamaDecoderLayer).
+[   183s] tokens per example: avg 122, max 273
+[   183s] 214 optimiser steps over 2 epochs
+==((====))==  Unsloth - 2x faster free finetuning | Num GPUs used = 1
+   \\   /|    Num examples = 855 | Num Epochs = 2 | Total steps = 214
+O^O/ \_/ \    Batch size per device = 4 | Gradient accumulation steps = 2
+\        /    Data Parallel GPUs = 1 | Total batch size (4 x 2 x 1) = 8
+ "-____-"     Trainable parameters = 24,313,856 of 3,237,063,680 (0.75% trained)
+  0%|          | 0/214 [00:00<?, ?it/s]  0%|          | 1/214 [00:30<1:49:18, 30.79s/it]  1%|          | 2/214 [00:32<47:47, 13.52s/it]    1%|▏         | 3/214 [00:33<27:58,  7.96s/it]  2%|▏         | 4/214 [00:35<19:20,  5.53s/it]  2%|▏         | 5/214 [00:36<13:49,  3.97s/it]  3%|▎         | 6/214 [00:37<10:33,  3.04s/it]  3%|▎         | 7/214 [00:39<08:51,  2.57s/it]  4%|▎         | 8/214 [00:40<07:27,  2.17s/it]  4%|▍         | 9/214 [00:42<07:21,  2.15s/it]  5%|▍         | 10/214 [00:43<06:07,  1.80s/it]                                                  5%|▍         | 10/214 [00:43<06:07,  1.80s/it]  5%|▌         | 11/214 [00:45<05:32,  1.64s/it]  6%|▌         | 12/214 [00:46<04:50,  1.44s/it]  6%|▌         | 13/214 [00:47<04:53,  1.46s/it]  7%|▋         | 14/214 [00:49<05:07,  1.54s/it]  7%|▋         | 15/214 [00:50<05:03,  1.53s/it]  7%|▋         | 16/214 [00:52<04:48,  1.46s/it]  8%|▊         | 17/214 [00:53<04:50,  1.48s/it]  8%|▊         | 18/214 [00:55<05:22,  1.64s/it]  9%|▉         | 19/214 [00:57<05:12,  1.60s/it]  9%|▉         | 20/214 [00:58<04:54,  1.52s/it]                                                  9%|▉         | 20/214 [00:58<04:54,  1.52s/it] 10%|▉         | 21/214 [01:00<05:10,  1.61s/it] 10%|█         | 22/214 [01:01<04:40,  1.46s/it] 11%|█         | 23/214 [01:03<04:53,  1.54s/it] 11%|█         | 24/214 [01:04<04:42,  1.49s/it] 12%|█▏        | 25/214 [01:06<04:55,  1.56s/it] 12%|█▏        | 26/214 [01:08<05:09,  1.65s/it] 13%|█▎        | 27/214 [01:09<05:07,  1.64s/it] 13%|█▎        | 28/214 [01:11<05:23,  1.74s/it] 14%|█▎        | 29/214 [01:13<05:11,  1.69s/it] 14%|█▍        | 30/214 [01:14<05:02,  1.64s/it]                                                 14%|█▍        | 30/214 [01:14<05:02,  1.64s/it] 14%|█▍        | 31/214 [01:16<05:19,  1.74s/it] 15%|█▍        | 32/214 [01:18<05:29,  1.81s/it] 15%|█▌        | 33/214 [01:20<05:15,  1.74s/it] 16%|█▌        | 34/214 [01:22<05:16,  1.76s/it] 16%|█▋        | 35/214 [01:23<04:54,  1.64s/it] 17%|█▋        | 36/214 [01:25<04:53,  1.65s/it] 17%|█▋        | 37/214 [01:26<04:31,  1.54s/it] 18%|█▊        | 38/214 [01:28<04:58,  1.69s/it] 18%|█▊        | 39/214 [01:30<05:07,  1.75s/it] 19%|█▊        | 40/214 [01:32<04:57,  1.71s/it]                                                 19%|█▊        | 40/214 [01:32<04:57,  1.71s/it] 19%|█▉        | 41/214 [01:34<05:17,  1.83s/it] 20%|█▉        | 42/214 [01:35<04:52,  1.70s/it] 20%|██        | 43/214 [01:37<04:42,  1.65s/it] 21%|██        | 44/214 [01:38<04:47,  1.69s/it] 21%|██        | 45/214 [01:40<04:37,  1.64s/it] 21%|██▏       | 46/214 [01:41<04:31,  1.62s/it] 22%|██▏       | 47/214 [01:43<04:35,  1.65s/it] 22%|██▏       | 48/214 [01:45<05:00,  1.81s/it] 23%|██▎       | 49/214 [01:47<04:38,  1.69s/it] 23%|██▎       | 50/214 [01:49<04:47,  1.75s/it]                                                 23%|██▎       | 50/214 [01:49<04:47,  1.75s/it] 24%|██▍       | 51/214 [01:50<04:41,  1.73s/it] 24%|██▍       | 52/214 [01:52<04:33,  1.69s/it] 25%|██▍       | 53/214 [01:54<04:33,  1.70s/it] 25%|██▌       | 54/214 [01:55<04:35,  1.72s/it] 26%|██▌       | 55/214 [01:57<04:14,  1.60s/it] 26%|██▌       | 56/214 [01:58<04:02,  1.53s/it] 27%|██▋       | 57/214 [02:00<04:09,  1.59s/it] 27%|██▋       | 58/214 [02:01<03:56,  1.52s/it] 28%|██▊       | 59/214 [02:03<04:09,  1.61s/it] 28%|██▊       | 60/214 [02:05<04:12,  1.64s/it]                                                 28%|██▊       | 60/214 [02:05<04:12,  1.64s/it] 29%|██▊       | 61/214 [02:06<03:51,  1.51s/it] 29%|██▉       | 62/214 [02:07<03:43,  1.47s/it] 29%|██▉       | 63/214 [02:09<03:46,  1.50s/it] 30%|██▉       | 64/214 [02:11<03:56,  1.57s/it] 30%|███       | 65/214 [02:12<03:38,  1.46s/it] 31%|███       | 66/214 [02:13<03:44,  1.51s/it] 31%|███▏      | 67/214 [02:15<03:57,  1.61s/it] 32%|███▏      | 68/214 [02:17<04:00,  1.65s/it] 32%|███▏      | 69/214 [02:19<04:02,  1.67s/it] 33%|███▎      | 70/214 [02:20<03:35,  1.50s/it]                                                 33%|███▎      | 70/214 [02:20<03:35,  1.50s/it] 33%|███▎      | 71/214 [02:34<12:23,  5.20s/it] 34%|███▎      | 72/214 [02:35<09:44,  4.11s/it] 34%|███▍      | 73/214 [02:37<07:42,  3.28s/it] 35%|███▍      | 74/214 [02:38<06:32,  2.80s/it] 35%|███▌      | 75/214 [02:40<05:37,  2.43s/it] 36%|███▌      | 76/214 [02:42<05:11,  2.25s/it] 36%|███▌      | 77/214 [02:44<04:50,  2.12s/it] 36%|███▋      | 78/214 [02:45<04:33,  2.01s/it] 37%|███▋      | 79/214 [02:46<03:58,  1.77s/it] 37%|███▋      | 80/214 [02:48<03:40,  1.65s/it]                                                 37%|███▋      | 80/214 [02:48<03:40,  1.65s/it] 38%|███▊      | 81/214 [02:49<03:27,  1.56s/it] 38%|███▊      | 82/214 [02:51<03:28,  1.58s/it] 39%|███▉      | 83/214 [02:53<03:48,  1.74s/it] 39%|███▉      | 84/214 [02:55<03:43,  1.72s/it] 40%|███▉      | 85/214 [02:56<03:25,  1.59s/it] 40%|████      | 86/214 [02:58<03:31,  1.65s/it] 41%|████      | 87/214 [03:00<03:57,  1.87s/it] 41%|████      | 88/214 [03:02<03:55,  1.87s/it] 42%|████▏     | 89/214 [03:04<03:51,  1.85s/it] 42%|████▏     | 90/214 [03:06<04:03,  1.96s/it]                                                 42%|████▏     | 90/214 [03:06<04:03,  1.96s/it] 43%|████▎     | 91/214 [03:08<04:06,  2.00s/it] 43%|████▎     | 92/214 [03:10<03:53,  1.92s/it] 43%|████▎     | 93/214 [03:12<03:50,  1.91s/it] 44%|████▍     | 94/214 [03:13<03:41,  1.84s/it] 44%|████▍     | 95/214 [03:15<03:45,  1.89s/it] 45%|████▍     | 96/214 [03:18<03:55,  2.00s/it] 45%|████▌     | 97/214 [03:19<03:42,  1.90s/it] 46%|████▌     | 98/214 [03:21<03:34,  1.85s/it] 46%|████▋     | 99/214 [03:23<03:28,  1.81s/it] 47%|████▋     | 100/214 [03:25<03:34,  1.88s/it]                                                  47%|████▋     | 100/214 [03:25<03:34,  1.88s/it] 47%|████▋     | 101/214 [03:26<03:11,  1.69s/it] 48%|████▊     | 102/214 [03:28<03:03,  1.64s/it] 48%|████▊     | 103/214 [03:29<02:53,  1.56s/it] 49%|████▊     | 104/214 [03:31<02:53,  1.58s/it] 49%|████▉     | 105/214 [03:32<02:53,  1.59s/it] 50%|████▉     | 106/214 [03:34<02:57,  1.64s/it] 50%|█████     | 107/214 [03:35<02:34,  1.44s/it]Unsloth: Will smartly offload gradients to save VRAM!
+Unsloth: Double buffering enabled (parallel H2D + compute) for backward pass.
+{'loss': '2.386', 'grad_norm': '1.649', 'learning_rate': '8.182e-05', 'epoch': '0.09346'}
+{'loss': '1.923', 'grad_norm': '1.316', 'learning_rate': '9.962e-05', 'epoch': '0.1869'}
+{'loss': '1.607', 'grad_norm': '1.434', 'learning_rate': '9.807e-05', 'epoch': '0.2804'}
+{'loss': '1.515', 'grad_norm': '1.494', 'learning_rate': '9.538e-05', 'epoch': '0.3738'}
+{'loss': '1.442', 'grad_norm': '1.281', 'learning_rate': '9.16e-05', 'epoch': '0.4673'}
+{'loss': '1.51', 'grad_norm': '1.574', 'learning_rate': '8.683e-05', 'epoch': '0.5607'}
+{'loss': '1.416', 'grad_norm': '1.739', 'learning_rate': '8.117e-05', 'epoch': '0.6542'}
+{'loss': '1.44', 'grad_norm': '1.654', 'learning_rate': '7.478e-05', 'epoch': '0.7477'}
+{'loss': '1.45', 'grad_norm': '1.444', 'learning_rate': '6.779e-05', 'epoch': '0.8411'}
+{'loss': '1.408', 'grad_norm': '1.197', 'learning_rate': '6.037e-05', 'epoch': '0.9346'}
+
+  0%|          | 0/12 [00:00<?, ?it/s][A
+ 17%|█▋        | 2/12 [00:00<00:03,  2.98it/s][A
+ 25%|██▌       | 3/12 [00:01<00:04,  2.08it/s][A
+ 33%|███▎      | 4/12 [00:01<00:04,  1.98it/s][A
+ 42%|████▏     | 5/12 [00:02<00:04,  1.63it/s][A
+ 50%|█████     | 6/12 [00:03<00:03,  1.65it/s][A
+ 58%|█████▊    | 7/12 [00:03<00:03,  1.58it/s][A
+ 67%|██████▋   | 8/12 [00:04<00:02,  1.58it/s][A
+ 75%|███████▌  | 9/12 [00:05<00:01,  1.66it/s][A
+ 83%|████████▎ | 10/12 [00:05<00:01,  1.57it/s][A
+ 92%|█████████▏| 11/12 [00:06<00:00,  1.63it/s][A
+100%|██████████| 12/12 [00:06<00:00,  1.71it/s][A                                                 
+                                               [A 50%|█████     | 107/214 [03:43<02:34,  1.44s/it]
+100%|██████████| 12/12 [00:06<00:00,  1.71it/s][A
+                                               [A 50%|█████     | 108/214 [03:46<07:42,  4.36s/it] 51%|█████     | 109/214 [03:48<06:19,  3.62s/it] 51%|█████▏    | 110/214 [03:50<05:13,  3.01s/it]                                                  51%|█████▏    | 110/214 [03:50<05:13,  3.01s/it] 52%|█████▏    | 111/214 [03:51<04:19,  2.52s/it] 52%|█████▏    | 112/214 [03:53<04:00,  2.36s/it] 53%|█████▎    | 113/214 [03:54<03:28,  2.06s/it] 53%|█████▎    | 114/214 [03:56<03:05,  1.85s/it] 54%|█████▎    | 115/214 [03:58<03:03,  1.86s/it] 54%|█████▍    | 116/214 [03:59<03:01,  1.85s/it] 55%|█████▍    | 117/214 [04:01<02:50,  1.76s/it] 55%|█████▌    | 118/214 [04:02<02:40,  1.67s/it] 56%|█████▌    | 119/214 [04:04<02:27,  1.55s/it] 56%|█████▌    | 120/214 [04:06<02:36,  1.66s/it]                                                  56%|█████▌    | 120/214 [04:06<02:36,  1.66s/it] 57%|█████▋    | 121/214 [04:07<02:30,  1.62s/it] 57%|█████▋    | 122/214 [04:09<02:36,  1.70s/it] 57%|█████▋    | 123/214 [04:10<02:18,  1.52s/it] 58%|█████▊    | 124/214 [04:12<02:16,  1.51s/it] 58%|█████▊    | 125/214 [04:13<02:24,  1.62s/it] 59%|█████▉    | 126/214 [04:15<02:17,  1.56s/it] 59%|█████▉    | 127/214 [04:16<02:13,  1.53s/it] 60%|█████▉    | 128/214 [04:18<02:16,  1.59s/it] 60%|██████    | 129/214 [04:19<02:11,  1.54s/it] 61%|██████    | 130/214 [04:22<02:29,  1.77s/it]                                                  61%|██████    | 130/214 [04:22<02:29,  1.77s/it] 61%|██████    | 131/214 [04:23<02:24,  1.75s/it] 62%|██████▏   | 132/214 [04:25<02:15,  1.65s/it] 62%|██████▏   | 133/214 [04:26<02:11,  1.62s/it] 63%|██████▎   | 134/214 [04:28<02:06,  1.58s/it] 63%|██████▎   | 135/214 [04:30<02:13,  1.68s/it] 64%|██████▎   | 136/214 [04:32<02:16,  1.75s/it] 64%|██████▍   | 137/214 [04:33<02:06,  1.64s/it] 64%|██████▍   | 138/214 [04:35<02:07,  1.68s/it] 65%|██████▍   | 139/214 [04:36<01:59,  1.59s/it] 65%|██████▌   | 140/214 [04:38<02:02,  1.66s/it]                                                  65%|██████▌   | 140/214 [04:38<02:02,  1.66s/it] 66%|██████▌   | 141/214 [04:40<02:06,  1.73s/it] 66%|██████▋   | 142/214 [04:42<02:07,  1.77s/it] 67%|██████▋   | 143/214 [04:43<01:58,  1.66s/it] 67%|██████▋   | 144/214 [04:45<01:55,  1.65s/it] 68%|██████▊   | 145/214 [04:47<01:55,  1.68s/it] 68%|██████▊   | 146/214 [04:48<01:56,  1.72s/it] 69%|██████▊   | 147/214 [04:50<01:49,  1.63s/it] 69%|██████▉   | 148/214 [04:52<01:47,  1.64s/it] 70%|██████▉   | 149/214 [04:53<01:46,  1.63s/it] 70%|███████   | 150/214 [04:55<01:40,  1.57s/it]                                                  70%|███████   | 150/214 [04:55<01:40,  1.57s/it] 71%|███████   | 151/214 [04:56<01:33,  1.49s/it] 71%|███████   | 152/214 [04:58<01:43,  1.67s/it] 71%|███████▏  | 153/214 [05:00<01:40,  1.65s/it] 72%|███████▏  | 154/214 [05:01<01:32,  1.54s/it] 72%|███████▏  | 155/214 [05:02<01:30,  1.54s/it] 73%|███████▎  | 156/214 [05:04<01:32,  1.59s/it] 73%|███████▎  | 157/214 [05:06<01:35,  1.68s/it] 74%|███████▍  | 158/214 [05:07<01:29,  1.59s/it] 74%|███████▍  | 159/214 [05:09<01:30,  1.64s/it] 75%|███████▍  | 160/214 [05:10<01:23,  1.55s/it]                                                  75%|███████▍  | 160/214 [05:10<01:23,  1.55s/it] 75%|███████▌  | 161/214 [05:12<01:26,  1.64s/it] 76%|███████▌  | 162/214 [05:14<01:21,  1.56s/it] 76%|███████▌  | 163/214 [05:15<01:19,  1.56s/it] 77%|███████▋  | 164/214 [05:17<01:20,  1.61s/it] 77%|███████▋  | 165/214 [05:19<01:19,  1.63s/it] 78%|███████▊  | 166/214 [05:20<01:08,  1.43s/it] 78%|███████▊  | 167/214 [05:21<01:06,  1.42s/it] 79%|███████▊  | 168/214 [05:23<01:06,  1.45s/it] 79%|███████▉  | 169/214 [05:24<01:04,  1.43s/it] 79%|███████▉  | 170/214 [05:26<01:06,  1.52s/it]                                                  79%|███████▉  | 170/214 [05:26<01:06,  1.52s/it] 80%|███████▉  | 171/214 [05:27<01:05,  1.52s/it] 80%|████████  | 172/214 [05:29<01:03,  1.51s/it] 81%|████████  | 173/214 [05:30<01:01,  1.51s/it] 81%|████████▏ | 174/214 [05:32<01:06,  1.66s/it] 82%|████████▏ | 175/214 [05:34<01:03,  1.64s/it] 82%|████████▏ | 176/214 [05:36<01:05,  1.73s/it] 83%|████████▎ | 177/214 [05:37<01:00,  1.63s/it] 83%|████████▎ | 178/214 [05:38<00:53,  1.48s/it] 84%|████████▎ | 179/214 [05:40<00:53,  1.54s/it] 84%|████████▍ | 180/214 [05:42<00:53,  1.57s/it]                                                  84%|████████▍ | 180/214 [05:42<00:53,  1.57s/it] 85%|████████▍ | 181/214 [05:43<00:51,  1.55s/it] 85%|████████▌ | 182/214 [05:44<00:46,  1.47s/it] 86%|████████▌ | 183/214 [05:46<00:44,  1.44s/it] 86%|████████▌ | 184/214 [05:47<00:46,  1.54s/it] 86%|████████▋ | 185/214 [05:49<00:43,  1.50s/it] 87%|████████▋ | 186/214 [05:50<00:39,  1.43s/it] 87%|████████▋ | 187/214 [05:52<00:40,  1.50s/it] 88%|████████▊ | 188/214 [05:53<00:35,  1.38s/it] 88%|████████▊ | 189/214 [05:54<00:33,  1.36s/it] 89%|████████▉ | 190/214 [05:56<00:33,  1.40s/it]                                                  89%|████████▉ | 190/214 [05:56<00:33,  1.40s/it] 89%|████████▉ | 191/214 [05:57<00:30,  1.34s/it] 90%|████████▉ | 192/214 [05:59<00:34,  1.56s/it] 90%|█████████ | 193/214 [06:01<00:34,  1.62s/it] 91%|█████████ | 194/214 [06:02<00:32,  1.64s/it] 91%|█████████ | 195/214 [06:04<00:30,  1.61s/it] 92%|█████████▏| 196/214 [06:06<00:28,  1.61s/it] 92%|█████████▏| 197/214 [06:07<00:27,  1.62s/it] 93%|█████████▎| 198/214 [06:09<00:28,  1.80s/it] 93%|█████████▎| 199/214 [06:11<00:27,  1.86s/it] 93%|█████████▎| 200/214 [06:13<00:24,  1.72s/it]                                                  93%|█████████▎| 200/214 [06:13<00:24,  1.72s/it] 94%|█████████▍| 201/214 [06:15<00:24,  1.86s/it] 94%|█████████▍| 202/214 [06:16<00:19,  1.64s/it] 95%|█████████▍| 203/214 [06:18<00:17,  1.57s/it] 95%|█████████▌| 204/214 [06:19<00:16,  1.64s/it] 96%|█████████▌| 205/214 [06:21<00:14,  1.65s/it] 96%|█████████▋| 206/214 [06:23<00:13,  1.72s/it] 97%|█████████▋| 207/214 [06:25<00:12,  1.79s/it] 97%|█████████▋| 208/214 [06:27<00:11,  1.84s/it] 98%|█████████▊| 209/214 [06:28<00:07,  1.60s/it] 98%|█████████▊| 210/214 [06:30<00:06,  1.71s/it]                                                  98%|█████████▊| 210/214 [06:30<00:06,  1.71s/it] 99%|█████████▊| 211/214 [06:31<00:05,  1.68s/it] 99%|█████████▉| 212/214 [06:33<00:03,  1.68s/it]100%|█████████▉| 213/214 [06:35<00:01,  1.62s/it]100%|██████████| 214/214 [06:36<00:00,  1.45s/it]{'eval_loss': '1.46', 'eval_runtime': '7.814', 'eval_samples_per_second': '12.03', 'eval_steps_per_second': '1.536', 'epoch': '1'}
+{'loss': '1.357', 'grad_norm': '1.289', 'learning_rate': '5.271e-05', 'epoch': '1.028'}
+{'loss': '1.191', 'grad_norm': '1.308', 'learning_rate': '4.498e-05', 'epoch': '1.121'}
+{'loss': '1.228', 'grad_norm': '1.468', 'learning_rate': '3.737e-05', 'epoch': '1.215'}
+{'loss': '1.156', 'grad_norm': '1.688', 'learning_rate': '3.006e-05', 'epoch': '1.308'}
+{'loss': '1.227', 'grad_norm': '1.86', 'learning_rate': '2.323e-05', 'epoch': '1.402'}
+{'loss': '1.215', 'grad_norm': '2.033', 'learning_rate': '1.704e-05', 'epoch': '1.495'}
+{'loss': '1.111', 'grad_norm': '1.841', 'learning_rate': '1.164e-05', 'epoch': '1.589'}
+{'loss': '1.118', 'grad_norm': '1.995', 'learning_rate': '7.157e-06', 'epoch': '1.682'}
+{'loss': '1.188', 'grad_norm': '2.202', 'learning_rate': '3.696e-06', 'epoch': '1.776'}
+{'loss': '1.144', 'grad_norm': '1.898', 'learning_rate': '1.341e-06', 'epoch': '1.869'}
+{'loss': '1.138', 'grad_norm': '1.715', 'learning_rate': '1.496e-07', 'epoch': '1.963'}
+
+  0%|          | 0/12 [00:00<?, ?it/s][A
+ 17%|█▋        | 2/12 [00:00<00:03,  2.84it/s][A
+ 25%|██▌       | 3/12 [00:01<00:04,  2.00it/s][A
+ 33%|███▎      | 4/12 [00:01<00:04,  1.89it/s][A
+ 42%|████▏     | 5/12 [00:02<00:04,  1.56it/s][A
+ 50%|█████     | 6/12 [00:03<00:03,  1.56it/s][A
+ 58%|█████▊    | 7/12 [00:04<00:03,  1.50it/s][A
+ 67%|██████▋   | 8/12 [00:04<00:02,  1.50it/s][A
+ 75%|███████▌  | 9/12 [00:05<00:01,  1.58it/s][A
+ 83%|████████▎ | 10/12 [00:06<00:01,  1.51it/s][A
+ 92%|█████████▏| 11/12 [00:06<00:00,  1.56it/s][A
+100%|██████████| 12/12 [00:07<00:00,  1.63it/s][A                                                 
+                                               [A100%|██████████| 214/214 [06:44<00:00,  1.45s/it]
+100%|██████████| 12/12 [00:07<00:00,  1.63it/s][A
+                                               [A                                                 100%|██████████| 214/214 [06:48<00:00,  1.45s/it]100%|██████████| 214/214 [06:48<00:00,  1.91s/it]
+{'eval_loss': '1.454', 'eval_runtime': '7.949', 'eval_samples_per_second': '11.82', 'eval_steps_per_second': '1.51', 'epoch': '2'}
+{'train_runtime': '408.7', 'train_samples_per_second': '4.184', 'train_steps_per_second': '0.524', 'train_loss': '1.387', 'epoch': '2'}
+[   592s] trained: {'train_runtime': 408.6639, 'train_samples_per_second': 4.184, 'train_steps_per_second': 0.524, 'total_flos': 4993035338840064.0, 'train_loss': 1.3872521502949366, 'epoch': 2.0}
+Unsloth: Restored added_tokens_decoder metadata in /content/ellie-out/ellie-lora/tokenizer_config.json.
+[   594s] $ rm -rf /content/ellie-out/run
+[   594s] adapter saved
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[   655s] adapter with the one-line prompt: {'correct_%': 100.0, 'replies': 40, 'clean_%': 77.5, 'american_%': 2.5, 'too_long_%': 5.0, 'markdown_%': 0.0, 'emoji_%': 0.0, 'invented_life_%': 0.0, 'robotic_%': 0.0, 'cut_off_%': 0.0, 'unhelpful_%': 15.0, 'ends_question_%': 85.0, 'avg_words': 33.8, 'lovely_per_reply': 0.33}
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=160) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+[   930s] base with the one-line prompt: {'correct_%': 100.0, 'replies': 40, 'clean_%': 2.5, 'american_%': 2.5, 'too_long_%': 97.5, 'markdown_%': 15.0, 'emoji_%': 0.0, 'invented_life_%': 12.5, 'robotic_%': 2.5, 'cut_off_%': 37.5, 'unhelpful_%': 2.5, 'ends_question_%': 47.5, 'avg_words': 92.3, 'lovely_per_reply': 0.72}
+Unsloth: Restored added_tokens_decoder metadata in /tmp/ellie-merged/tokenizer_config.json.
+Found HuggingFace hub cache directory: /root/.cache/huggingface/hub
+Fetching 1 files:   0%|          | 0/1 [00:00<?, ?it/s]Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s]Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s]
+Checking cache directory for required files...
+Unsloth: Copying 2 files from cache to `/tmp/ellie-merged`:   0%|          | 0/2 [00:00<?, ?it/s]Unsloth: Copying 2 files from cache to `/tmp/ellie-merged`: 100%|██████████| 2/2 [00:00<00:00, 7307.15it/s]
+Successfully copied all 2 files from cache to `/tmp/ellie-merged`
+Checking cache directory for required files...
+Cache check failed: tokenizer.model not found in local cache.
+Not all required files found in cache. Will proceed with downloading.
+Unsloth: Preparing safetensor model files:   0%|          | 0/2 [00:00<?, ?it/s]Unsloth: Preparing safetensor model files: 100%|██████████| 2/2 [00:00<00:00, 8867.45it/s]
+Unsloth: Merging weights into 16bit:   0%|          | 0/2 [00:00<?, ?it/s]Unsloth: Merging weights into 16bit:  50%|█████     | 1/2 [01:06<01:06, 66.41s/it]Unsloth: Merging weights into 16bit: 100%|██████████| 2/2 [01:24<00:00, 37.72s/it]Unsloth: Merging weights into 16bit: 100%|██████████| 2/2 [01:24<00:00, 42.03s/it]
+Unsloth: Merge process complete. Saved to `/tmp/ellie-merged`
+[  1018s] merged model saved
+[  1018s] $ git clone -q --depth 1 https://github.com/ggml-org/llama.cpp /tmp/llama.cpp
+[  1023s] $ pip install -q /tmp/llama.cpp/gguf-py
+[  1030s] $ python /tmp/llama.cpp/convert_hf_to_gguf.py /tmp/ellie-merged --outtype f16 --outfile /tmp/ellie-f16.gguf
+/usr/local/lib/python3.13/dist-packages/huggingface_hub/constants.py:302: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+INFO:hf-to-gguf:Loading model: ellie-merged
+INFO:numexpr.utils:NumExpr defaulting to 2 threads.
+INFO:hf-to-gguf:Model architecture: LlamaForCausalLM
+INFO:hf-to-gguf:gguf: loading model weight map from 'model.safetensors.index.json'
+INFO:hf-to-gguf:gguf: indexing model part 'model-00001-of-00002.safetensors'
+INFO:hf-to-gguf:gguf: indexing model part 'model-00002-of-00002.safetensors'
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+INFO:hf-to-gguf:Exporting model...
+INFO:hf-to-gguf:rope_freqs.weight,           torch.float32 --> F32, shape = {64}
+INFO:hf-to-gguf:token_embd.weight,           torch.bfloat16 --> F16, shape = {3072, 128256}
+INFO:hf-to-gguf:blk.0.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.0.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.0.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.0.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.0.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.0.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.0.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.0.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.0.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.1.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.1.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.1.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.1.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.1.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.1.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.1.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.1.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.1.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.10.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.10.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.10.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.10.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.10.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.10.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.10.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.10.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.10.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.11.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.11.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.11.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.11.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.11.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.11.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.11.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.11.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.11.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.12.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.12.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.12.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.12.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.12.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.12.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.12.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.12.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.12.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.13.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.13.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.13.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.13.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.13.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.13.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.13.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.13.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.13.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.14.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.14.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.14.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.14.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.14.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.14.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.14.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.14.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.14.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.15.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.15.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.15.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.15.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.15.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.15.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.15.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.15.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.15.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.16.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.16.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.16.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.16.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.16.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.16.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.16.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.16.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.16.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.17.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.17.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.17.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.17.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.17.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.17.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.17.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.17.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.17.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.18.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.18.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.18.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.18.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.18.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.18.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.18.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.18.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.18.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.19.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.19.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.19.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.19.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.19.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.19.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.19.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.19.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.19.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.2.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.2.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.2.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.2.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.2.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.2.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.2.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.2.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.2.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.20.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.20.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.20.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.20.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.20.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.20.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.3.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.3.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.3.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.3.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.3.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.3.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.3.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.3.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.3.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.4.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.4.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.4.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.4.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.4.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.4.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.4.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.4.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.4.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.5.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.5.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.5.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.5.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.5.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.5.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.5.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.5.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.5.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.6.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.6.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.6.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.6.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.6.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.6.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.6.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.6.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.6.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.7.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.7.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.7.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.7.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.7.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.7.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.7.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.7.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.7.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.8.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.8.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.8.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.8.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.8.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.8.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.8.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.8.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.8.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.9.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.9.ffn_down.weight,       torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.9.ffn_gate.weight,       torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.9.ffn_up.weight,         torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.9.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.9.attn_k.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.9.attn_output.weight,    torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.9.attn_q.weight,         torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.9.attn_v.weight,         torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.20.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.20.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.20.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.21.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.21.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.21.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.21.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.21.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.21.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.21.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.21.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.21.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.22.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.22.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.22.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.22.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.22.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.22.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.22.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.22.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.22.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.23.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.23.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.23.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.23.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.23.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.23.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.23.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.23.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.23.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.24.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.24.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.24.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.24.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.24.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.24.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.24.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.24.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.24.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.25.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.25.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.25.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.25.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.25.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.25.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.25.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.25.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.25.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.26.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.26.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.26.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.26.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.26.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.26.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.26.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.26.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.26.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.27.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.27.ffn_down.weight,      torch.bfloat16 --> F16, shape = {8192, 3072}
+INFO:hf-to-gguf:blk.27.ffn_gate.weight,      torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.27.ffn_up.weight,        torch.bfloat16 --> F16, shape = {3072, 8192}
+INFO:hf-to-gguf:blk.27.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.27.attn_k.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.27.attn_output.weight,   torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.27.attn_q.weight,        torch.bfloat16 --> F16, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.27.attn_v.weight,        torch.bfloat16 --> F16, shape = {3072, 1024}
+INFO:hf-to-gguf:output_norm.weight,          torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:Set meta model
+INFO:hf-to-gguf:Set model parameters
+INFO:hf-to-gguf:gguf: context length = 131072
+INFO:hf-to-gguf:gguf: embedding length = 3072
+INFO:hf-to-gguf:gguf: feed forward length = 8192
+INFO:hf-to-gguf:gguf: head count = 24
+INFO:hf-to-gguf:gguf: key-value head count = 8
+INFO:hf-to-gguf:gguf: rope scaling type = NONE
+INFO:hf-to-gguf:gguf: rope theta = 500000.0
+INFO:hf-to-gguf:gguf: rms norm epsilon = 1e-05
+INFO:hf-to-gguf:gguf: file type = 1
+INFO:hf-to-gguf:Set model quantization version
+INFO:hf-to-gguf:Set model tokenizer
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+WARNING:gguf.vocab:Unknown separator token '<|begin_of_text|>' in TemplateProcessing<pair>
+INFO:gguf.vocab:Adding 280147 merge(s).
+INFO:gguf.vocab:Setting special token type bos to 128000
+INFO:gguf.vocab:Setting special token type eos to 128009
+INFO:gguf.vocab:Setting special token type pad to 128004
+INFO:gguf.vocab:Setting add_bos_token to True
+INFO:gguf.vocab:Setting add_eos_token to False
+INFO:gguf.vocab:Setting add_sep_token to False
+INFO:gguf.vocab:Setting chat_template to {{- bos_token }}
+{%- if custom_tools is defined %}
+    {%- set tools = custom_tools %}
+{%- endif %}
+{%- if not tools_in_user_message is defined %}
+    {%- set tools_in_user_message = true %}
+{%- endif %}
+{%- if not date_string is defined %}
+    {%- if strftime_now is defined %}
+        {%- set date_string = strftime_now("%d %b %Y") %}
+    {%- else %}
+        {%- set date_string = "26 Jul 2024" %}
+    {%- endif %}
+{%- endif %}
+{%- if not tools is defined %}
+    {%- set tools = none %}
+{%- endif %}
+
+{#- This block extracts the system message, so we can slot it into the right place. #}
+{%- if messages[0]['role'] == 'system' %}
+    {%- set system_message = messages[0]['content']|trim %}
+    {%- set messages = messages[1:] %}
+{%- else %}
+    {%- set system_message = "" %}
+{%- endif %}
+
+{#- System message #}
+{{- "<|start_header_id|>system<|end_header_id|>\n\n" }}
+{%- if tools is not none %}
+    {{- "Environment: ipython\n" }}
+{%- endif %}
+{{- "Cutting Knowledge Date: December 2023\n" }}
+{{- "Today Date: " + date_string + "\n\n" }}
+{%- if tools is not none and not tools_in_user_message %}
+    {{- "You have access to the following functions. To call a function, please respond with JSON for a function call." }}
+    {{- 'Respond in the format {"name": function name, "parameters": dictionary of argument name and its value}.' }}
+    {{- "Do not use variables.\n\n" }}
+    {%- for t in tools %}
+        {{- t | tojson(indent=4) }}
+        {{- "\n\n" }}
+    {%- endfor %}
+{%- endif %}
+{{- system_message }}
+{{- "<|eot_id|>" }}
+
+{#- Custom tools are passed in a user message with some extra guidance #}
+{%- if tools_in_user_message and not tools is none %}
+    {#- Extract the first user message so we can plug it in here #}
+    {%- if messages | length != 0 %}
+        {%- set first_user_message = messages[0]['content']|trim %}
+        {%- set messages = messages[1:] %}
+    {%- else %}
+        {{- raise_exception("Cannot put tools in the first user message when there's no first user message!") }}
+{%- endif %}
+    {{- '<|start_header_id|>user<|end_header_id|>\n\n' -}}
+    {{- "Given the following functions, please respond with a JSON for a function call " }}
+    {{- "with its proper arguments that best answers the given prompt.\n\n" }}
+    {{- 'Respond in the format {"name": function name, "parameters": dictionary of argument name and its value}.' }}
+    {{- "Do not use variables.\n\n" }}
+    {%- for t in tools %}
+        {{- t | tojson(indent=4) }}
+        {{- "\n\n" }}
+    {%- endfor %}
+    {{- first_user_message + "<|eot_id|>"}}
+{%- endif %}
+
+{%- for message in messages %}
+    {%- if not (message.role == 'ipython' or message.role == 'tool' or 'tool_calls' in message) %}
+        {{- '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n'+ message['content'] | trim + '<|eot_id|>' }}
+    {%- elif 'tool_calls' in message %}
+        {%- if not message.tool_calls|length == 1 %}
+            {{- raise_exception("This model only supports single tool-calls at once!") }}
+        {%- endif %}
+        {%- set tool_call = message.tool_calls[0].function %}
+        {{- '<|start_header_id|>assistant<|end_header_id|>\n\n' -}}
+        {{- '{"name": "' + tool_call.name + '", ' }}
+        {{- '"parameters": ' }}
+        {{- tool_call.arguments | tojson }}
+        {{- "}" }}
+        {{- "<|eot_id|>" }}
+    {%- elif message.role == "tool" or message.role == "ipython" %}
+        {{- "<|start_header_id|>ipython<|end_header_id|>\n\n" }}
+        {%- if message.content is mapping or message.content is iterable %}
+            {{- message.content | tojson }}
+        {%- else %}
+            {{- message.content }}
+        {%- endif %}
+        {{- "<|eot_id|>" }}
+    {%- endif %}
+{%- endfor %}
+{%- if add_generation_prompt %}
+    {{- '<|start_header_id|>assistant<|end_header_id|>\n\n' }}
+{%- endif %}
+
+INFO:gguf.vocab:Setting clean_spaces to True
+INFO:gguf.gguf_writer:Writing the following files:
+INFO:gguf.gguf_writer:/tmp/ellie-f16.gguf: n_tensors = 255, total_size = 6.4G
+Writing:   0%|          | 0.00/6.43G [00:00<?, ?byte/s]Writing:  12%|█▏        | 788M/6.43G [00:10<01:13, 76.4Mbyte/s]Writing:  13%|█▎        | 838M/6.43G [00:12<01:31, 61.2Mbyte/s]Writing:  14%|█▍        | 889M/6.43G [00:13<01:25, 64.7Mbyte/s]Writing:  15%|█▍        | 939M/6.43G [00:13<01:19, 68.8Mbyte/s]Writing:  15%|█▌        | 964M/6.43G [00:13<01:16, 71.8Mbyte/s]Writing:  15%|█▌        | 983M/6.43G [00:14<01:13, 74.2Mbyte/s]Writing:  16%|█▌        | 1.04G/6.43G [00:14<01:04, 83.3Mbyte/s]Writing:  17%|█▋        | 1.09G/6.43G [00:14<00:58, 90.5Mbyte/s]Writing:  18%|█▊        | 1.14G/6.43G [00:15<00:52, 100Mbyte/s] Writing:  18%|█▊        | 1.17G/6.43G [00:15<00:52, 101Mbyte/s]Writing:  18%|█▊        | 1.18G/6.43G [00:15<00:52, 100Mbyte/s]Writing:  19%|█▉        | 1.24G/6.43G [00:19<02:26, 35.3Mbyte/s]Writing:  20%|██        | 1.29G/6.43G [00:19<01:53, 45.1Mbyte/s]Writing:  21%|██        | 1.34G/6.43G [00:19<01:30, 56.4Mbyte/s]Writing:  21%|██▏       | 1.37G/6.43G [00:20<01:20, 62.8Mbyte/s]Writing:  22%|██▏       | 1.39G/6.43G [00:20<01:13, 68.2Mbyte/s]Writing:  22%|██▏       | 1.44G/6.43G [00:20<00:57, 86.4Mbyte/s]Writing:  23%|██▎       | 1.49G/6.43G [00:21<00:52, 93.5Mbyte/s]Writing:  24%|██▍       | 1.54G/6.43G [00:22<01:26, 56.3Mbyte/s]Writing:  24%|██▍       | 1.57G/6.43G [00:22<01:17, 62.7Mbyte/s]Writing:  25%|██▍       | 1.59G/6.43G [00:23<01:13, 65.9Mbyte/s]Writing:  26%|██▌       | 1.64G/6.43G [00:23<00:57, 83.2Mbyte/s]Writing:  26%|██▋       | 1.69G/6.43G [00:24<00:49, 95.5Mbyte/s]Writing:  27%|██▋       | 1.74G/6.43G [00:24<00:47, 98.1Mbyte/s]Writing:  28%|██▊       | 1.77G/6.43G [00:29<03:27, 22.4Mbyte/s]Writing:  28%|██▊       | 1.79G/6.43G [00:29<02:57, 26.1Mbyte/s]Writing:  29%|██▊       | 1.85G/6.43G [00:29<01:59, 38.2Mbyte/s]Writing:  29%|██▉       | 1.90G/6.43G [00:30<01:37, 46.6Mbyte/s]Writing:  30%|███       | 1.95G/6.43G [00:31<01:21, 55.1Mbyte/s]Writing:  31%|███       | 1.97G/6.43G [00:31<01:15, 59.0Mbyte/s]Writing:  31%|███       | 1.99G/6.43G [00:31<01:14, 59.3Mbyte/s]Writing:  32%|███▏      | 2.05G/6.43G [00:32<01:15, 57.7Mbyte/s]Writing:  33%|███▎      | 2.10G/6.43G [00:33<01:01, 70.2Mbyte/s]Writing:  33%|███▎      | 2.15G/6.43G [00:33<00:50, 84.2Mbyte/s]Writing:  34%|███▍      | 2.17G/6.43G [00:33<00:49, 85.3Mbyte/s]Writing:  34%|███▍      | 2.19G/6.43G [00:34<00:51, 82.6Mbyte/s]Writing:  35%|███▍      | 2.25G/6.43G [00:34<00:41, 101Mbyte/s] Writing:  36%|███▌      | 2.30G/6.43G [00:34<00:39, 104Mbyte/s]Writing:  37%|███▋      | 2.35G/6.43G [00:39<02:28, 27.5Mbyte/s]Writing:  37%|███▋      | 2.37G/6.43G [00:39<02:04, 32.6Mbyte/s]Writing:  37%|███▋      | 2.39G/6.43G [00:39<01:48, 37.3Mbyte/s]Writing:  38%|███▊      | 2.45G/6.43G [00:40<01:13, 54.2Mbyte/s]Writing:  39%|███▉      | 2.50G/6.43G [00:40<00:59, 65.5Mbyte/s]Writing:  40%|███▉      | 2.55G/6.43G [00:41<00:49, 78.5Mbyte/s]Writing:  40%|████      | 2.57G/6.43G [00:41<00:44, 85.9Mbyte/s]Writing:  40%|████      | 2.59G/6.43G [00:41<00:44, 87.0Mbyte/s]Writing:  41%|████      | 2.65G/6.43G [00:42<00:50, 75.1Mbyte/s]Writing:  42%|████▏     | 2.70G/6.43G [00:43<00:51, 71.9Mbyte/s]Writing:  43%|████▎     | 2.75G/6.43G [00:43<00:50, 72.2Mbyte/s]Writing:  43%|████▎     | 2.78G/6.43G [00:44<00:47, 76.6Mbyte/s]Writing:  43%|████▎     | 2.80G/6.43G [00:44<00:46, 77.8Mbyte/s]Writing:  44%|████▍     | 2.85G/6.43G [00:44<00:44, 79.9Mbyte/s]Writing:  45%|████▌     | 2.90G/6.43G [00:45<00:37, 93.6Mbyte/s]Writing:  46%|████▌     | 2.95G/6.43G [00:45<00:32, 105Mbyte/s] Writing:  46%|████▋     | 2.98G/6.43G [00:45<00:35, 98.3Mbyte/s]Writing:  47%|████▋     | 3.00G/6.43G [00:46<00:33, 102Mbyte/s] Writing:  48%|████▊     | 3.05G/6.43G [00:49<01:49, 30.7Mbyte/s]Writing:  48%|████▊     | 3.10G/6.43G [00:50<01:18, 42.2Mbyte/s]Writing:  49%|████▉     | 3.15G/6.43G [00:50<01:01, 53.2Mbyte/s]Writing:  49%|████▉     | 3.18G/6.43G [00:50<00:54, 59.6Mbyte/s]Writing:  50%|████▉     | 3.20G/6.43G [00:50<00:49, 65.3Mbyte/s]Writing:  51%|█████     | 3.25G/6.43G [00:51<00:37, 85.5Mbyte/s]Writing:  51%|█████▏    | 3.30G/6.43G [00:52<00:57, 54.6Mbyte/s]Writing:  52%|█████▏    | 3.36G/6.43G [00:53<00:48, 63.0Mbyte/s]Writing:  53%|█████▎    | 3.38G/6.43G [00:53<00:44, 67.8Mbyte/s]Writing:  53%|█████▎    | 3.40G/6.43G [00:53<00:41, 73.6Mbyte/s]Writing:  54%|█████▍    | 3.46G/6.43G [00:54<00:31, 93.0Mbyte/s]Writing:  55%|█████▍    | 3.51G/6.43G [00:54<00:29, 99.8Mbyte/s]Writing:  55%|█████▍    | 3.53G/6.43G [00:54<00:29, 96.9Mbyte/s]Writing:  55%|█████▌    | 3.55G/6.43G [00:55<00:30, 95.3Mbyte/s]Writing:  56%|█████▌    | 3.61G/6.43G [00:55<00:29, 95.4Mbyte/s]Writing:  57%|█████▋    | 3.66G/6.43G [00:56<00:34, 81.0Mbyte/s]Writing:  58%|█████▊    | 3.71G/6.43G [00:58<00:52, 52.0Mbyte/s]Writing:  58%|█████▊    | 3.73G/6.43G [00:58<00:46, 57.7Mbyte/s]Writing:  58%|█████▊    | 3.75G/6.43G [00:58<00:46, 57.6Mbyte/s]Writing:  59%|█████▉    | 3.81G/6.43G [00:59<00:37, 69.9Mbyte/s]Writing:  60%|██████    | 3.86G/6.43G [00:59<00:33, 76.8Mbyte/s]Writing:  61%|██████    | 3.91G/6.43G [01:00<00:28, 88.8Mbyte/s]Writing:  61%|██████    | 3.93G/6.43G [01:00<00:26, 95.8Mbyte/s]Writing:  62%|██████▏   | 3.95G/6.43G [01:00<00:24, 99.9Mbyte/s]Writing:  62%|██████▏   | 4.01G/6.43G [01:01<00:26, 90.6Mbyte/s]Writing:  63%|██████▎   | 4.06G/6.43G [01:04<01:03, 37.5Mbyte/s]Writing:  64%|██████▍   | 4.11G/6.43G [01:04<00:46, 49.9Mbyte/s]Writing:  64%|██████▍   | 4.14G/6.43G [01:04<00:40, 55.9Mbyte/s]Writing:  65%|██████▍   | 4.15G/6.43G [01:04<00:37, 60.9Mbyte/s]Writing:  66%|██████▌   | 4.21G/6.43G [01:05<00:28, 78.1Mbyte/s]Writing:  66%|██████▋   | 4.26G/6.43G [01:05<00:23, 93.3Mbyte/s]Writing:  67%|██████▋   | 4.31G/6.43G [01:06<00:26, 80.4Mbyte/s]Writing:  67%|██████▋   | 4.34G/6.43G [01:07<00:44, 47.1Mbyte/s]Writing:  68%|██████▊   | 4.36G/6.43G [01:08<00:41, 49.4Mbyte/s]Writing:  69%|██████▊   | 4.41G/6.43G [01:08<00:33, 59.6Mbyte/s]Writing:  69%|██████▉   | 4.46G/6.43G [01:09<00:28, 68.1Mbyte/s]Writing:  70%|███████   | 4.51G/6.43G [01:10<00:26, 71.5Mbyte/s]Writing:  71%|███████   | 4.54G/6.43G [01:10<00:25, 74.1Mbyte/s]Writing:  71%|███████   | 4.56G/6.43G [01:10<00:24, 77.8Mbyte/s]Writing:  72%|███████▏  | 4.61G/6.43G [01:10<00:18, 97.2Mbyte/s]Writing:  73%|███████▎  | 4.66G/6.43G [01:11<00:17, 102Mbyte/s] Writing:  73%|███████▎  | 4.71G/6.43G [01:14<00:45, 38.0Mbyte/s]Writing:  74%|███████▍  | 4.74G/6.43G [01:14<00:38, 44.1Mbyte/s]Writing:  74%|███████▍  | 4.76G/6.43G [01:14<00:33, 49.7Mbyte/s]Writing:  75%|███████▍  | 4.82G/6.43G [01:15<00:23, 68.4Mbyte/s]Writing:  76%|███████▌  | 4.87G/6.43G [01:15<00:22, 70.6Mbyte/s]Writing:  76%|███████▋  | 4.92G/6.43G [01:18<00:42, 35.6Mbyte/s]Writing:  77%|███████▋  | 4.94G/6.43G [01:18<00:36, 41.1Mbyte/s]Writing:  77%|███████▋  | 4.96G/6.43G [01:18<00:31, 45.9Mbyte/s]Writing:  78%|███████▊  | 5.02G/6.43G [01:19<00:22, 61.8Mbyte/s]Writing:  79%|███████▉  | 5.07G/6.43G [01:19<00:17, 75.5Mbyte/s]Writing:  80%|███████▉  | 5.12G/6.43G [01:20<00:15, 83.9Mbyte/s]Writing:  80%|████████  | 5.17G/6.43G [01:20<00:14, 84.9Mbyte/s]Writing:  81%|████████  | 5.19G/6.43G [01:21<00:14, 87.8Mbyte/s]Writing:  81%|████████  | 5.21G/6.43G [01:21<00:13, 87.7Mbyte/s]Writing:  82%|████████▏ | 5.27G/6.43G [01:22<00:16, 71.0Mbyte/s]Writing:  83%|████████▎ | 5.32G/6.43G [01:23<00:18, 60.5Mbyte/s]Writing:  84%|████████▎ | 5.37G/6.43G [01:23<00:15, 70.3Mbyte/s]Writing:  84%|████████▍ | 5.39G/6.43G [01:24<00:13, 74.9Mbyte/s]Writing:  84%|████████▍ | 5.41G/6.43G [01:24<00:12, 79.3Mbyte/s]Writing:  85%|████████▌ | 5.47G/6.43G [01:24<00:09, 96.4Mbyte/s]Writing:  86%|████████▌ | 5.52G/6.43G [01:25<00:08, 107Mbyte/s] Writing:  87%|████████▋ | 5.57G/6.43G [01:25<00:07, 108Mbyte/s]Writing:  87%|████████▋ | 5.60G/6.43G [01:25<00:07, 111Mbyte/s]Writing:  87%|████████▋ | 5.61G/6.43G [01:25<00:07, 112Mbyte/s]Writing:  88%|████████▊ | 5.67G/6.43G [01:26<00:06, 119Mbyte/s]Writing:  89%|████████▉ | 5.72G/6.43G [01:28<00:13, 51.1Mbyte/s]Writing:  90%|████████▉ | 5.77G/6.43G [01:28<00:10, 60.1Mbyte/s]Writing:  90%|█████████ | 5.80G/6.43G [01:29<00:09, 67.1Mbyte/s]Writing:  91%|█████████ | 5.82G/6.43G [01:29<00:08, 73.3Mbyte/s]Writing:  91%|█████████▏| 5.87G/6.43G [01:29<00:06, 86.2Mbyte/s]Writing:  92%|█████████▏| 5.92G/6.43G [01:30<00:05, 93.4Mbyte/s]Writing:  93%|█████████▎| 5.97G/6.43G [01:30<00:04, 93.0Mbyte/s]Writing:  93%|█████████▎| 6.00G/6.43G [01:31<00:06, 68.9Mbyte/s]Writing:  94%|█████████▎| 6.02G/6.43G [01:34<00:17, 23.9Mbyte/s]Writing:  95%|█████████▍| 6.07G/6.43G [01:35<00:09, 37.0Mbyte/s]Writing:  95%|█████████▌| 6.12G/6.43G [01:35<00:06, 49.4Mbyte/s]Writing:  96%|█████████▌| 6.17G/6.43G [01:36<00:04, 60.8Mbyte/s]Writing:  96%|█████████▋| 6.20G/6.43G [01:36<00:03, 67.6Mbyte/s]Writing:  97%|█████████▋| 6.22G/6.43G [01:36<00:02, 71.9Mbyte/s]Writing:  98%|█████████▊| 6.27G/6.43G [01:36<00:01, 90.2Mbyte/s]Writing:  98%|█████████▊| 6.33G/6.43G [01:37<00:01, 89.6Mbyte/s]Writing:  99%|█████████▉| 6.38G/6.43G [01:38<00:00, 68.5Mbyte/s]Writing: 100%|█████████▉| 6.40G/6.43G [01:38<00:00, 75.0Mbyte/s]Writing: 100%|█████████▉| 6.42G/6.43G [01:38<00:00, 76.9Mbyte/s]Writing: 100%|██████████| 6.43G/6.43G [01:38<00:00, 65.0Mbyte/s]
+INFO:hf-to-gguf:Model successfully exported to /tmp/ellie-f16.gguf
+[  1151s] $ cmake -S /tmp/llama.cpp -B /tmp/llama.cpp/build -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF > /tmp/cmake.log
+CMAKE_BUILD_TYPE=Release
+[  1155s] $ cmake --build /tmp/llama.cpp/build --target llama-quantize -j 2 > /tmp/build.log
+[  1710s] $ /tmp/llama.cpp/build/bin/llama-quantize /tmp/ellie-f16.gguf /content/ellie-out/ellie-british-Q4_K_M.gguf Q4_K_M > /tmp/quantize.log 2>&1
+[  2066s] quantised: 2.02 GB
+[  2066s] done: ellie-british-Q4_K_M.gguf, ellie-lora, eval.json, metrics.json, samples.jsonl
+EXIT CODE 0

@@ -1,0 +1,15 @@
+# What Cloud Build uploads: the code only. Models are downloaded inside the build, not uploaded.
+#!include:.gitignore
+.git
+training/
+docs/
+frontend/node_modules/
+frontend/dist/
+frontend/e2e/
+frontend/test-results/
+frontend/playwright-report/
+backend/.venv/
+backend/voices/
+backend/tests/
+*.gguf
+*.onnx

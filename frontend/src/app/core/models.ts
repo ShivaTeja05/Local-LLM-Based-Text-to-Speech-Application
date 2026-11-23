@@ -19,8 +19,17 @@ export interface Voice {
 
 export interface Health {
   status: 'ok' | 'degraded';
-  llm: { ok: boolean; backend: string; model: string; error?: string };
+  /** `models`: what a client can choose right now, the default first (e.g. base and fine-tuned). */
+  llm: { ok: boolean; backend: string; model: string; models?: string[]; error?: string };
   tts: { ok: boolean; engine: string; voices: number; error?: string };
+  /** Voice input (optional: older backends do not report it). */
+  stt?: { ok: boolean; engine: string; model?: string; error?: string };
+}
+
+/** Rolling note of the oldest `turns` turns, which no longer fit the model's context window. */
+export interface Memory {
+  note: string;
+  turns: number;
 }
 
 /** Events produced by POST /api/chat/stream (see backend/app/api/chat.py). */

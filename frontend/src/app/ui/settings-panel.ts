@@ -39,7 +39,7 @@ export class SettingsPanel {
 
   protected readonly statusLine = computed(() => {
     switch (this.status.connection()) {
-      case 'ok': return 'Running locally';
+      case 'ok': return 'Running privately';
       case 'degraded': return this.status.health()?.llm.ok ? 'Speech unavailable' : 'Model unavailable';
       case 'offline': return 'Backend offline';
       default: return 'Connecting…';
@@ -48,7 +48,7 @@ export class SettingsPanel {
 
   protected readonly statusDetail = computed(() => {
     const h = this.status.health();
-    if (this.status.connection() === 'offline') return 'Start the backend on port 8000';
+    if (this.status.connection() === 'offline') return 'Locally: start the backend on port 8000';
     if (!h) return '';
     if (!h.llm.ok) return h.llm.error ?? `${h.llm.model} is not loaded`;
     if (!h.tts.ok) return h.tts.error ?? 'No voice installed';
@@ -79,8 +79,8 @@ export class SettingsPanel {
       this.player.stop();
       return;
     }
-    const clip = this.api.tts(`Hello, I'm ${shortName(label)}. Lovely to meet you.`, id);
-    this.player.play(previewId, [clip]);
+    const text = `Hello, this is the ${shortName(label)} voice. Lovely to meet you.`;
+    this.player.play(previewId, [{ audio: this.api.tts(text, id), text }]);
   }
 
   protected name(label: string): string {
@@ -89,6 +89,37 @@ export class SettingsPanel {
 
   protected accent(label: string): string {
     const m = /\((.*)\)/.exec(label);
-    return m ? m[1] : '';
+    return m ? m[1].replace(/^Kokoro, /, '') : '';
   }
+
+  protected readonly selectedModel = computed(() => {
+    const models = this.status.models();
+    const chosen = this.settings.model();
+    return chosen && models.includes(chosen) ? chosen : (models[0] ?? null);
+  });
+
+  protected chooseModel(id: string): void {
+    // The server's default model is stored as null, so a later default change is followed.
+    this.settings.model.set(id === this.status.models()[0] ? null : id);
+  }
+
+  /** The default model is the base one; any other offered model is a fine-tune of it. */
+  protected modelLabel(id: string): string {
+    return id === this.status.models()[0] ? 'Standard' : 'Fine-tuned';
+  }
+
+  protected readonly modelHint = computed(() =>
+    this.selectedModel() === this.status.models()[0]
+      ? `${this.selectedModel()}, guided by a detailed style prompt.`
+      : `${this.selectedModel()}: a LoRA adapter trained on Ellie's style, with a one-line prompt.`,
+  );
+
+  /** Piper and Kokoro voices in their own groups (each voice belongs to one engine). */
+  protected readonly voiceGroups = computed(() => {
+    const all = this.status.voices();
+    return [
+      { id: 'piper', title: 'Piper · quick', voices: all.filter((v) => !v.id.startsWith('kokoro-')) },
+      { id: 'kokoro', title: 'Kokoro · more natural', voices: all.filter((v) => v.id.startsWith('kokoro-')) },
+    ].filter((g) => g.voices.length);
+  });
 }

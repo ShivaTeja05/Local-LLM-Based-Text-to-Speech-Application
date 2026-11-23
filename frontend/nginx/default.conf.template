@@ -1,0 +1,43 @@
+# Rendered by the nginx image at start-up: ${BACKEND_URL} comes from the environment.
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    gzip on;
+    gzip_min_length 1024;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # The whole conversation is sent with each message, and voice recordings are up to 5 MB
+    # (the backend's STT_MAX_BYTES).
+    client_max_body_size 6m;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy same-origin always;
+
+    # API, streamed replies (SSE) and speech, plus the interactive API docs.
+    location ~ ^/(api/|docs$|openapi\.json$) {
+        proxy_pass ${BACKEND_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;      # SSE: pass each token to the browser at once
+        proxy_cache off;
+        proxy_read_timeout 300s;  # a slow CPU-only model can take a while
+    }
+
+    # Built files have content hashes in their names, so they can be cached for good.
+    location ~* \.(?:js|css|woff2?)$ {
+        expires max;
+        try_files $uri =404;
+    }
+
+    # The app itself: always revalidate index.html so a new build is picked up.
+    location / {
+        expires -1;
+        try_files $uri $uri/ /index.html;
+    }
+}

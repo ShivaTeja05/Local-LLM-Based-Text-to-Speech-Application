@@ -1,0 +1,28 @@
+{
+  "written": 999,
+  "no_good_reply": 44,
+  "near_eval_prompt": 6,
+  "duplicate": 0,
+  "kept": 949,
+  "train": 855,
+  "val": 94,
+  "multi_turn": 247,
+  "assistant_turns": 1339,
+  "avg_reply_words": 35.4,
+  "ends_question_%": 77.0,
+  "lovely_%": 13.6,
+  "teacher_attempts_rejected": 489,
+  "by_category": {
+    "oasst2": 422,
+    "small-talk": 93,
+    "advice": 71,
+    "british-everyday": 69,
+    "memory": 69,
+    "facts": 52,
+    "invented-life": 52,
+    "feelings": 40,
+    "format-trap": 37,
+    "boundaries": 22,
+    "numbers": 22
+  }
+}

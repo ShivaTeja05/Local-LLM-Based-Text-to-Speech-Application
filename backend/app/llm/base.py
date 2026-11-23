@@ -28,9 +28,11 @@ class LLMAdapter(Protocol):
     model: str
 
     def stream_chat(
-        self, messages: list[dict[str, str]], stats: StreamStats | None = None
+        self, messages: list[dict[str, str]], stats: StreamStats | None = None, options: dict | None = None,
+        model: str | None = None,
     ) -> AsyncIterator[str]:
-        """Yield text deltas for the assistant reply."""
+        """Yield text deltas for the assistant reply. ``options`` override sampling settings;
+        ``model`` picks another allowed model for this request."""
         ...
 
     async def health(self) -> dict:

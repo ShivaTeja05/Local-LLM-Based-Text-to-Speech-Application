@@ -12,6 +12,7 @@ const PATHS = {
   speaker: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11',
   mute: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5',
   check: 'M5 12.5l4.5 4.5L19 7.5',
+  mic: 'M12 14.5a3 3 0 0 0 3-3v-5a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zM18 11.5a6 6 0 0 1-12 0M12 17.5V20.5',
 } as const;
 
 export type IconName = keyof typeof PATHS;

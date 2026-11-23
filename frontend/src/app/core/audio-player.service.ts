@@ -1,14 +1,47 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+
+import { SettingsService } from './settings.service';
+
+/** One sentence of speech: its audio (being synthesised) and the words, which set the pause after it. */
+export interface Clip {
+  audio: Promise<ArrayBuffer>;
+  text: string;
+}
+
+const words = (text: string) => (text.trim().match(/\S+/g) ?? []).length;
 
 /**
- * Plays a message's speech as a gapless queue of sentence clips (Web Audio API) and exposes
- * the live loudness, which drives the avatar's mouth.
+ * How long a person would pause after saying this sentence, in milliseconds: a little longer after
+ * a question or exclamation, shorter after a clause break, and longer after a long sentence, when
+ * they would need more breath. (Natural conversational pauses are roughly 0.2-0.6 s.)
+ */
+export function pauseAfter(text: string): number {
+  const t = text.trim();
+  let ms = /[?!]["')\]]*$/.test(t) ? 380 : /[.…]["')\]]*$/.test(t) ? 320 : /[,;:—–-]$/.test(t) ? 180 : 260;
+  const n = words(t);
+  if (n > 14) ms += 120;
+  if (n > 24) ms += 80;
+  return ms;
+}
+
+/** Breathe in before a long sentence, or after a long one. */
+export function wantsBreath(previous: string, next: string): boolean {
+  return words(next) >= 10 || words(previous) >= 18;
+}
+
+/**
+ * Plays a message's speech as a queue of sentence clips (Web Audio API) and exposes the live
+ * loudness, which drives the avatar's mouth.
  *
- * Clips are queued as promises in sentence order, so sentence 2 can be synthesising while
- * sentence 1 plays, and order is kept even if sentence 2's WAV arrives first.
+ * Clips are queued in sentence order, so sentence 2 can be synthesising while sentence 1 plays,
+ * and order is kept even if sentence 2's WAV arrives first. With "natural pauses" on, the player
+ * leaves a human-sized pause between sentences, with a soft inhale before long ones. Time spent
+ * waiting for the next clip counts towards that pause, so it never adds delay on top.
  */
 @Injectable({ providedIn: 'root' })
 export class AudioPlayerService {
+  private readonly settings = inject(SettingsService);
+
   /** Id of the message being spoken, or null. */
   readonly speakingId = signal<string | null>(null);
   /** True while a clip is actually sounding (not while waiting for the first one). */
@@ -20,7 +53,8 @@ export class AudioPlayerService {
   private ctx: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private samples: Float32Array<ArrayBuffer> | null = null;
-  private queue: Promise<ArrayBuffer>[] = [];
+  private breath: AudioBuffer | null = null;
+  private queue: Clip[] = [];
   private source: AudioBufferSourceNode | null = null;
   private generation = 0;
   private pumping = false;
@@ -48,9 +82,9 @@ export class AudioPlayerService {
     this.finishing = false;
   }
 
-  enqueue(messageId: string, clip: Promise<ArrayBuffer>): void {
+  enqueue(messageId: string, clip: Clip): void {
     if (this.speakingId() !== messageId) return;
-    clip.catch(() => undefined); // failures are handled in the pump; avoid unhandled rejections
+    clip.audio.catch(() => undefined); // failures are handled in the pump; avoid unhandled rejections
     this.queue.push(clip);
     if (!this.pumping) void this.pump(this.generation);
   }
@@ -63,7 +97,7 @@ export class AudioPlayerService {
   }
 
   /** Play a complete set of clips (replay). */
-  play(messageId: string, clips: Promise<ArrayBuffer>[]): void {
+  play(messageId: string, clips: Clip[]): void {
     this.begin(messageId);
     clips.forEach((c) => this.enqueue(messageId, c));
     this.end(messageId);
@@ -94,11 +128,12 @@ export class AudioPlayerService {
 
   private async pump(gen: number): Promise<void> {
     this.pumping = true;
+    let previous: { text: string; endedAt: number } | null = null;
     while (this.queue.length && gen === this.generation) {
       const next = this.queue.shift()!;
       let buffer: AudioBuffer | null = null;
       try {
-        const bytes = await next;
+        const bytes = await next.audio;
         if (gen !== this.generation || !this.ctx) return;
         buffer = await this.ctx.decodeAudioData(bytes.slice(0));
       } catch (err) {
@@ -106,12 +141,47 @@ export class AudioPlayerService {
         continue;
       }
       if (gen !== this.generation) return;
+      if (previous && this.settings.naturalPauses()) {
+        await this.breathe(previous, next.text, gen);
+        if (gen !== this.generation) return;
+      }
       await this.playBuffer(buffer, gen);
+      previous = { text: next.text, endedAt: performance.now() };
     }
     if (gen !== this.generation) return;
     this.pumping = false;
     this.sounding.set(false);
     if (this.finishing) this.reset();
+  }
+
+  /** The pause between two sentences, with a soft inhale before long ones. */
+  private async breathe(previous: { text: string; endedAt: number }, nextText: string, gen: number): Promise<void> {
+    const jitter = 0.85 + Math.random() * 0.3; // ±15%, so it doesn't sound mechanical
+    const pause = pauseAfter(previous.text) * jitter;
+    const remaining = pause - (performance.now() - previous.endedAt); // time already spent waiting counts
+    if (remaining <= 0) return;
+    if (wantsBreath(previous.text, nextText) && remaining > 220) this.playBreath(remaining);
+    await new Promise((resolve) => setTimeout(resolve, remaining));
+    if (gen === this.generation) this.level.set(0);
+  }
+
+  /** A soft synthetic inhale: band-passed noise with a breathy swell, straight to the speakers
+   *  (not through the analyser, so the avatar's lips stay closed while "breathing"). */
+  private playBreath(withinMs: number): void {
+    if (!this.ctx) return;
+    if (!this.breath) this.breath = makeBreath(this.ctx);
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.breath;
+    const band = this.ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 1400;
+    band.Q.value = 0.7;
+    const gain = this.ctx.createGain();
+    gain.gain.value = 0.9;
+    src.connect(band).connect(gain).connect(this.ctx.destination);
+    // End the inhale just before the next sentence starts.
+    const lead = Math.max(0, withinMs / 1000 - this.breath.duration - 0.05);
+    src.start(this.ctx.currentTime + lead);
   }
 
   private playBuffer(buffer: AudioBuffer, gen: number): Promise<void> {
@@ -150,4 +220,19 @@ export class AudioPlayerService {
     };
     this.raf = requestAnimationFrame(tick);
   }
+}
+
+/** 0.32 s of noise shaped like a quiet inhale: a quick swell, a short hold, a gentle fade. */
+function makeBreath(ctx: BaseAudioContext): AudioBuffer {
+  const seconds = 0.32;
+  const buffer = ctx.createBuffer(1, Math.round(ctx.sampleRate * seconds), ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let low = 0;
+  for (let i = 0; i < data.length; i++) {
+    const t = i / data.length;
+    const envelope = t < 0.4 ? Math.sin((t / 0.4) * (Math.PI / 2)) : Math.cos(((t - 0.4) / 0.6) * (Math.PI / 2));
+    low += (Math.random() * 2 - 1 - low) * 0.35; // soften the hiss a little
+    data[i] = low * envelope * 0.12; // audible but soft: speech peaks are several times louder
+  }
+  return buffer;
 }

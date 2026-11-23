@@ -31,6 +31,8 @@ p { margin: 0; }
 .empty { margin: 0 8px; color: var(--muted); }
 
 .voices { display: flex; flex-direction: column; gap: 2px; }
+.voice-group { margin: 12px 0 4px 10px; font-size: var(--fs-small); font-weight: 500; color: var(--muted); }
+.voice-group:first-of-type { margin-top: 0; }
 .voice {
   display: flex;
   align-items: center;
@@ -155,3 +157,5 @@ p { margin: 0; }
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+.hint { margin: 8px 2px 0; font-size: var(--fs-small); line-height: 18px; color: var(--muted); }

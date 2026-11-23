@@ -113,6 +113,28 @@ textarea::placeholder { color: var(--muted); }
 .count.low { color: var(--negative); }
 .send { flex: none; }
 
+/* Push-to-talk: quiet until it records, then the accent with a soft pulse and the seconds. */
+.mic { flex: none; color: var(--muted); }
+.mic:hover:not(:disabled) { color: var(--text); }
+.mic.recording {
+  width: auto;
+  gap: 6px;
+  padding: 0 14px;
+  color: var(--ground);
+  background: var(--accent);
+  border-color: var(--accent);
+  animation: mic-pulse 1.6s var(--ease) infinite;
+}
+.mic.recording:hover:not(:disabled) { background: var(--accent); }
+.mic-time { font-size: var(--fs-small); font-weight: 500; }
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .mic.recording { animation: none; } }
+.voice-problem { margin: -8px 28px 12px; font-size: var(--fs-small); color: var(--muted); }
+.voice-problem:empty { display: none; }
+
 @media (max-width: 767px) {
   .scroller { padding: 20px 16px 8px; }
   .composer { margin: 0 12px 12px; }

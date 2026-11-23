@@ -62,13 +62,29 @@
     #field
     id="message"
     rows="1"
-    placeholder="Message Ellie"
+    [placeholder]="voice.state() === 'recording' ? 'Listening… click the microphone again when you have finished' : voice.state() === 'transcribing' ? 'Writing down what you said…' : 'Message Ellie'"
     [attr.maxlength]="max"
     [attr.aria-describedby]="remaining() < 100 ? 'count' : null"
     (input)="onInput($event)"
     (keydown)="onKeydown($event)"></textarea>
   @if (remaining() < 100) {
     <span id="count" class="count num" [class.low]="remaining() < 20">{{ remaining() }} left</span>
+  }
+  @if (voice.available()) {
+    <button
+      type="button"
+      class="btn btn-icon mic"
+      [class.recording]="voice.state() === 'recording'"
+      [disabled]="voice.state() === 'transcribing' || chat.generating()"
+      [attr.aria-label]="micLabel()"
+      [attr.aria-pressed]="voice.state() === 'recording'"
+      [title]="micLabel()"
+      (click)="toggleMic()">
+      <app-icon [name]="voice.state() === 'recording' ? 'stop' : 'mic'" [size]="voice.state() === 'recording' ? 12 : 18" />
+      @if (voice.state() === 'recording') {
+        <span class="mic-time num" aria-hidden="true">{{ voice.seconds() }}s</span>
+      }
+    </button>
   }
   @if (chat.generating()) {
     <button type="button" class="btn btn-quiet send" (click)="chat.stopGenerating()">
@@ -82,3 +98,4 @@
     </button>
   }
 </form>
+<p class="voice-problem" role="status" aria-live="polite">{{ voice.problem() }}</p>

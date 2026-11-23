@@ -1,0 +1,21 @@
+# Use an Ollama that already runs on the host (for example the Ollama app on a Mac, which uses
+# the Metal GPU) instead of the Ollama container.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.host-ollama.yml up -d --build
+#
+# The host needs the model:  ollama pull llama3.2:3b
+# On Linux, the host's Ollama must listen beyond localhost: OLLAMA_HOST=0.0.0.0 ollama serve
+
+services:
+  # Not started with this file (only with `--profile bundled-ollama`).
+  ollama:
+    profiles: ["bundled-ollama"]
+  ollama-pull:
+    profiles: ["bundled-ollama"]
+
+  backend:
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Docker Desktop has it already; Linux needs this
+    depends_on: !reset []

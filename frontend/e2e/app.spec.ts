@@ -5,14 +5,19 @@ import { composer, finishedReplies, noHorizontalScroll, replies, say, stageLine,
 test.describe('Ellie: desktop, real backend', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('Running locally')).toBeVisible();
+    await expect(page.getByText('Running privately')).toBeVisible();
   });
 
   test('first screen: greeting, live status, voices, starters', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^Good (morning|afternoon|evening)\.$/);
-    await expect(page.getByText(/Ellie runs on this computer, with .+ and the Cori voice\./)).toBeVisible();
-    await expect(page.getByRole('radiogroup', { name: 'Voice' }).getByRole('radio')).toHaveCount(4);
-    await expect(page.getByRole('radio', { name: /^Cori/ })).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByText(/Ellie runs privately, with .+ and the Southern England voice, with no cloud AI services\./)).toBeVisible();
+    // Five regional English accents: South (default), North, Midlands, East and West.
+    const voices = page.getByRole('radiogroup', { name: 'Voice' }).getByRole('radio');
+    await expect(voices).toHaveCount(5);
+    for (const region of ['South', 'North', 'Midlands', 'East', 'West']) {
+      await expect(page.getByRole('radiogroup', { name: 'Voice' }).getByText(new RegExp(`^${region} ·`))).toBeVisible();
+    }
+    await expect(page.getByRole('radio', { name: /^Southern England/ })).toHaveAttribute('aria-checked', 'true');
     await expect(page.getByRole('switch', { name: 'Speak replies aloud' })).toHaveAttribute('aria-checked', 'true');
     await expect(page.getByRole('button', { name: 'How are you?' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Ellie, your conversation partner' })).toBeVisible();
@@ -108,18 +113,18 @@ test.describe('Ellie: desktop, real backend', () => {
 
   test('choosing a voice changes the voice used for speech', async ({ page }) => {
     const tts = trackTts(page);
-    await page.getByRole('radio', { name: /^Alan/ }).click();
-    await expect(page.getByText(/and the Alan voice\./)).toBeVisible();
+    await page.getByRole('radio', { name: /^Birmingham/ }).click();
+    await expect(page.getByText(/and the Birmingham voice, /)).toBeVisible();
     await say(page, 'Hello!');
     await expect.poll(() => tts.length).toBeGreaterThan(0);
-    expect(tts.every((r) => r.postDataJSON().voice === 'en_GB-alan-medium')).toBe(true);
+    expect(tts.every((r) => r.postDataJSON().voice === 'uk-midlands')).toBe(true);
   });
 
   test('voice preview plays a short sample in that voice', async ({ page }) => {
     const tts = trackTts(page);
-    await page.getByRole('button', { name: 'Preview Jenny' }).click();
+    await page.getByRole('button', { name: 'Preview Newcastle' }).click();
     await expect.poll(() => tts.length).toBe(1);
-    expect(tts[0].postDataJSON()).toEqual({ text: "Hello, I'm Jenny. Lovely to meet you.", voice: 'en_GB-jenny_dioco-medium' });
+    expect(tts[0].postDataJSON()).toEqual({ text: 'Hello, this is the Newcastle voice. Lovely to meet you.', voice: 'uk-north' });
   });
 
   test('remembers the conversation: follow-up questions use the history', async ({ page }) => {
@@ -204,5 +209,5 @@ test('backend offline on load: the screen says so and how to fix it', async ({ p
   await expect(page.getByText('Backend offline')).toBeVisible();
   await page.unroute('**/api/health');
   await page.getByRole('button', { name: 'Retry' }).click();
-  await expect(page.getByText('Running locally')).toBeVisible();
+  await expect(page.getByText('Running privately')).toBeVisible();
 });

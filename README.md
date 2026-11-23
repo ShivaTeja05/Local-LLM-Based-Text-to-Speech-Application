@@ -8,9 +8,10 @@ lip-syncs to the speech. Nothing is sent to a cloud AI service.
 |---|---|
 | Front end | Angular 21 LTS (TypeScript, signals), Web Audio API, animated SVG avatar |
 | Back end | Python 3.11, FastAPI, Server-Sent Events |
-| LLM (local) | Ollama + `llama3.2:3b` |
-| TTS (local) | Piper, British voice `en_GB-cori-high` (+ 3 more UK voices) |
-| Deployment | One port: FastAPI serves the API and the Angular build. Docker Compose *(planned)* |
+| LLM (local) | Ollama + `llama3.2:3b`, plus an optional LoRA fine-tune of it (`ellie-british`, [training/](training/README.md)) |
+| TTS (local) | Piper, **five regional English accents** (South, North, Midlands, East, West) from one 77 MB multi-speaker voice; Kokoro-82M as an optional second engine |
+| Voice input (local) | faster-whisper `base.en`: push-to-talk into the message box |
+| Deployment | Docker Compose: nginx (Angular build + `/api` proxy), backend, Ollama. Or one port without Docker. |
 
 📐 **Architecture, design decisions and delivery plan:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
@@ -21,19 +22,56 @@ lip-syncs to the speech. Nothing is sent to a cloud AI service.
   one sentence at a time, with a local Piper voice.
 - **▶ Play / ■ Stop** on every reply (replays from a cache, no new synthesis). **Stop** while
   she is writing keeps the partial reply.
-- **Speak replies aloud** switch, **voice picker** (4 UK voices, each with a ▶ preview), light,
-  dark or system **theme**. All remembered in the browser.
+- **Speak replies aloud** switch and a **voice picker with five regional English accents**, each
+  with a ▶ preview: Southern England (South, female, the default), Newcastle (North, female),
+  Birmingham (Midlands, male), Suffolk (East, male) and South-West England (West, female).
+- **Natural pauses and breaths:** a short, human-sized pause between sentences (longer after
+  questions and long sentences) and a soft inhale before long sentences. A switch turns it off.
+  Light, dark or system **theme**. All remembered in the browser.
+- **🎤 Push-to-talk:** click the microphone, speak, click again. Local Whisper writes it into the
+  message box so you can check it before sending. Talking over Ellie stops her speaking.
 - **Animated avatar** whose mouth follows the real loudness of the speech (60 fps lip-sync),
   with blinking, a thinking look, and happy or concerned expressions read from the reply.
-- **Conversation memory:** follow-up questions work. The chat survives a page refresh, and
-  **New conversation** clears it.
+- **Conversation memory:** follow-up questions work. In long chats, turns that no longer fit the
+  model's context window are folded into a short **memory note**, so Ellie still knows your name
+  later on. The chat survives a page refresh, and **New conversation** clears it.
+- **Standard vs fine-tuned model** switch (when the `ellie-british` adapter is installed): compare
+  the base model with its long style prompt against the LoRA fine-tune with a one-line prompt.
 - Honest states: a live status (model and voice), a clear message and **Try again** if the
   backend is down, and text chat keeps working if speech fails.
 - Works on desktop, tablet and phone (the sidebar folds into a top bar and a menu sheet).
 
 ---
 
-## Quick start (everything on one port)
+## Run with Docker (one command)
+
+Needs only [Docker](https://docs.docker.com/get-docker/) (with Compose v2.24+) and about 6 GB of disk.
+
+```bash
+docker compose up -d --build
+```
+
+Open <http://localhost:8080>. The first start downloads the model (~2 GB) into a Docker volume,
+so it takes a few minutes; later starts take seconds. Follow it with `docker compose logs -f`.
+
+| Service | What it does |
+|---|---|
+| `web` | nginx: serves the Angular build and proxies `/api` (unbuffered, for streaming) and `/docs` |
+| `backend` | FastAPI + Piper, with the 4 British voices built into the image |
+| `ollama` | runs `llama3.2:3b` (CPU, or an NVIDIA GPU: see the comment in `docker-compose.yml`) |
+| `ollama-pull` | one-off job that downloads the model if the volume does not have it yet |
+
+**On a Mac**, Ollama inside Docker cannot use the GPU. If the Ollama app is installed, use it
+instead (about twice as fast, and no second copy of the model):
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.host-ollama.yml up -d --build
+```
+
+Settings (port, model) are in [`.env.example`](.env.example): copy it to `.env`. Stop with
+`docker compose down` (add `-v` to delete the downloaded model too).
+
+## Quick start without Docker (everything on one port)
 
 With Ollama running and the backend installed (below):
 
@@ -71,7 +109,11 @@ source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-### 3. Download the British voices (~290 MB, from the official `rhasspy/piper-voices`)
+### 3. Download the British voices
+
+The five regional voices come from one Piper model, `en_GB-vctk-medium` (77 MB, from the official
+`rhasspy/piper-voices`). Add `--kokoro` for the optional Kokoro engine (~120 MB, checksummed). The
+Whisper model for voice input (~145 MB) downloads itself the first time the backend starts.
 
 ```bash
 ./scripts/download_voices.sh
@@ -184,6 +226,12 @@ They cover:
 - memory across turns, keyboard use, reload and New conversation;
 - backend down and speech failing, the 500-character limit, themes, and the tablet and phone layouts.
 
+To run the same tests against a deployment that is already running (Docker, a demo server):
+
+```bash
+E2E_BASE_URL=http://localhost:8080 npm run e2e
+```
+
 ---
 
 ## API
@@ -209,6 +257,11 @@ itself, in a way that keeps Ollama's prompt cache effective
 | Repeated phrase (TTS cache) | ~1 ms |
 | Long conversation: prompt processing, cache hit vs trim turn | ~0.18 s vs ~4.4 s |
 | Frontend production bundle (transfer size) | ~53 KB |
+
+**CPU only** (Docker on the same Mac, 11 cores, no GPU): the model writes 24–40 words (tokens)
+per second, and a short reply finishes in 1–4 s. The model and Piper share the CPU: each gets a
+fixed share of the cores (`LLM_NUM_THREAD`, `TTS_THREADS`, automatic by default). Without that,
+the model slowed to under 3 tokens per second whenever speech was being made.
 
 ## Known limitations
 

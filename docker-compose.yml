@@ -1,0 +1,71 @@
+# Ellie: the whole app in one command.
+#
+#   docker compose up -d --build      then open http://localhost:8080
+#
+# Services: web (nginx: Angular build + /api proxy) → backend (FastAPI + Piper) → ollama (LLM).
+# The first start downloads the model (~2 GB) into a volume; later starts reuse it.
+#
+# On a Mac, Ollama inside Docker cannot use the GPU. To use the Ollama app already running on
+# the Mac instead (much faster), add the override file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.host-ollama.yml up -d --build
+#
+# Settings (optional): copy .env.example to .env.
+
+name: ellie
+
+services:
+  ollama:
+    image: ollama/ollama:0.40.4
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: 30m
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    # Linux with an NVIDIA GPU: uncomment to give Ollama the GPU.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # One-off job: download the model if the volume does not have it yet, then exit.
+  ollama-pull:
+    image: ollama/ollama:0.40.4
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull", "${LLM_MODEL:-llama3.2:3b}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build: ./backend
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      LLM_MODEL: ${LLM_MODEL:-llama3.2:3b}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ollama-models:

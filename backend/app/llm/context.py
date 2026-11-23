@@ -49,7 +49,8 @@ def group_turns(messages: list[Message]) -> list[list[Message]]:
     return turns
 
 
-def build_messages(history: list[Message], settings: Settings) -> ContextResult:
+def split_history(history: list[Message], settings: Settings) -> tuple[list[list[Message]], str]:
+    """Validate the transcript; return (older turns, latest user text)."""
     if not history:
         raise ContextError("messages must not be empty")
     latest = history[-1]
@@ -69,8 +70,14 @@ def build_messages(history: list[Message], settings: Settings) -> ContextResult:
             continue
         limit = settings.max_user_chars if msg["role"] == "user" else settings.max_assistant_chars
         older.append({"role": msg["role"], "content": text[:limit]})
+    return group_turns(older), latest_text
 
-    turns = group_turns(older)
+
+def build_messages(history: list[Message], settings: Settings, note: str | None = None,
+                   short: bool = False) -> ContextResult:
+    """``note`` is the rolling memory of dropped turns; it is only used once turns are dropped.
+    ``short`` uses the one-line prompt (for a fine-tuned model)."""
+    turns, latest_text = split_history(history, settings)
     turn_tokens = [sum(estimate_tokens(m["content"]) for m in t) for t in turns]
     budget = settings.history_token_budget - estimate_tokens(latest_text)
 
@@ -87,6 +94,7 @@ def build_messages(history: list[Message], settings: Settings) -> ContextResult:
     dropped = 0 if k_min == 0 else min(len(turns), math.ceil(k_min / chunk) * chunk)
     kept = turns[dropped:]
 
-    messages = [*pinned_messages(), *(m for t in kept for m in t), {"role": "user", "content": latest_text}]
+    pinned = pinned_messages(note.strip() if note and dropped else None, short)
+    messages = [*pinned, *(m for t in kept for m in t), {"role": "user", "content": latest_text}]
     est = sum(turn_tokens[dropped:]) + estimate_tokens(latest_text)
     return ContextResult(messages, turns_total=len(turns), turns_dropped=dropped, est_history_tokens=est)

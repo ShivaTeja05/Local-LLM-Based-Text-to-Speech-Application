@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.llm.base import LLMUnavailableError, StreamStats
+from app.config import get_settings
 from app.llm.prompt import FALLBACK_REPLY, SYSTEM_PROMPT
 from app.main import create_app
 from app.tts.base import EmptySpeechError, VoiceInfo, VoiceNotFoundError
@@ -18,8 +19,8 @@ class FakeLLM:
         self.deltas, self.fail, self.truncated = deltas, fail, truncated
         self.last_messages = None
 
-    async def stream_chat(self, messages, stats: StreamStats | None = None):
-        self.last_messages = messages
+    async def stream_chat(self, messages, stats: StreamStats | None = None, options=None, model=None):
+        self.last_messages, self.last_options, self.last_model = messages, options, model
         if self.fail:
             raise self.fail
         for d in self.deltas:
@@ -156,3 +157,41 @@ def test_voices(make_client):
     assert make_client().get("/api/voices").json() == [
         {"id": "en_GB-test", "label": "Test voice", "is_default": True}
     ]
+
+
+def test_chat_can_use_an_allowed_fine_tuned_model_with_the_short_prompt(make_client):
+    from app.llm.prompt import SHORT_PROMPT
+
+    llm = FakeLLM()
+    events = parse_sse(make_client(llm=llm).post(
+        "/api/chat/stream", json={**USER_HI, "model": "ellie-british"}).text)
+    assert llm.last_model == "ellie-british"
+    assert llm.last_messages[0]["content"] == SHORT_PROMPT
+    assert events[-1][1]["model"] == "ellie-british"
+
+
+def test_chat_default_model_keeps_the_full_prompt(make_client):
+    llm = FakeLLM()
+    make_client(llm=llm).post("/api/chat/stream", json=USER_HI)
+    assert llm.last_model == get_settings().llm_model
+    assert llm.last_messages[0]["content"] == SYSTEM_PROMPT
+
+
+def test_chat_rejects_models_that_are_not_allowed(make_client):
+    r = make_client().post("/api/chat/stream", json={**USER_HI, "model": "qwen3.5:35b"})
+    assert r.status_code == 422
+
+
+def test_cors_allows_the_configured_frontend_pattern_only(monkeypatch):
+    import app.main as main_mod
+    from app.config import Settings
+
+    pattern = r"https://ellie[a-z0-9-]*\.vercel\.app"
+    monkeypatch.setattr(main_mod, "get_settings", lambda: Settings(_env_file=None, cors_origin_regex=pattern))
+    app = main_mod.create_app()
+    app.state.llm, app.state.tts = FakeLLM(), FakeTTS()
+    client = TestClient(app)
+    ok = client.get("/api/voices", headers={"Origin": "https://ellie-git-main-me.vercel.app"})
+    bad = client.get("/api/voices", headers={"Origin": "https://evil.example.com"})
+    assert ok.headers.get("access-control-allow-origin") == "https://ellie-git-main-me.vercel.app"
+    assert "access-control-allow-origin" not in bad.headers

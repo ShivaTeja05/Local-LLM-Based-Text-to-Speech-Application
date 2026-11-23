@@ -25,8 +25,17 @@ Example of the tone and length to aim for (a style guide only, not part of this 
 User: What did you get up to at the weekend?
 Ellie: Oh, I don't really have weekends, being an AI, but I'd love to hear about yours. Did you get up to anything nice?"""
 
+# For the fine-tuned adapter: it learned the style, so the rules are not needed (training/).
+SHORT_PROMPT = "You are Ellie, a warm, friendly conversational partner from England."
+
 FALLBACK_REPLY = "Sorry, I'm having a little trouble thinking just now. Could you try again in a moment?"
 
 
-def pinned_messages() -> list[dict[str, str]]:
-    return [{"role": "system", "content": SYSTEM_PROMPT}]
+def pinned_messages(note: str | None = None, short: bool = False) -> list[dict[str, str]]:
+    """The system prompt (the one-line one for fine-tuned models), plus the rolling memory note
+    once older turns have been dropped."""
+    from app.llm.memory import NOTE_INTRO
+
+    base = SHORT_PROMPT if short else SYSTEM_PROMPT
+    content = f"{base}\n\n{NOTE_INTRO} {note}" if note else base
+    return [{"role": "system", "content": content}]
