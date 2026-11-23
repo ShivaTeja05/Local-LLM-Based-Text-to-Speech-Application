@@ -62,8 +62,10 @@
 .eyes {
   transform-box: fill-box;
   transform-origin: center;
-  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1); // state changes: ease to the new look
 }
+// Following the pointer: move with it at once, no easing to trail behind.
+:host(.tracking) .eyes { transition: none; }
 .eyes.closed .eye { transform: scaleY(0.12); }
 .eyes.closed .glint { opacity: 0; }
 .eye {
@@ -98,34 +100,51 @@
 .hand rect { fill: var(--skin); stroke: var(--ear); stroke-width: 1; }
 
 @media (prefers-reduced-motion: no-preference) {
-  // A small nod as each sentence starts, tilting one way then the other so it doesn't look looped.
-  :host(.nod-a) .nodder { animation: nod-a 520ms ease-out; }
-  :host(.nod-b) .nodder { animation: nod-b 520ms ease-out; }
-  :host(.waving) .arm { animation: wave 1.8s ease-in-out; }
+  // A nod as each sentence starts, tilting one way then the other so it doesn't look looped.
+  :host(.nod-a) .nodder { animation: nod-a 600ms ease-out; }
+  :host(.nod-b) .nodder { animation: nod-b 600ms ease-out; }
+  :host(.waving) .arm { animation: wave 1.9s ease-in-out; }
+  :host(.offering) .arm { animation: offer 1.7s ease-in-out; }
+  :host(.presenting) .arm { animation: present 1.7s ease-in-out; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :host(.waving) .arm { animation: raise 1.8s ease-in-out; }
+  :host(.waving) .arm { animation: raise 1.9s ease-in-out; }
 }
 
 @keyframes nod-a {
   0% { transform: none; }
-  35% { transform: translateY(2.5px) rotate(1.4deg); }
+  35% { transform: translateY(5px) rotate(2.5deg); }
   100% { transform: none; }
 }
 @keyframes nod-b {
   0% { transform: none; }
-  35% { transform: translateY(2.5px) rotate(-1.4deg); }
+  35% { transform: translateY(5px) rotate(-2.5deg); }
   100% { transform: none; }
 }
 @keyframes wave {
   0% { transform: translateY(150px); }
   16% { transform: translateY(0) rotate(0deg); }
-  28% { transform: rotate(16deg); }
-  40% { transform: rotate(-10deg); }
-  52% { transform: rotate(16deg); }
-  64% { transform: rotate(-10deg); }
-  76% { transform: rotate(6deg); }
+  28% { transform: rotate(18deg); }
+  40% { transform: rotate(-12deg); }
+  52% { transform: rotate(18deg); }
+  64% { transform: rotate(-12deg); }
+  76% { transform: rotate(8deg); }
   86% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(150px); }
+}
+// "Over to you": an open palm tipped outwards while she asks.
+@keyframes offer {
+  0% { transform: translateY(150px); }
+  25%, 75% { transform: translateY(40px) rotate(22deg); }
+  100% { transform: translateY(150px); }
+}
+// Explaining: the hand comes up beside her and beats twice with the words.
+@keyframes present {
+  0% { transform: translateY(150px); }
+  22% { transform: translateY(48px) rotate(-8deg); }
+  40% { transform: translateY(58px) rotate(-3deg); }
+  58% { transform: translateY(46px) rotate(-8deg); }
+  76% { transform: translateY(56px) rotate(-4deg); }
   100% { transform: translateY(150px); }
 }
 @keyframes raise {

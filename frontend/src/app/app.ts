@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild,
+} from '@angular/core';
 
 import { AudioPlayerService } from './core/audio-player.service';
 import { ConversationService } from './core/conversation.service';
@@ -30,6 +32,27 @@ export class App {
   protected readonly drafting = signal(false);
   /** The voice in use, so the avatar can show its character. */
   protected readonly voiceId = computed(() => this.settings.voiceId() ?? this.status.defaultVoice()?.id ?? null);
+  /** Cues a hello wave: when Ellie is ready, on her first reply, and on New conversation. */
+  private readonly hello = signal(0);
+  protected readonly waveCue = computed(() => this.hello() + this.chat.fresh());
+  private greetedReady = false;
+  private greetedReply: string | null = null;
+  private readonly greetWhenReady = effect(() => {
+    if (this.status.connection() !== 'ok' || this.greetedReady) return;
+    this.greetedReady = true;
+    setTimeout(() => this.hello.update((n) => n + 1), 400);
+  });
+  private readonly greetOnFirstReply = effect(() => {
+    const id = this.player.sentence() && this.player.speakingId();
+    if (!id) return;
+    untracked(() => {
+      const first = this.chat.messages().find((m) => m.role === 'assistant');
+      if (first?.id === id && this.greetedReply !== id) {
+        this.greetedReply = id;
+        this.hello.update((n) => n + 1);
+      }
+    });
+  });
   /** The phone sheet's contents exist only while it is open (one settings panel in the DOM). */
   protected readonly sheetOpen = signal(false);
   private readonly now = signal(new Date());
