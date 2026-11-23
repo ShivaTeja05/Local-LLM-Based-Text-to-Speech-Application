@@ -54,6 +54,47 @@ describe('SentenceSplitter', () => {
     expect(out[0].length).toBeLessThanOrEqual(long.length);
   });
 
+  it('early start: speaks the opening words at the first comma, without waiting for the sentence', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    const got: string[] = [];
+    for (const t of ["I'm ", 'very ', 'well ', 'indeed ', 'this ', 'morning, ', 'thank ', 'you ', 'for ', 'asking. ', 'How']) got.push(...s.push(t));
+    expect(got).toEqual(["I'm very well indeed this morning,", 'thank you for asking.']);
+    expect(s.flush()).toEqual(['How']);
+  });
+
+  it('early start: with no comma, starts after about twelve words and never on "the" or "when"', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    const text = 'The Lake District is lovely in autumn when the trees turn to gold and red and orange';
+    const got: string[] = [];
+    for (const w of text.split(' ')) got.push(...s.push(w + ' '));
+    expect(got.length).toBe(1);
+    const first = got[0].split(' ');
+    expect(first.length).toBeGreaterThanOrEqual(8);
+    expect(first.length).toBeLessThanOrEqual(12);
+    expect(['the', 'to', 'a', 'and', 'when']).not.toContain(first[first.length - 1].toLowerCase());
+    expect((got[0] + ' ' + s.flush().join(' ')).trim()).toBe(text);
+  });
+
+  it('early start only shapes the first piece; later ones are whole sentences', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    const out: string[] = [];
+    for (const w of 'Oh hello there my dear old friend, lovely to see you. It is a sunny day, so let us go out. Bye'.split(' ')) out.push(...s.push(w + ' '));
+    out.push(...s.flush());
+    expect(out).toEqual(['Oh hello there my dear old friend,', 'lovely to see you.', 'It is a sunny day, so let us go out.', 'Bye']);
+  });
+
+  it('early start waits for a short first sentence rather than splitting it', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    expect(s.push('Hello, ')).toEqual([]);
+    expect(s.push('Sam! How ')).toEqual(['Hello, Sam!']);
+  });
+
+  it('counts how much text has been handed out', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    s.push('One two three four, five six. Seven');
+    expect(s.consumed).toBe('One two three four, five six.'.length);
+  });
+
   it('returns nothing for empty input', () => {
     expect(splitSentences('   ')).toEqual([]);
   });

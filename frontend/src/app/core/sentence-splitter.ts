@@ -6,28 +6,67 @@
  * A terminator at the very end of the buffer is not trusted yet: "5." may become "5.50".
  * Common abbreviations ("Mr.", "e.g.") and initials ("J. Smith") do not end a sentence.
  * A very long run with no terminator is split at a comma so speech never waits too long.
+ *
+ * Early start (live replies): the first piece does not wait for the whole first sentence. It is
+ * sent at the first comma/semicolon/colon/dash once there are at least six words and 30 characters,
+ * or after about twelve words if there is none (never ending on a word like "the" or "when"), so
+ * the voice starts while the LLM is still writing. Leading streaming voices buffer a similar amount
+ * (around 8 words / 40 characters) before speaking: much shorter pieces lose their natural
+ * intonation. Only the first piece is cut early; later ones are whole sentences, to keep seams few.
  */
 const ABBREVIATIONS = new Set([
   // "no" is deliberately absent: "No. I don't think so." is common in conversation.
   'mr', 'mrs', 'ms', 'dr', 'prof', 'st', 'sr', 'jr', 'vs', 'etc', 'e.g', 'i.e', 'approx', 'mt', 'ave',
 ]);
 const TERMINATORS = '.!?…';
+/** Words a spoken piece should not end on: the phrase would sound cut off. */
+const DANGLING = new Set([
+  'the', 'a', 'an', 'of', 'to', 'and', 'or', 'but', 'in', 'on', 'at', 'for', 'with', 'by', 'from', 'my', 'your',
+  'our', 'their', 'his', 'her', 'its', 'is', 'are', 'was', 'were', 'be', 'that', 'this', 'as', 'so', 'if', 'than',
+  'very', 'really', 'quite', 'some', 'any', 'into', 'about', "i'm", "it's", "you're", 'i', 'you', 'we', 'they',
+  'when', 'where', 'while', 'because', 'which', 'who', 'what', 'how', 'not', 'can', 'will', 'would', 'could',
+  'should', 'have', 'has', 'had', 'do', 'does', 'did', 'just', 'also', 'there', 'these', 'those', 'me', 'him',
+]);
+
+export interface SplitterOptions {
+  /** Break a long run with no sentence end at a comma after this many characters. */
+  maxChars?: number;
+  /** Send the first piece after a few words instead of waiting for the first full sentence. */
+  earlyStart?: boolean;
+}
 const CLOSERS = '"\'”’)]';
 
 export class SentenceSplitter {
   private buffer = '';
+  private pushed = 0;
+  private emitted = 0;
+  private readonly maxChars: number;
+  private readonly earlyStart: boolean;
 
-  constructor(private readonly maxChars = 220) {}
+  constructor(options: SplitterOptions | number = {}) {
+    const o = typeof options === 'number' ? { maxChars: options } : options;
+    this.maxChars = o.maxChars ?? 220;
+    this.earlyStart = o.earlyStart ?? false;
+  }
+
+  /** How many characters of the input have been handed out as pieces so far. */
+  get consumed(): number {
+    return this.pushed - this.buffer.length;
+  }
 
   push(text: string): string[] {
     this.buffer += text;
-    return this.extract();
+    this.pushed += text.length;
+    const out = this.extract();
+    this.emitted += out.length;
+    return out;
   }
 
   /** End of stream: whatever is left is the last sentence. */
   flush(): string[] {
     const rest = this.buffer.trim();
     this.buffer = '';
+    if (rest) this.emitted++;
     return rest ? [rest] : [];
   }
 
@@ -48,6 +87,11 @@ export class SentenceSplitter {
     }
     this.buffer = this.buffer.slice(start);
 
+    if (this.earlyStart && this.emitted === 0 && out.length === 0) {
+      const early = this.earlyPiece();
+      if (early) out.push(early);
+    }
+
     // Long run without a sentence end: break at the last comma/semicolon after 60 chars.
     if (this.buffer.length > this.maxChars) {
       const cut = Math.max(this.buffer.lastIndexOf(', '), this.buffer.lastIndexOf('; '));
@@ -57,6 +101,35 @@ export class SentenceSplitter {
       }
     }
     return out;
+  }
+
+  /** The opening words of the first sentence, if there are enough to start speaking. */
+  private earlyPiece(): string | null {
+    // Only whole words count: the last one may still be arriving.
+    const whole = this.buffer.slice(0, this.buffer.search(/\S*$/));
+    const words = [...whole.matchAll(/\S+/g)];
+    // A clause break after at least six words and 30 characters: ", " "; " ": " " - " " — ".
+    for (let k = 5; k < words.length; k++) {
+      const m = words[k];
+      if (m.index! + m[0].length < 30) continue;
+      if (/[,;:]$/.test(m[0]) || (k + 1 < words.length && /^[—–-]$/.test(words[k + 1][0]))) {
+        if (/^\d/.test(words[k + 1]?.[0] ?? '') && /,$/.test(m[0])) continue; // "1, 2, 3": wait
+        return this.take(m.index! + m[0].length);
+      }
+    }
+    // No break yet: after twelve words, cut after the last word that doesn't leave the phrase hanging.
+    if (words.length < 12) return null;
+    for (let k = 11; k >= 7; k--) {
+      const w = words[k][0].toLowerCase().replace(/[^a-z']/g, '');
+      if (!DANGLING.has(w)) return this.take(words[k].index! + words[k][0].length);
+    }
+    return null;
+  }
+
+  private take(end: number): string {
+    const piece = this.buffer.slice(0, end).trim();
+    this.buffer = this.buffer.slice(end).replace(/^\s+/, '');
+    return piece;
   }
 
   private isAbbreviation(sentenceStart: number, dot: number): boolean {

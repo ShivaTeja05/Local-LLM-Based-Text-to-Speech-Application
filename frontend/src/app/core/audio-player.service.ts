@@ -11,22 +11,60 @@ export interface Clip {
 const words = (text: string) => (text.trim().match(/\S+/g) ?? []).length;
 
 /**
- * How long a person would pause after saying this sentence, in milliseconds: a little longer after
- * a question or exclamation, shorter after a clause break, and longer after a long sentence, when
- * they would need more breath. (Natural conversational pauses are roughly 0.2-0.6 s.)
+ * How long a person would pause after saying this piece, in milliseconds. Measured human speech
+ * pauses about half as long at a comma as at a full stop (roughly 1:2), a little longer after a
+ * question, and longer after a long sentence. Conversation runs faster than reading aloud, so these
+ * sit at the brisk end of the measured ranges. A piece cut mid-phrase (no punctuation, the early
+ * start) gets only a tiny gap, so the phrase flows on. Each clip's own silence is trimmed first
+ * (see speechBounds), so this is the whole pause, not an extra on top of a random one.
  */
 export function pauseAfter(text: string): number {
   const t = text.trim();
-  let ms = /[?!]["')\]]*$/.test(t) ? 380 : /[.…]["')\]]*$/.test(t) ? 320 : /[,;:—–-]$/.test(t) ? 180 : 260;
+  const end = /[?]["')\]]*$/.test(t) ? 'question' : /[!]["')\]]*$/.test(t) ? 'exclaim'
+    : /[.…]["')\]]*$/.test(t) ? 'stop' : /[,;:—–-]$/.test(t) ? 'clause' : 'none';
+  let ms = { question: 560, exclaim: 520, stop: 480, clause: 240, none: 90 }[end];
   const n = words(t);
-  if (n > 14) ms += 120;
-  if (n > 24) ms += 80;
+  if (end !== 'none' && end !== 'clause') {
+    if (n > 14) ms += 60;
+    if (n > 24) ms += 40;
+  }
   return ms;
 }
 
-/** Breathe in before a long sentence, or after a long one. */
-export function wantsBreath(previous: string, next: string): boolean {
-  return words(next) >= 10 || words(previous) >= 18;
+/** Does this piece end a sentence (rather than a clause or a phrase)? */
+export const endsSentence = (text: string) => /[.!?…]["')\]]*$/.test(text.trim());
+
+/**
+ * Breathe in before the next sentence? People breathe at sentence breaks every few seconds, not
+ * before every sentence: after about 4 s of speech, or sooner before a long sentence.
+ */
+export function wantsBreath(previous: string, next: string, secondsSinceBreath: number): boolean {
+  if (!endsSentence(previous)) return false;
+  return secondsSinceBreath >= 4 || (words(next) >= 14 && secondsSinceBreath >= 2.5);
+}
+
+/**
+ * Where the speech in a clip starts and ends (sample indices). Synthesised clips carry anything from
+ * 0 to about 0.3 s of silence at either end, different every time, which made the gaps between
+ * pieces uneven. Finds the first and last 10 ms window louder than about -40 dB, keeping a short
+ * margin so soft onsets and the natural decay are not clipped.
+ */
+export function speechBounds(samples: Float32Array, sampleRate: number): { start: number; end: number } {
+  const win = Math.max(1, Math.round(sampleRate * 0.01));
+  const loud = (from: number) => {
+    let sum = 0;
+    for (let i = from; i < Math.min(from + win, samples.length); i++) sum += samples[i] * samples[i];
+    return Math.sqrt(sum / win) > 0.01;
+  };
+  let first = 0;
+  while (first < samples.length && !loud(first)) first += win;
+  let last = samples.length - win;
+  while (last > first && !loud(last)) last -= win;
+  if (first >= samples.length) return { start: 0, end: samples.length }; // silent: leave it
+  return {
+    start: Math.max(0, first - Math.round(sampleRate * 0.03)),
+    end: Math.min(samples.length, last + win + Math.round(sampleRate * 0.06)),
+  };
 }
 
 /**
@@ -34,9 +72,10 @@ export function wantsBreath(previous: string, next: string): boolean {
  * loudness, which drives the avatar's mouth.
  *
  * Clips are queued in sentence order, so sentence 2 can be synthesising while sentence 1 plays,
- * and order is kept even if sentence 2's WAV arrives first. With "natural pauses" on, the player
- * leaves a human-sized pause between sentences, with a soft inhale before long ones. Time spent
- * waiting for the next clip counts towards that pause, so it never adds delay on top.
+ * and order is kept even if sentence 2's WAV arrives first. With "natural pauses" on, each clip's
+ * own silence is trimmed and the player leaves a human-sized pause between pieces (pauseAfter),
+ * with a soft inhale every few seconds at a sentence break. Time spent waiting for the next clip
+ * counts towards that pause, so it never adds delay on top.
  */
 @Injectable({ providedIn: 'root' })
 export class AudioPlayerService {
@@ -132,6 +171,7 @@ export class AudioPlayerService {
   private async pump(gen: number): Promise<void> {
     this.pumping = true;
     let previous: { text: string; endedAt: number } | null = null;
+    let sinceBreath = 0; // seconds of speech since the last inhale
     while (this.queue.length && gen === this.generation) {
       const next = this.queue.shift()!;
       let buffer: AudioBuffer | null = null;
@@ -139,16 +179,18 @@ export class AudioPlayerService {
         const bytes = await next.audio;
         if (gen !== this.generation || !this.ctx) return;
         buffer = await this.ctx.decodeAudioData(bytes.slice(0));
+        if (this.settings.naturalPauses()) buffer = this.trim(buffer);
       } catch (err) {
         console.warn('Skipping a speech clip that failed', err);
         continue;
       }
       if (gen !== this.generation) return;
       if (previous && this.settings.naturalPauses()) {
-        await this.breathe(previous, next.text, gen);
+        if (await this.breathe(previous, next.text, sinceBreath, gen)) sinceBreath = 0;
         if (gen !== this.generation) return;
       }
       await this.playBuffer(buffer, gen, next.text);
+      sinceBreath += buffer.duration;
       previous = { text: next.text, endedAt: performance.now() };
     }
     if (gen !== this.generation) return;
@@ -157,15 +199,30 @@ export class AudioPlayerService {
     if (this.finishing) this.reset();
   }
 
-  /** The pause between two sentences, with a soft inhale before long ones. */
-  private async breathe(previous: { text: string; endedAt: number }, nextText: string, gen: number): Promise<void> {
-    const jitter = 0.85 + Math.random() * 0.3; // ±15%, so it doesn't sound mechanical
-    const pause = pauseAfter(previous.text) * jitter;
+  /** The pause between two pieces, with an inhale every few seconds. Returns whether it breathed. */
+  private async breathe(
+    previous: { text: string; endedAt: number }, nextText: string, sinceBreath: number, gen: number,
+  ): Promise<boolean> {
+    const inhale = wantsBreath(previous.text, nextText, sinceBreath);
+    const jitter = 0.9 + Math.random() * 0.2; // ±10%, so it doesn't sound mechanical
+    const pause = (pauseAfter(previous.text) + (inhale ? 100 : 0)) * jitter; // a breath takes a moment
     const remaining = pause - (performance.now() - previous.endedAt); // time already spent waiting counts
-    if (remaining <= 0) return;
-    if (wantsBreath(previous.text, nextText) && remaining > 220) this.playBreath(remaining);
+    if (remaining <= 0) return false;
+    const breathed = inhale && remaining > 340;
+    if (breathed) this.playBreath(remaining);
     await new Promise((resolve) => setTimeout(resolve, remaining));
     if (gen === this.generation) this.level.set(0);
+    return breathed;
+  }
+
+  /** The clip without its leading and trailing silence (speechBounds). */
+  private trim(buffer: AudioBuffer): AudioBuffer {
+    if (!this.ctx) return buffer;
+    const { start, end } = speechBounds(buffer.getChannelData(0), buffer.sampleRate);
+    if (start === 0 && end === buffer.length) return buffer;
+    const out = this.ctx.createBuffer(buffer.numberOfChannels, end - start, buffer.sampleRate);
+    for (let c = 0; c < buffer.numberOfChannels; c++) out.copyToChannel(buffer.getChannelData(c).subarray(start, end), c);
+    return out;
   }
 
   /** A soft synthetic inhale: band-passed noise with a breathy swell, straight to the speakers

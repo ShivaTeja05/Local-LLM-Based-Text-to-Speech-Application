@@ -55,14 +55,13 @@ export class ConversationService {
     const speak = this.settings.speechEnabled();
     const voice = this.settings.voiceId();
     const clips: Clip[] = [];
-    const splitter = new SentenceSplitter();
-    let spoken = 0;
+    // Start speaking after the first few words; after that, whole sentences.
+    const splitter = new SentenceSplitter({ earlyStart: true });
     const say = (sentence: string) => {
       if (!this.settings.speechEnabled()) return; // switched off mid-reply
       const clip: Clip = { audio: this.api.tts(sentence, voice), text: sentence };
       clip.audio.catch(() => undefined);
       clips.push(clip);
-      spoken++;
       this.player.enqueue(reply.id, clip);
     };
     if (speak) this.player.begin(reply.id);
@@ -79,8 +78,13 @@ export class ConversationService {
         } else if (ev.type === 'done') {
           this.patch(reply.id, { text: ev.text, state: 'done' });
           if (ev.turnsDropped > this.memory().turns) void this.remember(history, ev.turnsDropped);
-          // Speak what is left of the *final* text (the server may trim a cut-off ending).
-          if (speak) splitSentences(ev.text).slice(spoken).forEach(say);
+          // Speak what is left of the *final* text (the server may trim a cut-off ending): normally
+          // the splitter's remainder; if the text changed, whatever follows what was already said.
+          if (speak) {
+            const said = streamed.slice(0, splitter.consumed);
+            if (ev.text.trim() === streamed.trim()) splitter.flush().forEach(say);
+            else if (ev.text.startsWith(said)) splitSentences(ev.text.slice(said.length)).forEach(say);
+          }
         } else {
           this.patch(reply.id, { text: ev.message, state: 'error' });
           this.player.stop();

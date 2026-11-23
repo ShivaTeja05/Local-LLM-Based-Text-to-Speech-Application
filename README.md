@@ -42,8 +42,9 @@ to it. No cloud AI service is used at any step.
 
 **The brief**
 - Text input → a **small local LLM** (`llama3.2:3b` through Ollama) → the reply is shown on screen.
-- The reply is **spoken in British English** by a local TTS engine (Piper), sentence by sentence,
-  *while it is still being written*, so the voice starts about a second after you press Enter.
+- The reply is **spoken in British English** by a local TTS engine (Piper) *while it is still
+  being written*: the voice starts after the first few words (at the first comma, or about twelve
+  words in), then continues sentence by sentence.
 - **▶ Play / ■ Stop** on every reply (replays from a cache) and a **Speak replies aloud** switch.
 - **Lip-synced avatar**: the mouth follows the real loudness of the audio at 60 fps, with blinking,
   a thinking look, and happy or concerned expressions read from the reply.
@@ -57,7 +58,8 @@ to it. No cloud AI service is used at any step.
   a Cornish cove.
 - **Eyes that watch you**: while quiet, the avatar follows your pointer and your typing; while
   speaking, it looks straight at you.
-- **Natural pauses and breaths** between sentences, sized like a person's (switchable).
+- **Natural pauses and breaths**: each clip's own silence is trimmed, then pauses follow measured
+  human speech (a comma about half a full stop) with a breath every few seconds (switchable).
 - **🎤 Push-to-talk voice input** with local Whisper: what you say is written into the box for you
   to check before sending.
 - **Conversation memory**: follow-ups work, and long chats are folded into a short memory note so
