@@ -12,7 +12,9 @@
  * or after about twelve words if there is none (never ending on a word like "the" or "when"), so
  * the voice starts while the LLM is still writing. Leading streaming voices buffer a similar amount
  * (around 8 words / 40 characters) before speaking: much shorter pieces lose their natural
- * intonation. Only the first piece is cut early; later ones are whole sentences, to keep seams few.
+ * intonation. Later pieces may be cut at a comma too, but only once they are longer (a growing
+ * schedule, like ElevenLabs' 120/160/250-character one), so a long second sentence cannot leave
+ * the voice silent while the model is still writing it.
  */
 const ABBREVIATIONS = new Set([
   // "no" is deliberately absent: "No. I don't think so." is common in conversation.
@@ -27,6 +29,17 @@ const DANGLING = new Set([
   'when', 'where', 'while', 'because', 'which', 'who', 'what', 'how', 'not', 'can', 'will', 'would', 'could',
   'should', 'have', 'has', 'had', 'do', 'does', 'did', 'just', 'also', 'there', 'these', 'those', 'me', 'him',
 ]);
+
+/**
+ * Early-start schedule per piece: [min words, min characters] before a comma may end it, and the
+ * word count after which it is cut even without one. The first piece is short so the voice starts
+ * quickly; later ones grow, as the voice has more queued and fewer seams sound better.
+ */
+const SCHEDULE: [number, number, number][] = [
+  [6, 30, 12],
+  [10, 60, 20],
+  [16, 90, 30],
+];
 
 export interface SplitterOptions {
   /** Break a long run with no sentence end at a comma after this many characters. */
@@ -87,8 +100,9 @@ export class SentenceSplitter {
     }
     this.buffer = this.buffer.slice(start);
 
-    if (this.earlyStart && this.emitted === 0 && out.length === 0) {
-      const early = this.earlyPiece();
+    if (this.earlyStart && out.length === 0) {
+      const [minWords, minChars, forceWords] = SCHEDULE[Math.min(this.emitted, SCHEDULE.length - 1)];
+      const early = this.earlyPiece(minWords, minChars, forceWords);
       if (early) out.push(early);
     }
 
@@ -103,23 +117,23 @@ export class SentenceSplitter {
     return out;
   }
 
-  /** The opening words of the first sentence, if there are enough to start speaking. */
-  private earlyPiece(): string | null {
+  /** The opening words of the sentence being written, if there are enough to speak them now. */
+  private earlyPiece(minWords: number, minChars: number, forceWords: number): string | null {
     // Only whole words count: the last one may still be arriving.
     const whole = this.buffer.slice(0, this.buffer.search(/\S*$/));
     const words = [...whole.matchAll(/\S+/g)];
-    // A clause break after at least six words and 30 characters: ", " "; " ": " " - " " — ".
-    for (let k = 5; k < words.length; k++) {
+    // A clause break after enough words and characters: ", " "; " ": " " - " " — ".
+    for (let k = minWords - 1; k < words.length; k++) {
       const m = words[k];
-      if (m.index! + m[0].length < 30) continue;
+      if (m.index! + m[0].length < minChars) continue;
       if (/[,;:]$/.test(m[0]) || (k + 1 < words.length && /^[—–-]$/.test(words[k + 1][0]))) {
         if (/^\d/.test(words[k + 1]?.[0] ?? '') && /,$/.test(m[0])) continue; // "1, 2, 3": wait
         return this.take(m.index! + m[0].length);
       }
     }
-    // No break yet: after twelve words, cut after the last word that doesn't leave the phrase hanging.
-    if (words.length < 12) return null;
-    for (let k = 11; k >= 7; k--) {
+    // No break yet: after enough words, cut after the last word that doesn't leave the phrase hanging.
+    if (words.length < forceWords) return null;
+    for (let k = forceWords - 1; k >= forceWords - 5; k--) {
       const w = words[k][0].toLowerCase().replace(/[^a-z']/g, '');
       if (!DANGLING.has(w)) return this.take(words[k].index! + words[k][0].length);
     }

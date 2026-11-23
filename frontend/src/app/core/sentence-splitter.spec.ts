@@ -83,6 +83,21 @@ describe('SentenceSplitter', () => {
     expect(out).toEqual(['Oh hello there my dear old friend,', 'lovely to see you.', 'It is a sunny day, so let us go out.', 'Bye']);
   });
 
+  it('early start: a long second sentence is cut at a comma too, once it is long enough', () => {
+    const s = new SentenceSplitter({ earlyStart: true });
+    const text = 'Tea is lovely. It arrived in Britain in the seventeenth century as a rather costly luxury, ' +
+      'and within a hundred years it was drunk by almost everyone in the country. Lovely';
+    const out: string[] = [];
+    for (const w of text.split(' ')) out.push(...s.push(w + ' '));
+    out.push(...s.flush());
+    expect(out).toEqual([
+      'Tea is lovely.',
+      'It arrived in Britain in the seventeenth century as a rather costly luxury,',
+      'and within a hundred years it was drunk by almost everyone in the country.',
+      'Lovely',
+    ]);
+  });
+
   it('early start waits for a short first sentence rather than splitting it', () => {
     const s = new SentenceSplitter({ earlyStart: true });
     expect(s.push('Hello, ')).toEqual([]);

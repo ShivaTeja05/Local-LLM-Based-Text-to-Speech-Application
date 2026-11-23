@@ -56,9 +56,9 @@ test('sentences are separated by natural pauses, and the switch turns them off',
   test.skip(on.gaps.length < 1, 'the reply was a single sentence, so there was nothing to pause between');
   const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
   console.log(`pauses on: heard ${on.heard.map(Math.round).join(', ')} ms, ${on.breaths} breath(s)`);
-  // Human-sized and even: every silence a listener hears is between a short comma pause and a long
-  // sentence pause (each clip's own random silence is trimmed, so nothing is added on top).
-  expect(Math.min(...on.heard)).toBeGreaterThanOrEqual(150);
+  // Human-sized and even: every silence a listener hears is between the tiny gap after a phrase cut
+  // early (so it flows on) and a long sentence pause (each clip's own random silence is trimmed).
+  expect(Math.min(...on.heard)).toBeGreaterThanOrEqual(80);
   expect(Math.max(...on.heard)).toBeLessThan(900);
 
   await pauses.click();
