@@ -57,9 +57,14 @@ export class ConversationService {
     const clips: Clip[] = [];
     // Start speaking after the first few words; after that, whole sentences.
     const splitter = new SentenceSplitter({ earlyStart: true });
+    // Speech is requested one piece at a time, in the order it will be heard. Sent all at once, the
+    // pieces competed for the server's CPU, and the one needed next could take 8 s instead of 1 s.
+    let queue: Promise<unknown> = Promise.resolve();
     const say = (sentence: string) => {
       if (!this.settings.speechEnabled()) return; // switched off mid-reply
-      const clip: Clip = { audio: this.api.tts(sentence, voice), text: sentence };
+      const audio = queue.then(() => this.api.tts(sentence, voice));
+      queue = audio.catch(() => undefined);
+      const clip: Clip = { audio, text: sentence };
       clip.audio.catch(() => undefined);
       clips.push(clip);
       this.player.enqueue(reply.id, clip);
