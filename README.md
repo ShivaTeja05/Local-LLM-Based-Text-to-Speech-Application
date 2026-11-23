@@ -1,271 +1,192 @@
-# Local LLM-Based Text-to-Speech Application
+# Ellie: a local LLM that talks back in British English
 
-A web-based conversational prototype. You type a message, a **small LLM running locally** writes
-a reply, and a **local British English voice** reads it aloud. An optional animated avatar
-lip-syncs to the speech. Nothing is sent to a cloud AI service.
+Type a message and a **small language model running on our own server** writes a reply. A
+**local British English voice** reads it aloud as it is written, and an animated avatar lip-syncs
+to it. No cloud AI service is used at any step.
 
-| Part | Technology |
-|---|---|
-| Front end | Angular 21 LTS (TypeScript, signals), Web Audio API, animated SVG avatar |
-| Back end | Python 3.11, FastAPI, Server-Sent Events |
-| LLM (local) | Ollama + `llama3.2:3b`, plus an optional LoRA fine-tune of it (`ellie-british`, [training/](training/README.md)) |
-| TTS (local) | Piper, **five regional English accents** (South, North, Midlands, East, West) from one 77 MB multi-speaker voice; Kokoro-82M as an optional second engine |
-| Voice input (local) | faster-whisper `base.en`: push-to-talk into the message box |
-| Deployment | Docker Compose: nginx (Angular build + `/api` proxy), backend, Ollama. Or one port without Docker. |
+**▶ Live demo: [ellie-rosy.vercel.app](https://ellie-rosy.vercel.app)**
 
-📐 **Architecture, design decisions and delivery plan:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+> The backend sleeps when nobody is using it, to keep costs near zero. The first visit after a
+> quiet spell shows *"Waking Ellie up…"* for up to a minute while the model loads; after that,
+> replies start in about a second.
 
-### What it does
+<p align="center">
+  <img src="docs/images/desktop-light.png" alt="Ellie in the browser: the avatar speaking next to a chat reply" width="860">
+</p>
 
-- Type a message (Enter sends, Shift+Enter adds a line) or tap a starter prompt.
-- Ellie's reply **streams in word by word** and is **spoken in British English as it is written**,
-  one sentence at a time, with a local Piper voice.
-- **▶ Play / ■ Stop** on every reply (replays from a cache, no new synthesis). **Stop** while
-  she is writing keeps the partial reply.
-- **Speak replies aloud** switch and a **voice picker with five regional English accents**, each
-  with a ▶ preview: Southern England (South, female, the default), Newcastle (North, female),
-  Birmingham (Midlands, male), Suffolk (East, male) and South-West England (West, female).
-- **Natural pauses and breaths:** a short, human-sized pause between sentences (longer after
-  questions and long sentences) and a soft inhale before long sentences. A switch turns it off.
-  Light, dark or system **theme**. All remembered in the browser.
-- **🎤 Push-to-talk:** click the microphone, speak, click again. Local Whisper writes it into the
-  message box so you can check it before sending. Talking over Ellie stops her speaking.
-- **Animated avatar** whose mouth follows the real loudness of the speech (60 fps lip-sync),
-  with blinking, a thinking look, and happy or concerned expressions read from the reply.
-- **Conversation memory:** follow-up questions work. In long chats, turns that no longer fit the
-  model's context window are folded into a short **memory note**, so Ellie still knows your name
-  later on. The chat survives a page refresh, and **New conversation** clears it.
-- **Standard vs fine-tuned model** switch (when the `ellie-british` adapter is installed): compare
-  the base model with its long style prompt against the LoRA fine-tune with a one-line prompt.
-- Honest states: a live status (model and voice), a clear message and **Try again** if the
-  backend is down, and text chat keeps working if speech fails.
-- Works on desktop, tablet and phone (the sidebar folds into a top bar and a menu sheet).
+<p align="center">
+  <img src="docs/images/desktop-dark.png" alt="Dark theme" width="560">
+  &nbsp;
+  <img src="docs/images/phone.png" alt="Phone layout" width="190">
+</p>
+
+[![CI](https://github.com/ShivaTeja05/Local-LLM-Based-Text-to-Speech-Application/actions/workflows/ci.yml/badge.svg)](https://github.com/ShivaTeja05/Local-LLM-Based-Text-to-Speech-Application/actions/workflows/ci.yml)
+![Angular 21](https://img.shields.io/badge/Angular-21-dd0031)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.165-009688)
+![LLM](https://img.shields.io/badge/LLM-llama3.2%3A3b-222)
+![TTS](https://img.shields.io/badge/TTS-Piper-4b8bbe)
 
 ---
 
-## Run with Docker (one command)
+## Contents
 
-Needs only [Docker](https://docs.docker.com/get-docker/) (with Compose v2.24+) and about 6 GB of disk.
+- [What it does](#what-it-does)
+- [How it works](#how-it-works)
+- [Run it yourself](#run-it-yourself)
+- [Repository layout](#repository-layout)
+- [Tests](#tests)
+- [Documentation](#documentation)
+- [Known limitations](#known-limitations)
+
+## What it does
+
+**The brief**
+- Text input → a **small local LLM** (`llama3.2:3b` through Ollama) → the reply is shown on screen.
+- The reply is **spoken in British English** by a local TTS engine (Piper), sentence by sentence,
+  *while it is still being written*, so the voice starts about a second after you press Enter.
+- **▶ Play / ■ Stop** on every reply (replays from a cache) and a **Speak replies aloud** switch.
+- **Lip-synced avatar**: the mouth follows the real loudness of the audio at 60 fps, with blinking,
+  a thinking look, and happy or concerned expressions read from the reply.
+
+**Beyond the brief**
+- **Five regional English voices**: Southern England, Newcastle, Birmingham, Suffolk and
+  South-West England, each with a ▶ preview.
+- **Natural pauses and breaths** between sentences, sized like a person's (switchable).
+- **🎤 Push-to-talk voice input** with local Whisper: what you say is written into the box for you
+  to check before sending.
+- **Conversation memory**: follow-ups work, and long chats are folded into a short memory note so
+  Ellie still remembers your name later.
+- **A LoRA fine-tune** of the model that behaves like Ellie with a one-line prompt instead of a
+  256-token one ([training/](training/README.md)).
+- Light, dark and system themes; works on desktop, tablet and phone; keyboard accessible.
+- **Deployed** on Google Cloud Run + Vercel, with rate limits, a daily ceiling and security headers
+  ([deployment](docs/DEPLOYMENT.md), [security](docs/SECURITY.md)).
+
+## How it works
+
+```mermaid
+flowchart LR
+  U["Browser<br/>Angular 21"] -- "1 · conversation" --> B["FastAPI backend"]
+  B -- "2 · prompt + trimmed history" --> L["Ollama<br/>llama3.2:3b"]
+  L -- "tokens" --> B
+  B -- "3 · tokens over SSE" --> U
+  U -- "4 · each finished sentence" --> T["Piper TTS<br/>British voices"]
+  T -- "WAV" --> U
+  U -. "5 · play + lip-sync" .-> A["Avatar"]
+  M["Whisper STT"] -. "voice input" .-> U
+```
+
+1. The browser sends the whole conversation; the backend trims it to fit the model's context
+   window in a way that keeps Ollama's prompt cache effective.
+2. The model streams its reply token by token over Server-Sent Events.
+3. The frontend splits the stream into sentences. Each finished sentence goes to Piper while the
+   next one is still being written, so speech and text arrive together.
+4. The Web Audio API plays the clips in order and measures their loudness to drive the mouth.
+
+| Part | Technology |
+|---|---|
+| Frontend | Angular 21 (signals, standalone components), Web Audio API, animated SVG avatar |
+| Backend | Python, FastAPI, Server-Sent Events |
+| LLM | Ollama + `llama3.2:3b` (Q4_K_M); optional fine-tune `ellie-british` |
+| Text-to-speech | Piper `en_GB-vctk-medium` (five regional speakers); Kokoro-82M as an optional second engine |
+| Speech-to-text | faster-whisper `base.en` |
+| Hosting | Google Cloud Run (backend + model in one container, scales to zero) · Vercel (frontend) |
+
+The full design, with the reasons for each choice, is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Run it yourself
+
+### With Docker (one command)
+
+Needs [Docker](https://docs.docker.com/get-docker/) (Compose v2.24+) and about 6 GB of disk.
 
 ```bash
 docker compose up -d --build
 ```
 
-Open <http://localhost:8080>. The first start downloads the model (~2 GB) into a Docker volume,
-so it takes a few minutes; later starts take seconds. Follow it with `docker compose logs -f`.
+Open <http://localhost:8080>. The first start downloads the model (~2 GB), so it takes a few
+minutes; later starts take seconds.
 
-| Service | What it does |
-|---|---|
-| `web` | nginx: serves the Angular build and proxies `/api` (unbuffered, for streaming) and `/docs` |
-| `backend` | FastAPI + Piper, with the 4 British voices built into the image |
-| `ollama` | runs `llama3.2:3b` (CPU, or an NVIDIA GPU: see the comment in `docker-compose.yml`) |
-| `ollama-pull` | one-off job that downloads the model if the volume does not have it yet |
-
-**On a Mac**, Ollama inside Docker cannot use the GPU. If the Ollama app is installed, use it
-instead (about twice as fast, and no second copy of the model):
+**On a Mac**, Docker cannot use the GPU. If the [Ollama app](https://ollama.com/download) is
+installed, use it instead (about twice as fast):
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.host-ollama.yml up -d --build
 ```
 
-Settings (port, model) are in [`.env.example`](.env.example): copy it to `.env`. Stop with
-`docker compose down` (add `-v` to delete the downloaded model too).
+### Without Docker
 
-## Quick start without Docker (everything on one port)
-
-With Ollama running and the backend installed (below):
+Needs Python 3.11+, Node 20.19+ and [Ollama](https://ollama.com/download).
 
 ```bash
-cd frontend && npm install && npm run build && cd ..
+ollama pull llama3.2:3b
+```
+
+```bash
+cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && ./scripts/download_voices.sh
+```
+
+```bash
+cd frontend && npm install && npm run build
 ```
 
 ```bash
 cd backend && .venv/bin/uvicorn app.main:app --port 8000
 ```
 
-Open <http://localhost:8000>.
+Open <http://localhost:8000>. Step-by-step instructions, the dev server, configuration and the API
+are in [docs/INSTALL.md](docs/INSTALL.md).
 
----
+## Repository layout
 
-## Backend: install and run
-
-### Prerequisites
-
-- **Python 3.11+**
-- **[Ollama](https://ollama.com/download)** running locally
-
-### 1. Get the model
-
-```bash
-ollama pull llama3.2:3b
+```text
+├── backend/                 FastAPI app
+│   ├── app/
+│   │   ├── api/             routes: chat (SSE), tts, stt, memory, health
+│   │   ├── llm/             Ollama adapter, prompts, context trimming, memory notes
+│   │   ├── tts/             Piper + Kokoro engines, regional voices, text normalisation
+│   │   ├── stt/             Whisper engine
+│   │   └── protection.py    rate limits, daily ceiling, concurrency cap, security headers
+│   ├── tests/               unit, API and end-to-end tests (pytest)
+│   └── scripts/             voice and model downloads
+├── frontend/                Angular 21 app
+│   ├── src/app/core/        API client, SSE parser, sentence splitter, audio player, state
+│   ├── src/app/ui/          avatar, chat, composer, settings panel
+│   └── e2e/                 Playwright tests against the real stack
+├── deploy/cloudrun/         Dockerfile, Cloud Build config, start script, status report
+├── training/                LoRA fine-tune: dataset, training scripts, evaluation, results
+├── docs/                    architecture, install, deployment, security, screenshots
+└── docker-compose.yml       nginx + backend + Ollama in one command
 ```
 
-### 2. Install the backend
+## Tests
 
-```bash
-cd backend
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
-```
+| Suite | What it covers | Command |
+|---|---|---|
+| Backend unit + API | prompts, trimming, memory, TTS normalisation, voices, rate limits, security headers | `cd backend && .venv/bin/python -m pytest -q -m "not integration"` |
+| Backend end to end | the real chain Ollama → API → Piper → WAV: style, memory, every voice, concurrency | `cd backend && .venv/bin/python -m pytest tests/test_e2e.py -v -s` |
+| Frontend unit | SSE parser, sentence splitter, audio queue, conversation service | `cd frontend && npm test` |
+| Browser end to end | the brief's "How are you?" example spoken with lip-sync, voices, memory, voice input, phone layout | `cd frontend && npm run e2e` |
 
-### 3. Download the British voices
+The unit suites run on every push in [GitHub Actions](.github/workflows/ci.yml).
 
-The five regional voices come from one Piper model, `en_GB-vctk-medium` (77 MB, from the official
-`rhasspy/piper-voices`). Add `--kokoro` for the optional Kokoro engine (~120 MB, checksummed). The
-Whisper model for voice input (~145 MB) downloads itself the first time the backend starts.
+## Documentation
 
-```bash
-./scripts/download_voices.sh
-```
-
-### 4. (Optional) configure
-
-```bash
-cp .env.example .env
-```
-
-Every setting has a sensible default. See [`backend/.env.example`](backend/.env.example).
-
-### 5. Run
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-Interactive API docs: <http://localhost:8000/docs>
-
-### 6. Try it
-
-```bash
-curl -s localhost:8000/api/health
-```
-
-```bash
-curl -sN localhost:8000/api/chat/stream -H 'Content-Type: application/json' -d '{"messages":[{"role":"user","content":"How are you?"}]}'
-```
-
-```bash
-curl -s localhost:8000/api/tts -H 'Content-Type: application/json' -d '{"text":"I am very well, thank you. How are you?"}' -o reply.wav
-```
-
-Then play `reply.wav` (on macOS: `afplay reply.wav`).
-
-### Tests
-
-```bash
-cd backend && .venv/bin/python -m pytest -q
-```
-
-- **Unit and API tests** use fake LLM/TTS back ends, so they need no model.
-- **End-to-end tests** (`tests/test_e2e.py`) run the real chain: Ollama → API → Piper → WAV.
-  They check reply style, memory, context trimming, every voice, the full sentence-by-sentence
-  pipeline, concurrency and the Ollama-down fallback. They skip themselves if Ollama or the
-  voices are missing. To run only these with a latency report:
-
-```bash
-cd backend && .venv/bin/python -m pytest tests/test_e2e.py -v -s
-```
-
----
-
-## Frontend: install and run
-
-### Prerequisites
-
-- **Node.js 20.19+, 22.12+ or 24+** (Angular 21 LTS)
-- The backend running on port 8000 (above)
-
-### Install
-
-```bash
-cd frontend
-npm install
-```
-
-### Develop
-
-```bash
-npm start
-```
-
-Open <http://localhost:4200>. The dev server proxies `/api` to `localhost:8000` (`proxy.conf.json`).
-
-### Production build
-
-```bash
-npm run build
-```
-
-The output is in `frontend/dist/frontend/browser`. When that folder exists, the backend serves it
-at `/`, so the whole app runs from <http://localhost:8000>.
-
-### Tests
-
-Unit tests (Vitest, no backend needed): the SSE parser, the sentence splitter, tone detection and
-every path of the conversation service, using fakes for the API and the audio player.
-
-```bash
-npm test
-```
-
-End-to-end tests (Playwright) against the **real** stack, on desktop and phone sizes. They start
-the backend and the dev server themselves if they are not already running.
-
-```bash
-npx playwright install chromium
-```
-
-```bash
-npm run e2e
-```
-
-They cover:
-- the brief's "How are you?" example, written and spoken sentence by sentence, with lip-sync checked at 60 fps;
-- replay from the cache, speech off, voice choice and preview;
-- memory across turns, keyboard use, reload and New conversation;
-- backend down and speech failing, the 500-character limit, themes, and the tablet and phone layouts.
-
-To run the same tests against a deployment that is already running (Docker, a demo server):
-
-```bash
-E2E_BASE_URL=http://localhost:8080 npm run e2e
-```
-
----
-
-## API
-
-| Method | Path | Body | Returns |
-|---|---|---|---|
-| GET | `/api/health` | – | LLM and TTS status |
-| POST | `/api/chat/stream` | `{"messages":[{"role":"user","content":"..."}]}` | SSE: `token`…, then `done` (or `error`) |
-| POST | `/api/chat` | same | `{"reply": "...", ...}` |
-| POST | `/api/tts` | `{"text": "...", "voice": "en_GB-cori-high"}` | `audio/wav` |
-| GET | `/api/voices` | – | installed voices |
-
-Send the **whole conversation** in `messages`. The backend trims it to the context window
-itself, in a way that keeps Ollama's prompt cache effective
-([§4](docs/ARCHITECTURE.md#4-context-window-and-conversation-memory)).
-
-## Measured performance (Apple M3 Pro, warm model)
-
-| Step | Time |
+| Document | Contents |
 |---|---|
-| Full short reply, streamed | ~0.5 s |
-| Speech for one sentence (Piper) | 0.2–0.4 s |
-| Repeated phrase (TTS cache) | ~1 ms |
-| Long conversation: prompt processing, cache hit vs trim turn | ~0.18 s vs ~4.4 s |
-| Frontend production bundle (transfer size) | ~53 KB |
-
-**CPU only** (Docker on the same Mac, 11 cores, no GPU): the model writes 24–40 words (tokens)
-per second, and a short reply finishes in 1–4 s. The model and Piper share the CPU: each gets a
-fixed share of the cores (`LLM_NUM_THREAD`, `TTS_THREADS`, automatic by default). Without that,
-the model slowed to under 3 tokens per second whenever speech was being made.
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions, request flow, prompt design, context window, TTS, avatar, voice input |
+| [docs/INSTALL.md](docs/INSTALL.md) | Full local setup, configuration, tests and the HTTP API |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | How the live demo runs on Cloud Run + Vercel, cost, monitoring, redeploying |
+| [docs/SECURITY.md](docs/SECURITY.md) | Rate limits, the cost ceiling, headers, and the results of a security review |
+| [training/README.md](training/README.md) | The LoRA fine-tune: dataset, training, evaluation and results |
 
 ## Known limitations
 
-- A 3B model can occasionally state facts wrongly with confidence. It is tuned for friendly
-  conversation, not factual accuracy.
-- Piper reads most text well. Unusual formats (some abbreviations, codes) may sound odd. Common
-  cases (money, dates, URLs) are fixed in `backend/app/tts/normalise.py`.
+- A 3B model can occasionally state a fact wrongly with confidence. It is tuned for friendly,
+  spoken conversation, not factual accuracy.
+- The live demo runs on CPUs, not a GPU, so a long reply takes several seconds, and the first
+  visit after a quiet spell waits for the model to load.
+- The fine-tuned model is available locally (the **Standard / Fine-tuned** switch). The live demo
+  runs the standard model only, to keep the server image small.
+- Piper reads most text well; unusual formats (some abbreviations or codes) can sound odd.
+  Money, dates and URLs are handled in `backend/app/tts/normalise.py`.

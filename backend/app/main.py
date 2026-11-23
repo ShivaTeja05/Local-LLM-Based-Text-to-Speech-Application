@@ -88,7 +88,9 @@ def create_app() -> FastAPI:
     settings = get_settings()
     logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)  # one line per Ollama call is noise
-    app = FastAPI(title="Ellie: Local LLM Text-to-Speech API", version="0.1.0", lifespan=lifespan)
+    docs = settings.api_docs
+    app = FastAPI(title="Ellie: Local LLM Text-to-Speech API", version="0.1.0", lifespan=lifespan,
+                  docs_url="/docs" if docs else None, redoc_url=None, openapi_url="/openapi.json" if docs else None)
     # Added first, so it sits inside CORS: a 429 still carries CORS headers the browser can read.
     app.add_middleware(ProtectionMiddleware, enabled=settings.rate_limits,
                        max_generations=settings.max_concurrent_generations)

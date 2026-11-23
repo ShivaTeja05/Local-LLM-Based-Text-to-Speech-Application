@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Per-client rate limits and a cap on simultaneous replies (app/protection.py). On by default;
     # the local browser tests switch them off because they send many messages a minute.
     rate_limits: bool = True
+    # The interactive API docs (/docs, /openapi.json). Off in production: no need to publish a
+    # map of the API (set API_DOCS=false on Cloud Run).
+    api_docs: bool = True
     max_concurrent_generations: int = 2
     log_level: str = "INFO"
 

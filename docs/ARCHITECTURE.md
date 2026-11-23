@@ -639,7 +639,7 @@ flowchart TB
 | **Single port (simplest demo)** | `ng build`, then `uvicorn` alone: FastAPI serves the Angular build at `/` and the API at `/api` on port 8000 (it mounts `frontend/dist/frontend/browser` when it exists). |
 | **Server** | `docker compose up -d --build` → `web` (nginx), `backend`, `ollama`, plus a one-off `ollama-pull` job that downloads the model into the `ollama-models` volume. On Linux with an NVIDIA GPU, uncomment the `deploy.resources` block. |
 | **Mac with Docker** | `docker compose -f docker-compose.yml -f docker-compose.host-ollama.yml up -d --build`: `web` and `backend` in Docker, the model in the native Ollama app (Metal GPU), reached at `host.docker.internal:11434`. |
-| **Demo link for submission** | Either (a) a small cloud VM running the compose stack, or (b) the dev machine exposed through a Cloudflare Tunnel during the review window. Both still count as a *locally running* model, because the model runs on our own host. |
+| **Live demo (built)** | Frontend on **Vercel**; backend, Ollama, the model, Piper and Whisper in **one container on Google Cloud Run** (8 vCPU, scales to zero). Still a *locally running* model: it runs in our own container, not a cloud AI service. Details, cost and monitoring: [DEPLOYMENT.md](DEPLOYMENT.md); protection: [SECURITY.md](SECURITY.md). |
 
 On macOS, Ollama inside Docker cannot use the Metal GPU, which is why the override file exists.
 

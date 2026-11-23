@@ -113,3 +113,23 @@ def test_limiter_windows():
 
     a1, a2, a3, b1 = asyncio.run(run())
     assert a1 is None and a2 is None and a3 > 0 and b1 is None
+
+
+def test_global_ceiling_holds_even_across_many_addresses(monkeypatch):
+    import app.protection as prot
+
+    monkeypatch.setattr(prot, "GLOBAL_LIMITS", {("POST", "/api/chat/stream"): [(3, 3600)]})
+    settings = Settings(_env_file=None)
+    monkeypatch.setattr(main_mod, "get_settings", lambda: settings)
+    app = main_mod.create_app()
+    app.state.llm, app.state.tts = FakeLLM(), FakeTTS()
+    client = TestClient(app)
+    codes = [chat(client, ip=f"198.51.100.{i}").status_code for i in range(4)]  # 4 different visitors
+    assert codes == [200, 200, 200, 429]
+    assert "busy day" in chat(client, ip="198.51.100.99").json()["detail"]
+
+
+def test_api_docs_can_be_switched_off(monkeypatch):
+    monkeypatch.setattr(main_mod, "get_settings", lambda: Settings(_env_file=None, api_docs=False))
+    client = TestClient(main_mod.create_app())
+    assert client.get("/docs").status_code == 404 and client.get("/openapi.json").status_code == 404

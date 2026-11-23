@@ -25,8 +25,17 @@ LIMITS: dict[tuple[str, str], list[tuple[int, int]]] = {
     ("POST", "/api/tts"): [(120, 60)],
     ("POST", "/api/stt"): [(10, 60), (100, 3600)],
     ("POST", "/api/memory"): [(10, 60)],
-    ("GET", "/api/health"): [(60, 60)],
+    ("GET", "/api/health"): [(120, 60)],  # the app polls every 15 s; several tabs must fit
     ("GET", "/api/voices"): [(30, 60)],
+}
+# Ceilings across ALL clients together: a hard bound on compute however requests are spread
+# across addresses (the per-client limits alone can be dodged by using many addresses).
+GLOBAL_LIMITS: dict[tuple[str, str], list[tuple[int, int]]] = {
+    ("POST", "/api/chat/stream"): [(600, 3600), (3000, 86400)],
+    ("POST", "/api/chat"): [(600, 3600), (3000, 86400)],
+    ("POST", "/api/tts"): [(4000, 3600), (20000, 86400)],
+    ("POST", "/api/stt"): [(300, 3600), (1500, 86400)],
+    ("POST", "/api/memory"): [(300, 3600), (1500, 86400)],
 }
 GENERATION_ROUTES = {"/api/chat/stream", "/api/chat", "/api/memory"}
 
@@ -88,6 +97,7 @@ class ProtectionMiddleware:
         self.app = app
         self.enabled = enabled
         self.limiter = RateLimiter()
+        self.global_limiter = RateLimiter(GLOBAL_LIMITS)
         self.generations = asyncio.Semaphore(max_generations)
         self.queue_seconds = queue_seconds
         self.headers = [(k.lower().encode(), v.encode()) for k, v in SECURITY_HEADERS.items()]
@@ -113,6 +123,14 @@ class ProtectionMiddleware:
         path, method = scope["path"], scope["method"]
         client = client_key(request)
         retry = await self.limiter.check(method, path, client)
+        if retry is None:
+            busy_day = await self.global_limiter.check(method, path, "*everyone*")
+            if busy_day is not None:
+                log.warning("global limit reached for %s %s", method, path)
+                response = JSONResponse(
+                    {"detail": "Ellie has had a very busy day. Please try again a little later."}, status_code=429,
+                    headers={"Retry-After": str(max(1, math.ceil(busy_day)))})
+                return await response(scope, receive, send_with_headers)
         if retry is not None:
             log.warning("rate limited %s %s (client %s)", method, path, client)
             response: Response = JSONResponse(

@@ -36,7 +36,7 @@ flowchart LR
   F --> D["867 conversations<br/>781 train / 86 val"]
   D --> K["4 · Kaggle T4 · Unsloth<br/>LoRA r=16 on the 16-bit model"]
   K --> A["adapter: safetensors + GGUF"]
-  A --> O["5 · ollama create ellie-british<br/>FROM llama3.2:3b + ADAPTER"]
+  A --> O["5 · merge into the weights<br/>GGUF Q4_K_M · ollama create ellie-british"]
   O --> E["6 · Same 40-prompt eval"]
 ```
 
@@ -97,12 +97,38 @@ argument the installed version does not accept, so a renamed argument cannot fai
 
 ```bash
 training/kaggle/run.sh --fetch      # download the output of the last run
-training/ollama/install.sh          # ollama create ellie-british (FROM llama3.2:3b + ADAPTER)
+training/ollama/install.sh          # ollama create ellie-british from the merged Q4_K_M GGUF
 backend/.venv/bin/python training/eval/run_eval.py adapter-short ellie-british --prompt short
 ```
 
 In the app, the settings panel then shows **Model: Standard / Fine-tuned** (the backend sends the
 one-line prompt to the fine-tuned model).
+
+## Results
+
+The final model (v2) with the **one-line prompt**, on the same 40 prompts × 3 samples as the
+baseline (120 replies per row, [`eval/results/summary.json`](eval/results/summary.json)):
+
+| Setup | Prompt tokens | Clean | Too long | Robotic | American | Lists/markdown | Invented life | Cut off | Facts right | Avg words |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `llama3.2:3b` + one-line prompt | 52 | 1.7% | 97.5% | 1.7% | 10% | 14% | 6.7% | 35% | 100% | 90 |
+| `llama3.2:3b` + full prompt (the app today) | 256 | 60% | 33% | 8.3% | 0.8% | 0% | 0% | 0% | 100% | 45 |
+| **`ellie-british` + one-line prompt** | **52** | **86.7%** | **10%** | **0.8%** | **0%** | **0%** | **0%** | **0%** | 75% | **35** |
+| `qwen3.5:35b` + full prompt (the teacher) | 259 | 94.2% | 1.7% | 0.8% | 0% | 0% | 0% | 0% | 100% | 38 |
+
+- With a fifth of the prompt, the fine-tune is **far cleaner than the base model with its full
+  prompt** (86.7% vs 60%) and close to the 35B teacher that wrote its training data: short,
+  spoken, British, no lists, never pretending to have a life.
+- **The cost:** 3 of the 12 fact answers were wrong (75%), where the base model got all 12. A small
+  model loses a little knowledge when its style is retrained; v2 halved the learning rate and
+  trained for 2 epochs instead of 3 after v1 did worse on facts ([`results/`](results/)).
+- It met the targets for length, robotic replies and invented life, and came close on clean
+  replies (86.7%, target 85%).
+
+**Training runs.** Both runs used a T4 GPU. The final one ran on Google Colab, driven from the command line
+([`colab/`](colab/)): LoRA r = 16 at learning rate 1e-4 for 2 epochs, about 7 minutes. Ollama 0.40
+no longer loads separate LoRA adapters, so the adapter is merged into the weights and quantised to
+Q4_K_M with llama.cpp, like the base model ([`ollama/install.sh`](ollama/install.sh)).
 
 ## Commands
 
