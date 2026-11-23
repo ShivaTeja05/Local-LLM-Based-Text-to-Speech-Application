@@ -6,6 +6,7 @@ describe('looks', () => {
     const looks = ids.map((id) => lookFor(id));
     expect(new Set(looks.map((l) => `${l.hair}/${l.outfit}`)).size).toBe(5);
     expect(new Set(looks.map((l) => l.description)).size).toBe(5);
+    expect(new Set(looks.map((l) => l.scene)).size).toBe(5);
   });
 
   it('falls back sensibly for voices without a look of their own', () => {

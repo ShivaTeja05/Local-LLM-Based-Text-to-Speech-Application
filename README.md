@@ -51,6 +51,12 @@ to it. No cloud AI service is used at any step.
 **Beyond the brief**
 - **Five regional English voices**: Southern England, Newcastle, Birmingham, Suffolk and
   South-West England, each with a ▶ preview.
+- **A character for each voice**, dressed in a nod to its region and set against a sunny local
+  scene: a navy blazer by the London Eye, a striped scarf under the Tyne Bridge, a flat cap and
+  waistcoat on a Birmingham canal, a fisherman's jumper by Suffolk beach huts, a yellow oilskin in
+  a Cornish cove.
+- **Eyes that watch you**: while quiet, the avatar follows your pointer and your typing; while
+  speaking, it looks straight at you.
 - **Natural pauses and breaths** between sentences, sized like a person's (switchable).
 - **🎤 Push-to-talk voice input** with local Whisper: what you say is written into the box for you
   to check before sending.
