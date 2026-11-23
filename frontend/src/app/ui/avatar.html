@@ -1,22 +1,136 @@
-<svg class="face" viewBox="0 0 240 240" role="img" aria-label="Ellie, your conversation partner">
+<svg class="face" viewBox="0 0 240 240" [attr.role]="still() ? 'presentation' : 'img'"
+     [attr.aria-label]="still() ? null : label()" [attr.aria-hidden]="still() || null">
+  <defs>
+    <clipPath [attr.id]="faceClip"><ellipse cx="120" cy="118" rx="48" ry="56" /></clipPath>
+  </defs>
   <g class="head">
-    <!-- jumper and neck -->
-    <path class="jumper" d="M34 240 C42 200 76 186 120 186 C164 186 198 200 206 240 Z" />
-    <path class="collar" d="M98 188 Q120 206 142 188" />
+    <!-- clothes -->
+    <path class="top" d="M34 240 C42 200 76 186 120 186 C164 186 198 200 206 240 Z" />
+    @switch (look().outfit) {
+      @case ('blazer') {
+        <!-- tailored blazer: white shirt, lapels, a pocket square -->
+        <path class="shirt" d="M101 186 L120 218 L139 186 Z" />
+        <path class="lapel" d="M101 185 L120 217 L111 228 L88 198 L97 192 Z" />
+        <path class="lapel" d="M139 185 L120 217 L129 228 L152 198 L143 192 Z" />
+        <path class="shirt" d="M157 216 L163 210 L166 216 L168 212 L170 220 L157 221 Z" />
+        <circle class="button" cx="120" cy="233" r="2.2" />
+      }
+      @case ('waistcoat') {
+        <!-- tweed waistcoat, collar and tie -->
+        <path class="shirt" d="M100 186 L120 224 L140 186 Z" />
+        <path class="tie" d="M116.5 202 L123.5 202 L122 209 L118 209 Z M118 209 L122 209 L125.5 233 L120 239 L114.5 233 Z" />
+        <path class="shirt" d="M101 186 L120 202 L110 211 L96 192 Z" />
+        <path class="shirt" d="M139 186 L120 202 L130 211 L144 192 Z" />
+        <path class="edge" d="M99 189 L120 228 L141 189" />
+        <circle class="button" cx="111" cy="224" r="1.8" /><circle class="button" cx="129" cy="224" r="1.8" />
+        <circle class="button" cx="115" cy="235" r="1.8" /><circle class="button" cx="125" cy="235" r="1.8" />
+        <path class="weave" d="M58 222 l5 5 M70 210 l5 5 M76 228 l5 5 M164 210 l5 5 M170 228 l5 5 M182 220 l5 5 M88 236 l4 4 M150 236 l4 4" />
+      }
+      @case ('gansey') {
+        <!-- navy fisherman's gansey: ribbed neck, ridged yoke, cables -->
+        <path class="rib" d="M96 187 Q120 204 144 187" />
+        <path class="ridge" d="M56 212 Q120 196 184 212 M50 220 Q120 204 190 220" />
+        <path class="cable" d="M92 226 q5 5 0 10 q-5 5 0 10" />
+        <path class="cable" d="M148 226 q-5 5 0 10 q5 5 0 10" />
+        <path class="cable" d="M120 222 l6 6 l-6 6 l-6 -6 Z M120 234 l6 6 l-6 6" />
+      }
+      @case ('oilskin') {
+        <!-- yellow oilskin over a Breton stripe -->
+        <path class="shirt" d="M98 186 L120 210 L142 186 Z" />
+        <path class="stripe" d="M101 191 L139 191 M106 197 L134 197 M111 203 L129 203" />
+        <path class="seam" d="M120 209 L120 240" />
+        <circle class="fill-trim" cx="127" cy="224" r="2.4" />
+        <path class="fill-trim" d="M96 185 L120 209 L111 219 L87 194 Z" />
+        <path class="fill-trim" d="M144 185 L120 209 L129 219 L153 194 Z" />
+      }
+      @default {
+        <path class="collar" d="M98 188 Q120 206 142 188" />
+      }
+    }
     <rect class="neck" x="104" y="150" width="32" height="44" rx="12" />
 
-    <!-- hair (back), ears, face -->
-    <path class="hair" d="M52 112 C52 62 82 36 120 36 C158 36 188 62 188 112 L190 166 C178 176 166 174 158 168 L82 168 C74 174 62 176 50 166 Z" />
+    <!-- hair behind the head -->
+    @switch (look().hair) {
+      @case ('bob') {
+        <path class="hair" d="M52 112 C52 62 82 36 120 36 C158 36 188 62 188 112 L190 166 C178 176 166 174 158 168 L82 168 C74 174 62 176 50 166 Z" />
+      }
+      @case ('long') {
+        <path class="hair" d="M50 112 C48 60 82 36 120 36 C158 36 192 60 190 112 L194 190 C186 204 172 206 164 196 C170 208 156 214 150 204 L150 186 C146 178 140 172 136 170 L104 170 C100 172 94 178 90 186 L90 204 C84 214 70 208 76 196 C68 206 54 204 46 190 Z" />
+      }
+      @case ('bun') {
+        <circle class="hair" cx="120" cy="34" r="18" />
+        <rect class="hair-tie" x="108" y="47" width="24" height="5" rx="2.5" />
+        <path class="hair" d="M64 120 C60 70 88 42 120 42 C152 42 180 70 176 120 C176 132 172 140 166 144 L74 144 C68 140 64 132 64 120 Z" />
+      }
+      @case ('cap') {
+        <path class="hair" d="M70 118 C68 92 76 80 86 78 L154 78 C164 80 172 92 170 118 L166 124 L74 124 Z" />
+      }
+      @default {
+        <path class="hair" d="M70 114 C68 68 92 46 120 46 C148 46 172 68 170 114 L166 120 L74 120 Z" />
+      }
+    }
+
+    <!-- ears, face -->
     <ellipse class="ear" cx="72" cy="122" rx="7" ry="11" />
     <ellipse class="ear" cx="168" cy="122" rx="7" ry="11" />
+    @if (look().earrings === 'pearls') {
+      <circle class="pearl" cx="71" cy="134" r="2.6" />
+      <circle class="pearl" cx="169" cy="134" r="2.6" />
+    } @else if (look().earrings === 'hoops') {
+      <circle class="hoop" cx="71" cy="138" r="4.5" />
+      <circle class="hoop" cx="169" cy="138" r="4.5" />
+    }
     <ellipse class="skin" cx="120" cy="118" rx="48" ry="56" />
 
-    <!-- fringe -->
-    <path class="hair" d="M70 116 C66 72 92 50 124 50 C154 50 176 70 174 104 C160 86 138 76 112 78 C94 80 80 92 74 116 Z" />
+    @if (look().outfit === 'scarf') {
+      <path class="scarf" d="M132 200 L150 197 L157 240 L135 240 Z" />
+      <path class="scarf-stripe" d="M133 213 L152 210 M134 226 L154 223" />
+      <path class="scarf" d="M78 176 C96 195 144 195 162 176 L167 195 C146 214 94 214 73 195 Z" />
+      <path class="scarf-stripe" d="M76 185 C96 203 144 203 164 185" />
+    }
 
-    <!-- cheeks -->
+    <!-- hair in front: fringe, bun strands, cap -->
+    @switch (look().hair) {
+      @case ('bob') {
+        <path class="hair" d="M70 116 C66 72 92 50 124 50 C154 50 176 70 174 104 C160 86 138 76 112 78 C94 80 80 92 74 116 Z" />
+      }
+      @case ('long') {
+        <path class="hair" d="M70 120 C64 76 90 48 120 52 C112 68 96 86 76 120 Z M170 120 C176 76 150 48 120 52 C128 68 144 86 164 120 Z" />
+      }
+      @case ('bun') {
+        <path class="hair" d="M70 114 C68 74 92 54 122 54 C150 54 172 72 170 104 C156 80 130 76 104 84 C88 90 76 100 70 114 Z" />
+        <path class="strand" d="M168 104 C175 116 167 127 172 138" />
+      }
+      @case ('cap') {
+        <path class="cap" d="M60 94 C56 56 88 36 124 38 C162 40 186 62 180 92 C160 84 140 82 120 82 C96 82 76 86 60 94 Z" />
+        <path class="tweed" d="M84 60 l6 8 M100 52 l6 8 M118 48 l6 8 M136 50 l6 8 M152 56 l6 8 M76 76 l6 8 M164 72 l6 8" />
+        <path class="brim" d="M74 93 C92 80 148 80 166 93 C150 101 90 101 74 93 Z" />
+      }
+      @default {
+        <path class="hair" d="M72 104 C72 70 96 52 124 54 C150 56 170 74 168 100 C160 86 146 78 128 78 C108 78 88 86 78 106 Z" />
+      }
+    }
+    @if (look().clip) {
+      <polygon class="starfish" points="152,64 153.5,67.9 157.7,68.2 154.5,70.8 155.5,74.9 152,72.6 148.5,74.9 149.5,70.8 146.3,68.2 150.5,67.9" />
+    }
+
+    <!-- cheeks and freckles -->
     <circle class="cheek" cx="92" cy="138" r="9" [attr.opacity]="cheek()" />
     <circle class="cheek" cx="148" cy="138" r="9" [attr.opacity]="cheek()" />
+    @if (look().freckles) {
+      <g class="freckles">
+        <circle cx="95" cy="128" r="1" /><circle cx="100" cy="131" r="1" /><circle cx="105" cy="128" r="1" />
+        <circle cx="135" cy="128" r="1" /><circle cx="140" cy="131" r="1" /><circle cx="145" cy="128" r="1" />
+        <circle cx="117" cy="130" r="0.8" /><circle cx="123" cy="130" r="0.8" />
+      </g>
+    }
+
+    <!-- beard (the mouth is drawn over it) -->
+    @if (look().beard) {
+      <path class="beard" [class.stubble]="look().beard === 'stubble'"
+            [attr.clip-path]="look().beard === 'stubble' ? 'url(#' + faceClip + ')' : null"
+            d="M73 118 C72 150 92 184 120 184 C148 184 168 150 167 118 C163 134 156 146 146 150 C138 140 128 140 120 142 C112 140 102 140 94 150 C84 146 77 134 73 118 Z" />
+    }
 
     <!-- brows -->
     <path class="brow" d="M92 100 Q102 94 112 98" [attr.transform]="leftBrow()" />
@@ -29,6 +143,13 @@
       <circle class="glint" cx="103.6" cy="113.6" r="1.6" />
       <circle class="glint" cx="139.6" cy="113.6" r="1.6" />
     </g>
+    @if (look().glasses) {
+      <g class="glasses">
+        <circle cx="102" cy="116" r="11" />
+        <circle cx="138" cy="116" r="11" />
+        <path d="M113 115 Q120 110 127 115 M91 114 L74 111 M149 114 L166 111" />
+      </g>
+    }
 
     <!-- nose and mouth -->
     <path class="nose" d="M120 122 Q116 134 121 136" />

@@ -11,24 +11,53 @@
   overflow: visible;
 }
 
-.jumper { fill: #34413e; }
-.collar { fill: none; stroke: #263230; stroke-width: 3; stroke-linecap: round; }
-.neck { fill: #dcb092; }
-.hair { fill: #3a2a22; }
-.ear { fill: #e3b797; }
-.skin { fill: #edc9ac; }
-.cheek { fill: #e59a8a; transition: opacity 400ms ease; }
+// Colours come from the voice's look (looks.ts) as custom properties on the host.
+.top { fill: var(--top); }
+.collar { fill: none; stroke: var(--trim); stroke-width: 3; stroke-linecap: round; }
+.fill-trim { fill: var(--trim); }
+.shirt { fill: #f6f4ef; }
+.lapel { fill: color-mix(in srgb, var(--top) 88%, white); stroke: color-mix(in srgb, var(--top) 70%, black); stroke-width: 1.2; stroke-linejoin: round; }
+.button { fill: color-mix(in srgb, var(--top) 60%, black); }
+.tie { fill: var(--trim); }
+.edge { fill: none; stroke: color-mix(in srgb, var(--top) 65%, black); stroke-width: 1.6; stroke-linejoin: round; }
+.weave { fill: none; stroke: color-mix(in srgb, var(--top) 80%, white); stroke-width: 1.4; stroke-linecap: round; opacity: 0.7; }
+.ridge { fill: none; stroke: var(--trim); stroke-width: 2.4; stroke-linecap: round; }
+.stripe { fill: none; stroke: #2b3650; stroke-width: 2.6; }
+.pearl { fill: #f5f1e8; stroke: #d9d2c3; stroke-width: 0.6; }
+.seam { fill: none; stroke: var(--trim); stroke-width: 2; }
+.rib { fill: none; stroke: var(--trim); stroke-width: 6; stroke-linecap: round; }
+.cable { fill: none; stroke: var(--trim); stroke-width: 2.6; stroke-linecap: round; }
+.neck { fill: var(--neck); }
+.hair { fill: var(--hair); }
+.strand { fill: none; stroke: var(--hair); stroke-width: 3; stroke-linecap: round; }
+.hair-tie { fill: #1f1f1f; }
+.ear { fill: var(--ear); }
+.skin { fill: var(--skin); }
+.gold { fill: #d9b35a; }
+.hoop { fill: none; stroke: #d9b35a; stroke-width: 1.6; }
+.scarf { fill: #1f1f1f; }
+.scarf-stripe { fill: none; stroke: #f4f1ea; stroke-width: 3.4; }
+.cap { fill: #6e6152; }
+.tweed { fill: none; stroke: #5d5244; stroke-width: 1.6; stroke-linecap: round; }
+.brim { fill: #574c40; }
+.starfish { fill: #e8755a; stroke: #c95a42; stroke-width: 0.8; stroke-linejoin: round; }
+.freckles circle { fill: color-mix(in srgb, var(--nose) 80%, #6b3b22); opacity: 0.75; }
+.beard { fill: var(--hair); }
+.beard.stubble { opacity: 0.3; }
+.glasses { fill: none; stroke: #262222; stroke-width: 2.2; stroke-linecap: round; }
+.glasses circle { fill: rgb(255 255 255 / 0.08); }
+.cheek { fill: var(--cheek); transition: opacity 400ms ease; }
 .brow {
   fill: none;
-  stroke: #3a2a22;
+  stroke: var(--brow);
   stroke-width: 3.5;
   stroke-linecap: round;
   transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .eye { fill: #2a211c; }
 .glint { fill: #ffffff; }
-.nose { fill: none; stroke: #c99a7c; stroke-width: 2.2; stroke-linecap: round; }
-.mouth { fill: #7c3a33; }
+.nose { fill: none; stroke: var(--nose); stroke-width: 2.2; stroke-linecap: round; }
+.mouth { fill: var(--lips); }
 
 .eyes {
   transform-box: fill-box;

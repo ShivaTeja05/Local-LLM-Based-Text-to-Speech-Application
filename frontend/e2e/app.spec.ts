@@ -39,7 +39,7 @@ test.describe('Ellie: desktop, real backend', () => {
       const t0 = performance.now();
       await new Promise<void>((done) => {
         const tick = () => {
-          shapes.add(document.querySelector('.mouth')!.getAttribute('d')!);
+          shapes.add(document.querySelector('.portrait .mouth')!.getAttribute('d')!);
           const m = /scaleX\(([\d.]+)\)/.exec((document.querySelector('.meter span') as HTMLElement).style.transform);
           maxLevel = Math.max(maxLevel, m ? Number(m[1]) : 0);
           if (performance.now() - t0 < 1000) requestAnimationFrame(tick);

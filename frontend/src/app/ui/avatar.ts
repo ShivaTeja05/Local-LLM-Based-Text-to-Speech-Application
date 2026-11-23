@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, booleanAttribute, computed, inject, input, signal,
+} from '@angular/core';
 
 import { AvatarState, Expression } from '../core/models';
+import { lookFor, paletteStyle } from './looks';
 
 /**
  * Ellie's face. Flat SVG on a 240px grid. The mouth is reshaped every frame from the live
@@ -10,21 +13,34 @@ import { AvatarState, Expression } from '../core/models';
  * Gaze: while Ellie is quiet, her eyes follow what the user is doing: the mouse pointer, or the
  * text box they are typing in. While she speaks she looks straight out at the user, and while
  * she thinks she looks up and away.
+ *
+ * Each voice has its own character (looks.ts): hair, clothes, extras and colours change, while the
+ * face that talks, blinks and watches stays the same.
  */
 @Component({
   selector: 'app-avatar',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './avatar.html',
   styleUrl: './avatar.scss',
-  host: { '[class]': '"is-" + state() + " feels-" + expression()' },
+  host: { '[class]': '"is-" + state() + " feels-" + expression()', '[style]': 'palette()' },
 })
 export class Avatar {
   readonly state = input<AvatarState>('idle');
   readonly expression = input<Expression>('neutral');
   /** 0..1 loudness of the speech playing right now. */
   readonly level = input(0);
+  /** The voice whose character to draw. */
+  readonly voice = input<string | null>(null);
+  /** A still picture (e.g. in the voice list): no blinking, no watching. */
+  readonly still = input(false, { transform: booleanAttribute });
+
+  protected readonly look = computed(() => lookFor(this.voice()));
+  protected readonly palette = computed(() => paletteStyle(this.look()));
+  protected readonly label = computed(() => `Ellie, your conversation partner: ${this.look().description}`);
 
   protected readonly blinking = signal(false);
+  /** Unique per instance: several avatars share the page (the stage and the voice list). */
+  protected readonly faceClip = `ellie-face-${nextAvatarId++}`;
 
   /** Mouth openness 0..1 and smile -1..1. */
   private readonly open = computed(() => (this.state() === 'speaking' ? this.level() : 0));
@@ -64,7 +80,7 @@ export class Avatar {
   constructor() {
     const schedule = () => {
       this.timer = setTimeout(() => {
-        this.blinking.set(true);
+        this.blinking.set(!this.still());
         this.timer = setTimeout(() => {
           this.blinking.set(false);
           schedule();
@@ -79,6 +95,7 @@ export class Avatar {
     let frame = 0;
     const update = () => {
       frame = 0;
+      if (this.still()) return;
       const box = host.getBoundingClientRect();
       this.watching.set(target && box.width ? gazeOffset(target, box) : null);
     };
@@ -118,6 +135,8 @@ export class Avatar {
     return 'translate(0 0)';
   }
 }
+
+let nextAvatarId = 0;
 
 export interface Point {
   x: number;

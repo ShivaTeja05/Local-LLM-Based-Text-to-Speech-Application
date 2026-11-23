@@ -28,6 +28,8 @@ export class App {
 
   private readonly sheet = viewChild.required<ElementRef<HTMLDialogElement>>('sheet');
   protected readonly drafting = signal(false);
+  /** The voice in use, so the avatar can show its character. */
+  protected readonly voiceId = computed(() => this.settings.voiceId() ?? this.status.defaultVoice()?.id ?? null);
   /** The phone sheet's contents exist only while it is open (one settings panel in the DOM). */
   protected readonly sheetOpen = signal(false);
   private readonly now = signal(new Date());

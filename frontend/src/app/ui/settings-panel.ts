@@ -5,6 +5,7 @@ import { AudioPlayerService } from '../core/audio-player.service';
 import { ConversationService } from '../core/conversation.service';
 import { SettingsService, ThemeChoice } from '../core/settings.service';
 import { StatusService, shortName } from '../core/status.service';
+import { Avatar } from './avatar';
 import { Icon } from './icon';
 
 let nextUid = 0;
@@ -12,7 +13,7 @@ let nextUid = 0;
 @Component({
   selector: 'app-settings-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Avatar, Icon],
   templateUrl: './settings-panel.html',
   styleUrl: './settings-panel.scss',
 })

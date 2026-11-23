@@ -27,8 +27,11 @@
         <div class="voice" [class.selected]="selectedVoice() === v.id">
           <button type="button" class="voice-pick" role="radio" [attr.aria-checked]="selectedVoice() === v.id"
                   (click)="chooseVoice(v.id)">
-            <span class="voice-name">{{ name(v.label) }}</span>
-            <span class="voice-accent">{{ accent(v.label) }}</span>
+            <app-avatar class="voice-face" [voice]="v.id" still />
+            <span class="voice-text">
+              <span class="voice-name">{{ name(v.label) }}</span>
+              <span class="voice-accent">{{ accent(v.label) }}</span>
+            </span>
           </button>
           <button type="button" class="voice-preview btn-icon"
                   [attr.aria-label]="(player.speakingId() === 'preview:' + v.id ? 'Stop preview of ' : 'Preview ') + name(v.label)"
