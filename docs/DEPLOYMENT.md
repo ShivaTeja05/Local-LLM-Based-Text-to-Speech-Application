@@ -27,9 +27,9 @@ that is mostly idle, CPUs that scale to zero are the better trade.
 | Setting | Value | Why |
 |---|---|---|
 | Image | [`deploy/cloudrun/Dockerfile`](../deploy/cloudrun/Dockerfile) | Three stages: build the frontend, take the Ollama binary (CPU only), then Python + the model, voices and Whisper |
-| Size | 8 vCPU, 16 GiB | The model writes about 6–7 words a second on 7 threads |
+| Size | 8 vCPU, 16 GiB | The model writes about 5 words a second on 5 threads, about twice as fast as speech |
 | Instances | min 0, max 1 | Scales to zero; one instance at most caps the cost |
-| CPU split | `LLM_NUM_THREAD=7`, `TTS_THREADS=1`, `STT_THREADS=1` | Speech is made while the model is still writing, so each engine gets a fixed share ([ARCHITECTURE §10.2](ARCHITECTURE.md#102-sharing-the-cpu-between-the-llm-and-piper)) |
+| CPU split | `LLM_NUM_THREAD=5`, `TTS_THREADS=2`, `STT_THREADS=1` | Speech is made while the model is still writing, so each engine gets a fixed share ([ARCHITECTURE §10.2](ARCHITECTURE.md#102-sharing-the-cpu-between-the-llm-and-piper)). With 7/1, a long sentence could take 5 s to synthesise during writing and leave a silence; with 5/2 every gap measured stayed under 0.75 s |
 | `CORS_ORIGIN_REGEX` | `https://ellie[a-z0-9-]*\.vercel\.app` | Only the Vercel frontend may call the API from a browser |
 | `API_DOCS` | `false` | No public API map |
 | Start-up | [`start.sh`](../deploy/cloudrun/start.sh) | Starts Ollama, waits for it, then uvicorn on `$PORT` |
@@ -47,7 +47,7 @@ gcloud builds submit --config deploy/cloudrun/cloudbuild.yaml --region=europe-we
 ```
 
 ```bash
-gcloud run deploy ellie --image=europe-west1-docker.pkg.dev/<PROJECT_ID>/ellie/ellie:<TAG> --region=europe-west1 --cpu=8 --memory=16Gi --min-instances=0 --max-instances=1 --cpu-boost --execution-environment=gen2 --set-env-vars=LLM_NUM_THREAD=7,TTS_THREADS=1,STT_THREADS=1,API_DOCS=false --allow-unauthenticated
+gcloud run deploy ellie --image=europe-west1-docker.pkg.dev/<PROJECT_ID>/ellie/ellie:<TAG> --region=europe-west1 --cpu=8 --memory=16Gi --min-instances=0 --max-instances=1 --cpu-boost --execution-environment=gen2 --set-env-vars=LLM_NUM_THREAD=5,TTS_THREADS=2,STT_THREADS=1,API_DOCS=false --allow-unauthenticated
 ```
 
 `CORS_ORIGIN_REGEX` is set the same way (it contains commas and backslashes, so set it on its own
