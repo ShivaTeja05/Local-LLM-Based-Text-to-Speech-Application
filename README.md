@@ -72,6 +72,11 @@ to it. No cloud AI service is used at any step.
   an open voice converter (OpenVoice v2) gives it your voice quality. No training, about 0.6 s per
   sentence; the recording is never stored, and the voice fingerprint stays in your browser
   ([how it works](docs/ARCHITECTURE.md#63-use-my-voice-hear-yourself-speak-british-english-built)).
+- **Measured against real British speech:** a corpus study compares Ellie's replies with the
+  Spoken BNC2014 (Britishness index, Log Ratio, keywords, turn length). The fine-tune makes her
+  spelling and vocabulary fully British (0.77 → 1.00), and the study shows what is still missing:
+  she over-uses *lovely* 23× and lacks the *yeah*, *you know* and tag questions of real talk
+  ([research/](research/README.md)).
 - **A LoRA fine-tune** of the model that behaves like Ellie with a one-line prompt instead of a
   256-token one ([training/](training/README.md)).
 - Light, dark and system themes; works on desktop, tablet and phone; keyboard accessible.
@@ -196,6 +201,7 @@ The unit suites run on every push in [GitHub Actions](.github/workflows/ci.yml).
 | [docs/SECURITY.md](docs/SECURITY.md) | Rate limits, the cost ceiling, headers, and the results of a security review |
 | [docs/PRIVACY.md](docs/PRIVACY.md) | What is stored, where (your browser's own database), for how long, and how to delete it |
 | [training/README.md](training/README.md) | The LoRA fine-tune: dataset, training, evaluation and results |
+| [research/README.md](research/README.md) | **How British is Ellie?** Her replies measured against 10 million words of real British conversation (Spoken BNC2014) |
 
 ## Known limitations
 

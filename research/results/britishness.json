@@ -1,0 +1,1965 @@
+{
+  "corpus": {
+    "name": "Spoken BNC2014 (Love et al. 2017)",
+    "words": 10267222,
+    "turns": 1177516,
+    "words_per_turn": {
+      "mean": 8.7,
+      "median": 5.0
+    },
+    "britishness": {
+      "british": 23315,
+      "american": 1375,
+      "index": 0.944,
+      "british_forms": [
+        [
+          "mum",
+          6303
+        ],
+        [
+          "film",
+          1873
+        ],
+        [
+          "holiday",
+          1739
+        ],
+        [
+          "colour",
+          1035
+        ],
+        [
+          "realise",
+          977
+        ],
+        [
+          "favourite",
+          890
+        ],
+        [
+          "rubbish",
+          799
+        ],
+        [
+          "centre",
+          740
+        ]
+      ],
+      "american_forms": [
+        [
+          "movie",
+          346
+        ],
+        [
+          "movies",
+          178
+        ],
+        [
+          "realize",
+          110
+        ],
+        [
+          "cookie",
+          110
+        ],
+        [
+          "truck",
+          86
+        ],
+        [
+          "candy",
+          84
+        ],
+        [
+          "cookies",
+          82
+        ],
+        [
+          "realized",
+          79
+        ]
+      ]
+    },
+    "features_per_10k": {
+      "lovely": 3.86,
+      "brilliant": 1.48,
+      "cheers": 0.4,
+      "cuppa": 0.02,
+      "quite": 17.0,
+      "rather": 2.29,
+      "reckon": 1.04,
+      "fancy": 0.59,
+      "a bit": 14.49,
+      "loads": 3.01,
+      "mate": 1.28,
+      "proper": 1.16,
+      "awesome": 0.47,
+      "i guess": 2.01,
+      "gotten": 0.1,
+      "yeah": 253.26,
+      "okay / ok": 21.7,
+      "really": 47.23,
+      "actually": 17.07,
+      "you know": 44.63,
+      "i mean": 18.94,
+      "sort of": 13.61,
+      "kind of": 11.35,
+      "i think": 34.39,
+      "like": 153.36,
+      "erm / er / um": 120.74,
+      "tag questions": 23.54
+    }
+  },
+  "models": {
+    "base-full": {
+      "label": "llama3.2:3b + full style prompt (the live app)",
+      "replies": 120,
+      "words": 5333,
+      "words_per_reply": {
+        "mean": 44.4,
+        "median": 41.5
+      },
+      "britishness": {
+        "british": 45,
+        "american": 1,
+        "index": 0.978,
+        "british_forms": [
+          [
+            "favourite",
+            24
+          ],
+          [
+            "colour",
+            8
+          ],
+          [
+            "grey",
+            4
+          ],
+          [
+            "holiday",
+            4
+          ],
+          [
+            "colours",
+            2
+          ],
+          [
+            "favourites",
+            1
+          ],
+          [
+            "travelled",
+            1
+          ],
+          [
+            "holidays",
+            1
+          ]
+        ],
+        "american_forms": [
+          [
+            "cozy",
+            1
+          ]
+        ]
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 31.9,
+          "bnc_per_10k": 3.9,
+          "count": 17,
+          "log_ratio": 3.05,
+          "ll": 41.8
+        },
+        "brilliant": {
+          "per_10k": 50.6,
+          "bnc_per_10k": 1.5,
+          "count": 27,
+          "log_ratio": 5.09,
+          "ll": 137.8
+        },
+        "cheers": {
+          "per_10k": 7.5,
+          "bnc_per_10k": 0.4,
+          "count": 4,
+          "log_ratio": 4.23,
+          "ll": 15.9
+        },
+        "cuppa": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 0.0,
+          "count": 1,
+          "log_ratio": 6.33,
+          "ll": 6.8
+        },
+        "quite": {
+          "per_10k": 16.9,
+          "bnc_per_10k": 17.0,
+          "count": 9,
+          "log_ratio": -0.01,
+          "ll": 0.0
+        },
+        "rather": {
+          "per_10k": 3.8,
+          "bnc_per_10k": 2.3,
+          "count": 2,
+          "log_ratio": 0.71,
+          "ll": 0.4
+        },
+        "reckon": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 1.0,
+          "count": 1,
+          "log_ratio": 0.86,
+          "ll": 0.3
+        },
+        "fancy": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 0.6,
+          "count": 1,
+          "log_ratio": 1.68,
+          "ll": 0.9
+        },
+        "a bit": {
+          "per_10k": 41.3,
+          "bnc_per_10k": 14.5,
+          "count": 22,
+          "log_ratio": 1.51,
+          "ll": 17.5
+        },
+        "loads": {
+          "per_10k": 9.4,
+          "bnc_per_10k": 3.0,
+          "count": 5,
+          "log_ratio": 1.64,
+          "ll": 4.6
+        },
+        "mate": {
+          "per_10k": 11.3,
+          "bnc_per_10k": 1.3,
+          "count": 6,
+          "log_ratio": 3.13,
+          "ll": 15.4
+        },
+        "proper": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.2,
+          "count": 0,
+          "log_ratio": -0.31,
+          "ll": 1.2
+        },
+        "awesome": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.5,
+          "count": 0,
+          "log_ratio": 1.0,
+          "ll": 0.5
+        },
+        "i guess": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 2.0,
+          "count": 0,
+          "log_ratio": -1.1,
+          "ll": 2.1
+        },
+        "gotten": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.1,
+          "count": 0,
+          "log_ratio": 3.25,
+          "ll": 0.1
+        },
+        "yeah": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 253.3,
+          "count": 0,
+          "log_ratio": -8.08,
+          "ll": 270.1
+        },
+        "okay / ok": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 21.7,
+          "count": 1,
+          "log_ratio": -3.53,
+          "ll": 16.2
+        },
+        "really": {
+          "per_10k": 31.9,
+          "bnc_per_10k": 47.2,
+          "count": 17,
+          "log_ratio": -0.57,
+          "ll": 3.0
+        },
+        "actually": {
+          "per_10k": 18.8,
+          "bnc_per_10k": 17.1,
+          "count": 10,
+          "log_ratio": 0.14,
+          "ll": 0.1
+        },
+        "you know": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 44.6,
+          "count": 0,
+          "log_ratio": -5.57,
+          "ll": 47.6
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -4.34,
+          "ll": 20.2
+        },
+        "sort of": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 13.6,
+          "count": 1,
+          "log_ratio": -2.86,
+          "ll": 8.5
+        },
+        "kind of": {
+          "per_10k": 9.4,
+          "bnc_per_10k": 11.3,
+          "count": 5,
+          "log_ratio": -0.28,
+          "ll": 0.2
+        },
+        "i think": {
+          "per_10k": 22.5,
+          "bnc_per_10k": 34.4,
+          "count": 12,
+          "log_ratio": -0.61,
+          "ll": 2.5
+        },
+        "like": {
+          "per_10k": 95.6,
+          "bnc_per_10k": 153.4,
+          "count": 51,
+          "log_ratio": -0.68,
+          "ll": 13.4
+        },
+        "erm / er / um": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 120.7,
+          "count": 0,
+          "log_ratio": -7.01,
+          "ll": 128.7
+        },
+        "tag questions": {
+          "per_10k": 37.5,
+          "bnc_per_10k": 23.5,
+          "count": 20,
+          "log_ratio": 0.67,
+          "ll": 3.7
+        }
+      },
+      "keywords_vs_bnc": {
+        "overused": [
+          {
+            "word": "favourite",
+            "ellie_per_10k": 45.0,
+            "bnc_per_10k": 0.9,
+            "log_ratio": 5.7,
+            "ll": 141.9
+          },
+          {
+            "word": "brilliant",
+            "ellie_per_10k": 50.6,
+            "bnc_per_10k": 1.5,
+            "log_ratio": 5.09,
+            "ll": 137.8
+          },
+          {
+            "word": "chat",
+            "ellie_per_10k": 33.8,
+            "bnc_per_10k": 0.6,
+            "log_ratio": 5.93,
+            "ll": 112.0
+          },
+          {
+            "word": "or",
+            "ellie_per_10k": 150.0,
+            "bnc_per_10k": 40.5,
+            "log_ratio": 1.89,
+            "ll": 92.6
+          },
+          {
+            "word": "your",
+            "ellie_per_10k": 121.9,
+            "bnc_per_10k": 30.2,
+            "log_ratio": 2.01,
+            "ll": 83.4
+          },
+          {
+            "word": "calming",
+            "ellie_per_10k": 11.3,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 9.59,
+            "ll": 65.6
+          },
+          {
+            "word": "spaniels",
+            "ellie_per_10k": 9.4,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 10.91,
+            "ll": 61.8
+          },
+          {
+            "word": "you'll",
+            "ellie_per_10k": 35.6,
+            "bnc_per_10k": 3.1,
+            "log_ratio": 3.54,
+            "ll": 58.4
+          },
+          {
+            "word": "program",
+            "ellie_per_10k": 13.1,
+            "bnc_per_10k": 0.1,
+            "log_ratio": 7.31,
+            "ll": 56.5
+          },
+          {
+            "word": "how's",
+            "ellie_per_10k": 18.8,
+            "bnc_per_10k": 0.5,
+            "log_ratio": 5.29,
+            "ll": 53.6
+          },
+          {
+            "word": "computer",
+            "ellie_per_10k": 22.5,
+            "bnc_per_10k": 0.9,
+            "log_ratio": 4.6,
+            "ll": 53.3
+          },
+          {
+            "word": "plans",
+            "ellie_per_10k": 15.0,
+            "bnc_per_10k": 0.3,
+            "log_ratio": 5.71,
+            "ll": 47.4
+          },
+          {
+            "word": "planning",
+            "ellie_per_10k": 16.9,
+            "bnc_per_10k": 0.5,
+            "log_ratio": 5.2,
+            "ll": 47.2
+          },
+          {
+            "word": "experiences",
+            "ellie_per_10k": 11.3,
+            "bnc_per_10k": 0.1,
+            "log_ratio": 7.16,
+            "ll": 47.2
+          },
+          {
+            "word": "any",
+            "ellie_per_10k": 52.5,
+            "bnc_per_10k": 10.5,
+            "log_ratio": 2.32,
+            "ll": 45.1
+          }
+        ],
+        "underused": [
+          {
+            "word": "yeah",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 253.3,
+            "log_ratio": -8.08,
+            "ll": 270.1
+          },
+          {
+            "word": "oh",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 94.1,
+            "log_ratio": -6.65,
+            "ll": 100.4
+          },
+          {
+            "word": "mm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 80.3,
+            "log_ratio": -6.42,
+            "ll": 85.6
+          },
+          {
+            "word": "i",
+            "ellie_per_10k": 135.0,
+            "bnc_per_10k": 336.9,
+            "log_ratio": -1.32,
+            "ll": 83.6
+          },
+          {
+            "word": "he",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 67.6,
+            "log_ratio": -6.17,
+            "ll": 72.0
+          },
+          {
+            "word": "was",
+            "ellie_per_10k": 18.8,
+            "bnc_per_10k": 118.0,
+            "log_ratio": -2.65,
+            "ll": 69.0
+          },
+          {
+            "word": "know",
+            "ellie_per_10k": 5.6,
+            "bnc_per_10k": 85.1,
+            "log_ratio": -3.92,
+            "ll": 68.4
+          },
+          {
+            "word": "erm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 55.1,
+            "log_ratio": -5.88,
+            "ll": 58.8
+          },
+          {
+            "word": "er",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 50.7,
+            "log_ratio": -5.76,
+            "ll": 54.0
+          },
+          {
+            "word": "they",
+            "ellie_per_10k": 15.0,
+            "bnc_per_10k": 87.6,
+            "log_ratio": -2.55,
+            "ll": 49.2
+          },
+          {
+            "word": "no",
+            "ellie_per_10k": 16.9,
+            "bnc_per_10k": 86.5,
+            "log_ratio": -2.36,
+            "ll": 44.8
+          },
+          {
+            "word": "cos",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 41.7,
+            "log_ratio": -5.47,
+            "ll": 44.4
+          },
+          {
+            "word": "it",
+            "ellie_per_10k": 108.8,
+            "bnc_per_10k": 225.4,
+            "log_ratio": -1.05,
+            "ll": 39.9
+          },
+          {
+            "word": "we",
+            "ellie_per_10k": 11.3,
+            "bnc_per_10k": 65.8,
+            "log_ratio": -2.55,
+            "ll": 37.0
+          },
+          {
+            "word": "she",
+            "ellie_per_10k": 5.6,
+            "bnc_per_10k": 47.6,
+            "log_ratio": -3.08,
+            "ll": 31.9
+          }
+        ]
+      }
+    },
+    "tuned-short": {
+      "label": "ellie-british LoRA fine-tune + one-line prompt",
+      "replies": 120,
+      "words": 4175,
+      "words_per_reply": {
+        "mean": 34.8,
+        "median": 35.0
+      },
+      "britishness": {
+        "british": 28,
+        "american": 0,
+        "index": 1.0,
+        "british_forms": [
+          [
+            "favourite",
+            14
+          ],
+          [
+            "colour",
+            6
+          ],
+          [
+            "colours",
+            2
+          ],
+          [
+            "holidays",
+            2
+          ],
+          [
+            "theatre",
+            1
+          ],
+          [
+            "grey",
+            1
+          ],
+          [
+            "jewellery",
+            1
+          ],
+          [
+            "mum",
+            1
+          ]
+        ],
+        "american_forms": []
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 91.0,
+          "bnc_per_10k": 3.9,
+          "count": 38,
+          "log_ratio": 4.56,
+          "ll": 167.1
+        },
+        "brilliant": {
+          "per_10k": 26.3,
+          "bnc_per_10k": 1.5,
+          "count": 11,
+          "log_ratio": 4.15,
+          "ll": 42.5
+        },
+        "cheers": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.4,
+          "count": 0,
+          "log_ratio": 1.58,
+          "ll": 0.3
+        },
+        "cuppa": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.0,
+          "count": 0,
+          "log_ratio": 5.68,
+          "ll": 0.0
+        },
+        "quite": {
+          "per_10k": 12.0,
+          "bnc_per_10k": 17.0,
+          "count": 5,
+          "log_ratio": -0.51,
+          "ll": 0.7
+        },
+        "rather": {
+          "per_10k": 9.6,
+          "bnc_per_10k": 2.3,
+          "count": 4,
+          "log_ratio": 2.07,
+          "ll": 5.4
+        },
+        "reckon": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.0,
+          "count": 0,
+          "log_ratio": 0.21,
+          "ll": 0.9
+        },
+        "fancy": {
+          "per_10k": 12.0,
+          "bnc_per_10k": 0.6,
+          "count": 5,
+          "log_ratio": 4.35,
+          "ll": 20.6
+        },
+        "a bit": {
+          "per_10k": 4.8,
+          "bnc_per_10k": 14.5,
+          "count": 2,
+          "log_ratio": -1.6,
+          "ll": 3.7
+        },
+        "loads": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 3.0,
+          "count": 0,
+          "log_ratio": -1.33,
+          "ll": 2.5
+        },
+        "mate": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.3,
+          "count": 0,
+          "log_ratio": -0.1,
+          "ll": 1.1
+        },
+        "proper": {
+          "per_10k": 7.2,
+          "bnc_per_10k": 1.2,
+          "count": 3,
+          "log_ratio": 2.63,
+          "ll": 5.9
+        },
+        "awesome": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.5,
+          "count": 0,
+          "log_ratio": 1.35,
+          "ll": 0.4
+        },
+        "i guess": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 2.0,
+          "count": 0,
+          "log_ratio": -0.75,
+          "ll": 1.7
+        },
+        "gotten": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.1,
+          "count": 0,
+          "log_ratio": 3.61,
+          "ll": 0.1
+        },
+        "yeah": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 253.3,
+          "count": 0,
+          "log_ratio": -7.72,
+          "ll": 211.4
+        },
+        "okay / ok": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 21.7,
+          "count": 0,
+          "log_ratio": -4.18,
+          "ll": 18.1
+        },
+        "really": {
+          "per_10k": 9.6,
+          "bnc_per_10k": 47.2,
+          "count": 4,
+          "log_ratio": -2.3,
+          "ll": 18.7
+        },
+        "actually": {
+          "per_10k": 7.2,
+          "bnc_per_10k": 17.1,
+          "count": 3,
+          "log_ratio": -1.25,
+          "ll": 3.1
+        },
+        "you know": {
+          "per_10k": 9.6,
+          "bnc_per_10k": 44.6,
+          "count": 4,
+          "log_ratio": -2.22,
+          "ll": 17.0
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -3.98,
+          "ll": 15.8
+        },
+        "sort of": {
+          "per_10k": 9.6,
+          "bnc_per_10k": 13.6,
+          "count": 4,
+          "log_ratio": -0.51,
+          "ll": 0.6
+        },
+        "kind of": {
+          "per_10k": 26.3,
+          "bnc_per_10k": 11.3,
+          "count": 11,
+          "log_ratio": 1.22,
+          "ll": 6.0
+        },
+        "i think": {
+          "per_10k": 2.4,
+          "bnc_per_10k": 34.4,
+          "count": 1,
+          "log_ratio": -3.84,
+          "ll": 21.4
+        },
+        "like": {
+          "per_10k": 117.4,
+          "bnc_per_10k": 153.4,
+          "count": 49,
+          "log_ratio": -0.39,
+          "ll": 3.8
+        },
+        "erm / er / um": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 120.7,
+          "count": 0,
+          "log_ratio": -6.66,
+          "ll": 100.8
+        },
+        "tag questions": {
+          "per_10k": 2.4,
+          "bnc_per_10k": 23.5,
+          "count": 1,
+          "log_ratio": -3.3,
+          "ll": 13.1
+        }
+      },
+      "keywords_vs_bnc": {
+        "overused": [
+          {
+            "word": "ai",
+            "ellie_per_10k": 45.5,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 13.93,
+            "ll": 279.2
+          },
+          {
+            "word": "your",
+            "ellie_per_10k": 198.8,
+            "bnc_per_10k": 30.2,
+            "log_ratio": 2.72,
+            "ll": 171.7
+          },
+          {
+            "word": "lovely",
+            "ellie_per_10k": 91.0,
+            "bnc_per_10k": 3.9,
+            "log_ratio": 4.56,
+            "ll": 167.1
+          },
+          {
+            "word": "since",
+            "ellie_per_10k": 57.5,
+            "bnc_per_10k": 1.8,
+            "log_ratio": 5.0,
+            "ll": 119.5
+          },
+          {
+            "word": "specific",
+            "ellie_per_10k": 28.7,
+            "bnc_per_10k": 0.3,
+            "log_ratio": 6.64,
+            "ll": 86.3
+          },
+          {
+            "word": "news",
+            "ellie_per_10k": 33.5,
+            "bnc_per_10k": 0.7,
+            "log_ratio": 5.63,
+            "ll": 81.6
+          },
+          {
+            "word": "chat",
+            "ellie_per_10k": 31.1,
+            "bnc_per_10k": 0.6,
+            "log_ratio": 5.81,
+            "ll": 78.9
+          },
+          {
+            "word": "or",
+            "ellie_per_10k": 155.7,
+            "bnc_per_10k": 40.5,
+            "log_ratio": 1.94,
+            "ll": 78.8
+          },
+          {
+            "word": "favourite",
+            "ellie_per_10k": 33.5,
+            "bnc_per_10k": 0.9,
+            "log_ratio": 5.27,
+            "ll": 74.9
+          },
+          {
+            "word": "personal",
+            "ellie_per_10k": 26.3,
+            "bnc_per_10k": 0.4,
+            "log_ratio": 5.93,
+            "ll": 68.6
+          },
+          {
+            "word": "asking",
+            "ellie_per_10k": 28.7,
+            "bnc_per_10k": 0.8,
+            "log_ratio": 5.24,
+            "ll": 63.6
+          },
+          {
+            "word": "check",
+            "ellie_per_10k": 33.5,
+            "bnc_per_10k": 1.4,
+            "log_ratio": 4.56,
+            "ll": 61.6
+          },
+          {
+            "word": "tips",
+            "ellie_per_10k": 16.8,
+            "bnc_per_10k": 0.1,
+            "log_ratio": 7.79,
+            "ll": 61.0
+          },
+          {
+            "word": "access",
+            "ellie_per_10k": 21.6,
+            "bnc_per_10k": 0.3,
+            "log_ratio": 6.24,
+            "ll": 59.9
+          },
+          {
+            "word": "today",
+            "ellie_per_10k": 43.1,
+            "bnc_per_10k": 3.2,
+            "log_ratio": 3.73,
+            "ll": 59.7
+          }
+        ],
+        "underused": [
+          {
+            "word": "yeah",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 253.3,
+            "log_ratio": -7.72,
+            "ll": 211.4
+          },
+          {
+            "word": "no",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 86.5,
+            "log_ratio": -6.17,
+            "ll": 72.2
+          },
+          {
+            "word": "mm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 80.3,
+            "log_ratio": -6.07,
+            "ll": 67.0
+          },
+          {
+            "word": "was",
+            "ellie_per_10k": 14.4,
+            "bnc_per_10k": 118.0,
+            "log_ratio": -3.04,
+            "ll": 61.2
+          },
+          {
+            "word": "he",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 67.6,
+            "log_ratio": -5.82,
+            "ll": 56.4
+          },
+          {
+            "word": "and",
+            "ellie_per_10k": 105.4,
+            "bnc_per_10k": 268.4,
+            "log_ratio": -1.35,
+            "ll": 53.8
+          },
+          {
+            "word": "they",
+            "ellie_per_10k": 9.6,
+            "bnc_per_10k": 87.6,
+            "log_ratio": -3.19,
+            "ll": 47.5
+          },
+          {
+            "word": "erm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 55.1,
+            "log_ratio": -5.52,
+            "ll": 46.0
+          },
+          {
+            "word": "er",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 50.7,
+            "log_ratio": -5.4,
+            "ll": 42.3
+          },
+          {
+            "word": "that's",
+            "ellie_per_10k": 4.8,
+            "bnc_per_10k": 61.8,
+            "log_ratio": -3.69,
+            "ll": 37.3
+          },
+          {
+            "word": "cos",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 41.7,
+            "log_ratio": -5.12,
+            "ll": 34.8
+          },
+          {
+            "word": "oh",
+            "ellie_per_10k": 21.6,
+            "bnc_per_10k": 94.1,
+            "log_ratio": -2.13,
+            "ll": 34.1
+          },
+          {
+            "word": "it's",
+            "ellie_per_10k": 38.3,
+            "bnc_per_10k": 114.8,
+            "log_ratio": -1.58,
+            "ll": 28.8
+          },
+          {
+            "word": "we",
+            "ellie_per_10k": 12.0,
+            "bnc_per_10k": 65.8,
+            "log_ratio": -2.46,
+            "ll": 27.9
+          },
+          {
+            "word": "she",
+            "ellie_per_10k": 4.8,
+            "bnc_per_10k": 47.6,
+            "log_ratio": -3.31,
+            "ll": 26.5
+          }
+        ]
+      }
+    },
+    "base-short": {
+      "label": "llama3.2:3b + one-line prompt (no fine-tune)",
+      "replies": 120,
+      "words": 10695,
+      "words_per_reply": {
+        "mean": 89.1,
+        "median": 88.0
+      },
+      "britishness": {
+        "british": 36,
+        "american": 11,
+        "index": 0.766,
+        "british_forms": [
+          [
+            "colour",
+            9
+          ],
+          [
+            "mum",
+            7
+          ],
+          [
+            "favourite",
+            6
+          ],
+          [
+            "grey",
+            3
+          ],
+          [
+            "holiday",
+            3
+          ],
+          [
+            "theatre",
+            2
+          ],
+          [
+            "sweets",
+            2
+          ],
+          [
+            "centre",
+            1
+          ]
+        ],
+        "american_forms": [
+          [
+            "favorite",
+            5
+          ],
+          [
+            "jewelry",
+            2
+          ],
+          [
+            "cozy",
+            2
+          ],
+          [
+            "colors",
+            1
+          ],
+          [
+            "flavors",
+            1
+          ]
+        ]
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 71.1,
+          "bnc_per_10k": 3.9,
+          "count": 76,
+          "log_ratio": 4.2,
+          "ll": 297.7
+        },
+        "brilliant": {
+          "per_10k": 2.8,
+          "bnc_per_10k": 1.5,
+          "count": 3,
+          "log_ratio": 0.92,
+          "ll": 1.0
+        },
+        "cheers": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.4,
+          "count": 0,
+          "log_ratio": 0.23,
+          "ll": 0.9
+        },
+        "cuppa": {
+          "per_10k": 22.4,
+          "bnc_per_10k": 0.0,
+          "count": 24,
+          "log_ratio": 9.91,
+          "ll": 263.2
+        },
+        "quite": {
+          "per_10k": 10.3,
+          "bnc_per_10k": 17.0,
+          "count": 11,
+          "log_ratio": -0.73,
+          "ll": 3.3
+        },
+        "rather": {
+          "per_10k": 2.8,
+          "bnc_per_10k": 2.3,
+          "count": 3,
+          "log_ratio": 0.29,
+          "ll": 0.1
+        },
+        "reckon": {
+          "per_10k": 0.9,
+          "bnc_per_10k": 1.0,
+          "count": 1,
+          "log_ratio": -0.15,
+          "ll": 0.0
+        },
+        "fancy": {
+          "per_10k": 5.6,
+          "bnc_per_10k": 0.6,
+          "count": 6,
+          "log_ratio": 3.26,
+          "ll": 16.3
+        },
+        "a bit": {
+          "per_10k": 38.3,
+          "bnc_per_10k": 14.5,
+          "count": 41,
+          "log_ratio": 1.4,
+          "ll": 28.7
+        },
+        "loads": {
+          "per_10k": 3.7,
+          "bnc_per_10k": 3.0,
+          "count": 4,
+          "log_ratio": 0.31,
+          "ll": 0.2
+        },
+        "mate": {
+          "per_10k": 25.2,
+          "bnc_per_10k": 1.3,
+          "count": 27,
+          "log_ratio": 4.3,
+          "ll": 109.2
+        },
+        "proper": {
+          "per_10k": 0.9,
+          "bnc_per_10k": 1.2,
+          "count": 1,
+          "log_ratio": -0.31,
+          "ll": 0.0
+        },
+        "awesome": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.5,
+          "count": 0,
+          "log_ratio": -0.01,
+          "ll": 1.0
+        },
+        "i guess": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 2.0,
+          "count": 0,
+          "log_ratio": -2.11,
+          "ll": 4.3
+        },
+        "gotten": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.1,
+          "count": 0,
+          "log_ratio": 2.25,
+          "ll": 0.2
+        },
+        "yeah": {
+          "per_10k": 0.9,
+          "bnc_per_10k": 253.3,
+          "count": 1,
+          "log_ratio": -8.08,
+          "ll": 528.2
+        },
+        "okay / ok": {
+          "per_10k": 1.9,
+          "bnc_per_10k": 21.7,
+          "count": 2,
+          "log_ratio": -3.54,
+          "ll": 32.6
+        },
+        "really": {
+          "per_10k": 13.1,
+          "bnc_per_10k": 47.2,
+          "count": 14,
+          "log_ratio": -1.85,
+          "ll": 37.1
+        },
+        "actually": {
+          "per_10k": 4.7,
+          "bnc_per_10k": 17.1,
+          "count": 5,
+          "log_ratio": -1.87,
+          "ll": 13.6
+        },
+        "you know": {
+          "per_10k": 25.2,
+          "bnc_per_10k": 44.6,
+          "count": 27,
+          "log_ratio": -0.82,
+          "ll": 10.7
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -5.34,
+          "ll": 40.5
+        },
+        "sort of": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 13.6,
+          "count": 0,
+          "log_ratio": -4.86,
+          "ll": 29.1
+        },
+        "kind of": {
+          "per_10k": 6.5,
+          "bnc_per_10k": 11.3,
+          "count": 7,
+          "log_ratio": -0.79,
+          "ll": 2.6
+        },
+        "i think": {
+          "per_10k": 15.0,
+          "bnc_per_10k": 34.4,
+          "count": 16,
+          "log_ratio": -1.2,
+          "ll": 14.9
+        },
+        "like": {
+          "per_10k": 80.4,
+          "bnc_per_10k": 153.4,
+          "count": 86,
+          "log_ratio": -0.93,
+          "ll": 44.9
+        },
+        "erm / er / um": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 120.7,
+          "count": 0,
+          "log_ratio": -8.01,
+          "ll": 258.1
+        },
+        "tag questions": {
+          "per_10k": 22.4,
+          "bnc_per_10k": 23.5,
+          "count": 24,
+          "log_ratio": -0.07,
+          "ll": 0.1
+        }
+      },
+      "keywords_vs_bnc": {
+        "overused": [
+          {
+            "word": "lovely",
+            "ellie_per_10k": 71.1,
+            "bnc_per_10k": 3.9,
+            "log_ratio": 4.2,
+            "ll": 297.7
+          },
+          {
+            "word": "cuppa",
+            "ellie_per_10k": 22.4,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 9.91,
+            "ll": 263.2
+          },
+          {
+            "word": "chat",
+            "ellie_per_10k": 26.2,
+            "bnc_per_10k": 0.6,
+            "log_ratio": 5.56,
+            "ll": 159.8
+          },
+          {
+            "word": "your",
+            "ellie_per_10k": 106.6,
+            "bnc_per_10k": 30.2,
+            "log_ratio": 1.82,
+            "ll": 123.7
+          },
+          {
+            "word": "or",
+            "ellie_per_10k": 125.3,
+            "bnc_per_10k": 40.5,
+            "log_ratio": 1.63,
+            "ll": 121.0
+          },
+          {
+            "word": "love",
+            "ellie_per_10k": 42.1,
+            "bnc_per_10k": 4.7,
+            "log_ratio": 3.17,
+            "ll": 117.2
+          },
+          {
+            "word": "gettin",
+            "ellie_per_10k": 7.5,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 13.91,
+            "ll": 109.9
+          },
+          {
+            "word": "help",
+            "ellie_per_10k": 29.0,
+            "bnc_per_10k": 2.2,
+            "log_ratio": 3.75,
+            "ll": 103.3
+          },
+          {
+            "word": "mate",
+            "ellie_per_10k": 23.4,
+            "bnc_per_10k": 1.2,
+            "log_ratio": 4.23,
+            "ll": 98.8
+          },
+          {
+            "word": "about",
+            "ellie_per_10k": 97.2,
+            "bnc_per_10k": 32.2,
+            "log_ratio": 1.59,
+            "ll": 90.5
+          },
+          {
+            "word": "stroll",
+            "ellie_per_10k": 7.5,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 9.58,
+            "ll": 85.2
+          },
+          {
+            "word": "question",
+            "ellie_per_10k": 20.6,
+            "bnc_per_10k": 1.3,
+            "log_ratio": 3.99,
+            "ll": 80.0
+          },
+          {
+            "word": "spaniels",
+            "ellie_per_10k": 6.5,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 10.39,
+            "ll": 79.9
+          },
+          {
+            "word": "tips",
+            "ellie_per_10k": 9.4,
+            "bnc_per_10k": 0.1,
+            "log_ratio": 6.94,
+            "ll": 75.2
+          },
+          {
+            "word": "raindrops",
+            "ellie_per_10k": 5.6,
+            "bnc_per_10k": 0.0,
+            "log_ratio": 11.49,
+            "ll": 73.4
+          }
+        ],
+        "underused": [
+          {
+            "word": "yeah",
+            "ellie_per_10k": 0.9,
+            "bnc_per_10k": 253.3,
+            "log_ratio": -8.08,
+            "ll": 528.2
+          },
+          {
+            "word": "i",
+            "ellie_per_10k": 97.2,
+            "bnc_per_10k": 336.9,
+            "log_ratio": -1.79,
+            "ll": 253.9
+          },
+          {
+            "word": "oh",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 94.1,
+            "log_ratio": -7.65,
+            "ll": 201.2
+          },
+          {
+            "word": "mm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 80.3,
+            "log_ratio": -7.42,
+            "ll": 171.7
+          },
+          {
+            "word": "no",
+            "ellie_per_10k": 5.6,
+            "bnc_per_10k": 86.5,
+            "log_ratio": -3.95,
+            "ll": 140.1
+          },
+          {
+            "word": "he",
+            "ellie_per_10k": 0.9,
+            "bnc_per_10k": 67.6,
+            "log_ratio": -6.18,
+            "ll": 133.9
+          },
+          {
+            "word": "erm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 55.1,
+            "log_ratio": -6.88,
+            "ll": 117.8
+          },
+          {
+            "word": "er",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 50.7,
+            "log_ratio": -6.76,
+            "ll": 108.3
+          },
+          {
+            "word": "was",
+            "ellie_per_10k": 31.8,
+            "bnc_per_10k": 118.0,
+            "log_ratio": -1.89,
+            "ll": 95.1
+          },
+          {
+            "word": "it",
+            "ellie_per_10k": 102.9,
+            "bnc_per_10k": 225.4,
+            "log_ratio": -1.13,
+            "ll": 89.5
+          },
+          {
+            "word": "cos",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 41.7,
+            "log_ratio": -6.48,
+            "ll": 89.1
+          },
+          {
+            "word": "they",
+            "ellie_per_10k": 22.4,
+            "bnc_per_10k": 87.6,
+            "log_ratio": -1.97,
+            "ll": 74.0
+          },
+          {
+            "word": "well",
+            "ellie_per_10k": 15.9,
+            "bnc_per_10k": 69.7,
+            "log_ratio": -2.13,
+            "ll": 64.8
+          },
+          {
+            "word": "she",
+            "ellie_per_10k": 6.5,
+            "bnc_per_10k": 47.6,
+            "log_ratio": -2.86,
+            "ll": 60.0
+          },
+          {
+            "word": "yes",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 27.8,
+            "log_ratio": -5.9,
+            "ll": 59.5
+          }
+        ]
+      }
+    },
+    "teacher-full": {
+      "label": "qwen3.5:35b + full prompt (wrote the training data)",
+      "replies": 120,
+      "words": 4507,
+      "words_per_reply": {
+        "mean": 37.6,
+        "median": 37.0
+      },
+      "britishness": {
+        "british": 21,
+        "american": 0,
+        "index": 1.0,
+        "british_forms": [
+          [
+            "favourite",
+            10
+          ],
+          [
+            "grey",
+            3
+          ],
+          [
+            "holiday",
+            2
+          ],
+          [
+            "film",
+            2
+          ],
+          [
+            "honour",
+            1
+          ],
+          [
+            "mummy",
+            1
+          ],
+          [
+            "holidays",
+            1
+          ],
+          [
+            "jumper",
+            1
+          ]
+        ],
+        "american_forms": []
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 46.6,
+          "bnc_per_10k": 3.9,
+          "count": 21,
+          "log_ratio": 3.59,
+          "ll": 66.0
+        },
+        "brilliant": {
+          "per_10k": 66.6,
+          "bnc_per_10k": 1.5,
+          "count": 30,
+          "log_ratio": 5.49,
+          "ll": 169.1
+        },
+        "cheers": {
+          "per_10k": 4.4,
+          "bnc_per_10k": 0.4,
+          "count": 2,
+          "log_ratio": 3.47,
+          "ll": 6.0
+        },
+        "cuppa": {
+          "per_10k": 2.2,
+          "bnc_per_10k": 0.0,
+          "count": 1,
+          "log_ratio": 6.57,
+          "ll": 7.1
+        },
+        "quite": {
+          "per_10k": 31.1,
+          "bnc_per_10k": 17.0,
+          "count": 14,
+          "log_ratio": 0.87,
+          "ll": 4.2
+        },
+        "rather": {
+          "per_10k": 22.2,
+          "bnc_per_10k": 2.3,
+          "count": 10,
+          "log_ratio": 3.28,
+          "ll": 27.5
+        },
+        "reckon": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.0,
+          "count": 0,
+          "log_ratio": 0.1,
+          "ll": 0.9
+        },
+        "fancy": {
+          "per_10k": 13.3,
+          "bnc_per_10k": 0.6,
+          "count": 6,
+          "log_ratio": 4.5,
+          "ll": 25.9
+        },
+        "a bit": {
+          "per_10k": 26.6,
+          "bnc_per_10k": 14.5,
+          "count": 12,
+          "log_ratio": 0.88,
+          "ll": 3.7
+        },
+        "loads": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 3.0,
+          "count": 0,
+          "log_ratio": -1.44,
+          "ll": 2.7
+        },
+        "mate": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.3,
+          "count": 0,
+          "log_ratio": -0.21,
+          "ll": 1.2
+        },
+        "proper": {
+          "per_10k": 15.5,
+          "bnc_per_10k": 1.2,
+          "count": 7,
+          "log_ratio": 3.74,
+          "ll": 23.3
+        },
+        "awesome": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.5,
+          "count": 0,
+          "log_ratio": 1.24,
+          "ll": 0.4
+        },
+        "i guess": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 2.0,
+          "count": 0,
+          "log_ratio": -0.86,
+          "ll": 1.8
+        },
+        "gotten": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 0.1,
+          "count": 0,
+          "log_ratio": 3.5,
+          "ll": 0.1
+        },
+        "yeah": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 253.3,
+          "count": 0,
+          "log_ratio": -7.83,
+          "ll": 228.2
+        },
+        "okay / ok": {
+          "per_10k": 2.2,
+          "bnc_per_10k": 21.7,
+          "count": 1,
+          "log_ratio": -3.29,
+          "ll": 13.0
+        },
+        "really": {
+          "per_10k": 11.1,
+          "bnc_per_10k": 47.2,
+          "count": 5,
+          "log_ratio": -2.09,
+          "ll": 18.1
+        },
+        "actually": {
+          "per_10k": 20.0,
+          "bnc_per_10k": 17.1,
+          "count": 9,
+          "log_ratio": 0.23,
+          "ll": 0.2
+        },
+        "you know": {
+          "per_10k": 11.1,
+          "bnc_per_10k": 44.6,
+          "count": 5,
+          "log_ratio": -2.01,
+          "ll": 16.3
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -4.09,
+          "ll": 17.1
+        },
+        "sort of": {
+          "per_10k": 13.3,
+          "bnc_per_10k": 13.6,
+          "count": 6,
+          "log_ratio": -0.03,
+          "ll": 0.0
+        },
+        "kind of": {
+          "per_10k": 33.3,
+          "bnc_per_10k": 11.3,
+          "count": 15,
+          "log_ratio": 1.55,
+          "ll": 12.5
+        },
+        "i think": {
+          "per_10k": 2.2,
+          "bnc_per_10k": 34.4,
+          "count": 1,
+          "log_ratio": -3.95,
+          "ll": 23.5
+        },
+        "like": {
+          "per_10k": 99.8,
+          "bnc_per_10k": 153.4,
+          "count": 45,
+          "log_ratio": -0.62,
+          "ll": 9.6
+        },
+        "erm / er / um": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 120.7,
+          "count": 0,
+          "log_ratio": -6.77,
+          "ll": 108.8
+        },
+        "tag questions": {
+          "per_10k": 4.4,
+          "bnc_per_10k": 23.5,
+          "count": 2,
+          "log_ratio": -2.41,
+          "ll": 10.5
+        }
+      },
+      "keywords_vs_bnc": {
+        "overused": [
+          {
+            "word": "brilliant",
+            "ellie_per_10k": 66.6,
+            "bnc_per_10k": 1.5,
+            "log_ratio": 5.49,
+            "ll": 169.1
+          },
+          {
+            "word": "your",
+            "ellie_per_10k": 159.8,
+            "bnc_per_10k": 30.2,
+            "log_ratio": 2.4,
+            "ll": 122.8
+          },
+          {
+            "word": "afraid",
+            "ellie_per_10k": 31.1,
+            "bnc_per_10k": 0.3,
+            "log_ratio": 6.79,
+            "ll": 103.4
+          },
+          {
+            "word": "or",
+            "ellie_per_10k": 150.9,
+            "bnc_per_10k": 40.5,
+            "log_ratio": 1.9,
+            "ll": 79.3
+          },
+          {
+            "word": "chat",
+            "ellie_per_10k": 28.8,
+            "bnc_per_10k": 0.6,
+            "log_ratio": 5.7,
+            "ll": 77.0
+          },
+          {
+            "word": "absolutely",
+            "ellie_per_10k": 44.4,
+            "bnc_per_10k": 2.8,
+            "log_ratio": 3.99,
+            "ll": 72.9
+          },
+          {
+            "word": "lovely",
+            "ellie_per_10k": 46.6,
+            "bnc_per_10k": 3.9,
+            "log_ratio": 3.59,
+            "ll": 66.0
+          },
+          {
+            "word": "planning",
+            "ellie_per_10k": 24.4,
+            "bnc_per_10k": 0.5,
+            "log_ratio": 5.73,
+            "ll": 65.6
+          },
+          {
+            "word": "sounds",
+            "ellie_per_10k": 39.9,
+            "bnc_per_10k": 2.5,
+            "log_ratio": 3.98,
+            "ll": 65.5
+          },
+          {
+            "word": "digital",
+            "ellie_per_10k": 17.8,
+            "bnc_per_10k": 0.2,
+            "log_ratio": 6.61,
+            "ll": 57.1
+          },
+          {
+            "word": "usually",
+            "ellie_per_10k": 28.8,
+            "bnc_per_10k": 1.3,
+            "log_ratio": 4.43,
+            "ll": 54.9
+          },
+          {
+            "word": "for",
+            "ellie_per_10k": 148.7,
+            "bnc_per_10k": 56.4,
+            "log_ratio": 1.4,
+            "ll": 46.7
+          },
+          {
+            "word": "favourite",
+            "ellie_per_10k": 22.2,
+            "bnc_per_10k": 0.9,
+            "log_ratio": 4.68,
+            "ll": 45.5
+          },
+          {
+            "word": "treating",
+            "ellie_per_10k": 11.1,
+            "bnc_per_10k": 0.1,
+            "log_ratio": 7.78,
+            "ll": 43.5
+          },
+          {
+            "word": "news",
+            "ellie_per_10k": 20.0,
+            "bnc_per_10k": 0.7,
+            "log_ratio": 4.88,
+            "ll": 43.4
+          }
+        ],
+        "underused": [
+          {
+            "word": "yeah",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 253.3,
+            "log_ratio": -7.83,
+            "ll": 228.2
+          },
+          {
+            "word": "i",
+            "ellie_per_10k": 113.2,
+            "bnc_per_10k": 336.9,
+            "log_ratio": -1.57,
+            "ll": 90.4
+          },
+          {
+            "word": "mm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 80.3,
+            "log_ratio": -6.18,
+            "ll": 72.4
+          },
+          {
+            "word": "he",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 67.6,
+            "log_ratio": -5.93,
+            "ll": 60.9
+          },
+          {
+            "word": "erm",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 55.1,
+            "log_ratio": -5.63,
+            "ll": 49.7
+          },
+          {
+            "word": "er",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 50.7,
+            "log_ratio": -5.51,
+            "ll": 45.7
+          },
+          {
+            "word": "it",
+            "ellie_per_10k": 99.8,
+            "bnc_per_10k": 225.4,
+            "log_ratio": -1.18,
+            "ll": 39.9
+          },
+          {
+            "word": "know",
+            "ellie_per_10k": 15.5,
+            "bnc_per_10k": 85.1,
+            "log_ratio": -2.45,
+            "ll": 38.9
+          },
+          {
+            "word": "but",
+            "ellie_per_10k": 24.4,
+            "bnc_per_10k": 100.7,
+            "log_ratio": -2.05,
+            "ll": 37.6
+          },
+          {
+            "word": "cos",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 41.7,
+            "log_ratio": -5.23,
+            "ll": 37.6
+          },
+          {
+            "word": "was",
+            "ellie_per_10k": 35.5,
+            "bnc_per_10k": 118.0,
+            "log_ratio": -1.73,
+            "ll": 35.9
+          },
+          {
+            "word": "no",
+            "ellie_per_10k": 22.2,
+            "bnc_per_10k": 86.5,
+            "log_ratio": -1.96,
+            "ll": 30.7
+          },
+          {
+            "word": "she",
+            "ellie_per_10k": 4.4,
+            "bnc_per_10k": 47.6,
+            "log_ratio": -3.42,
+            "ll": 29.4
+          },
+          {
+            "word": "oh",
+            "ellie_per_10k": 33.3,
+            "bnc_per_10k": 94.1,
+            "log_ratio": -1.5,
+            "ll": 23.6
+          },
+          {
+            "word": "said",
+            "ellie_per_10k": 0.0,
+            "bnc_per_10k": 26.2,
+            "log_ratio": -4.56,
+            "ll": 23.6
+          }
+        ]
+      }
+    }
+  }
+}
