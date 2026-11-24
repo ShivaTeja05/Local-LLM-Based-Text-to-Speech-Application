@@ -92,25 +92,73 @@
 }
 
 // --- Body language -------------------------------------------------------------------------
+// Wrappers, outermost first: .lean (leaning in, reactions of the whole body), .life (breathing at
+// rest), .nodder (nods), .head (bob while speaking).
+.lean, .life { transform-box: view-box; transform-origin: 120px 240px; }
+.lean { transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .nodder { transform-box: view-box; transform-origin: 120px 200px; }
 
 .arm { transform-box: view-box; transform-origin: 204px 180px; transform: translateY(150px); }
 .sleeve { fill: var(--top); }
 .cuff { fill: color-mix(in srgb, var(--top) 80%, black); }
-.hand rect { fill: var(--skin); stroke: var(--ear); stroke-width: 1; }
+.hand rect, .thumb-hand rect { fill: var(--skin); stroke: var(--ear); stroke-width: 1; }
+.knuckles { fill: none; stroke: var(--ear); stroke-width: 1.2; stroke-linecap: round; }
+.thumb-hand { display: none; }
+:host(.thumbs-up) .arm-r .hand { display: none; }
+:host(.thumbs-up) .arm-r .thumb-hand { display: inline; }
+
+// Laughing: happy closed eyes instead of open ones.
+.happy-eye { fill: none; stroke: #2a211c; stroke-width: 2.6; stroke-linecap: round; opacity: 0; }
+:host(.laughing) .eye, :host(.laughing) .glint { opacity: 0; }
+:host(.laughing) .happy-eye { opacity: 1; }
+// A blush for a compliment, warmer cheeks for laughing and thanks.
+:host(.blushing) .cheek { fill: color-mix(in srgb, var(--cheek) 70%, #ff5b6e); }
+
+// Leaning in while the user types; a sympathetic tilt when they share sad news.
+:host(.is-listening) .lean { transform: translateY(-2px) scale(1.025); }
+:host(.comforting) .lean { transform: rotate(-4deg) translateY(1px); }
 
 @media (prefers-reduced-motion: no-preference) {
-  // A nod as each sentence starts, tilting one way then the other so it doesn't look looped.
+  // At rest she breathes, with a slight sway: never frozen.
+  .life { animation: breathe 4.6s ease-in-out infinite; }
+  :host(.laughing) .life { animation: laugh-bounce 0.36s ease-in-out 4; }
+  :host(.cheering) .life { animation: hop 0.5s ease-in-out 3; }
+  :host(.shrugging) .life { animation: shrug-up 1.7s ease-in-out; }
+  // A nod as each sentence starts (and while the user types), tilting one way then the other.
   :host(.nod-a) .nodder { animation: nod-a 600ms ease-out; }
   :host(.nod-b) .nodder { animation: nod-b 600ms ease-out; }
-  :host(.waving) .arm { animation: wave 1.9s ease-in-out; }
-  :host(.offering) .arm { animation: offer 1.7s ease-in-out; }
-  :host(.presenting) .arm { animation: present 1.7s ease-in-out; }
+  :host(.waving) .arm-r { animation: wave 1.9s ease-in-out; }
+  :host(.offering) .arm-r { animation: offer 1.7s ease-in-out; }
+  :host(.presenting) .arm-r { animation: present 1.7s ease-in-out; }
+  :host(.thumbs-up) .arm-r { animation: thumbs 1.7s ease-in-out; }
+  :host(.shrugging) .arm { animation: shrug 1.7s ease-in-out; }
+  :host(.cheering) .arm { animation: cheer 2s ease-in-out; }
+  :host(.comforting) .arm-r { animation: heart 2.6s ease-in-out; }
+  :host(.thanking) .arm-r { animation: heart 2s ease-in-out; }
+  :host(.pondering) .arm-r { animation: chin-in 0.5s ease-out forwards; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :host(.waving) .arm { animation: raise 1.9s ease-in-out; }
+  :host(.waving) .arm-r { animation: raise 1.9s ease-in-out; }
+  :host(.cheering) .arm { animation: raise 2s ease-in-out; }
 }
 
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-1.2px) rotate(0.4deg) scale(1.004); }
+  65% { transform: translateY(-0.4px) rotate(-0.3deg); }
+}
+@keyframes laugh-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) rotate(-0.8deg); }
+}
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-5px); }
+}
+@keyframes shrug-up {
+  0%, 100% { transform: translateY(0); }
+  25%, 75% { transform: translateY(-4px); }
+}
 @keyframes nod-a {
   0% { transform: none; }
   35% { transform: translateY(5px) rotate(2.5deg); }
@@ -146,6 +194,42 @@
   58% { transform: translateY(46px) rotate(-8deg); }
   76% { transform: translateY(56px) rotate(-4deg); }
   100% { transform: translateY(150px); }
+}
+// Thumbs up, with a little pump.
+@keyframes thumbs {
+  0% { transform: translateY(150px); }
+  22% { transform: translate(-14px, 34px) rotate(-6deg); }
+  38% { transform: translate(-14px, 28px) rotate(-6deg); }
+  54%, 80% { transform: translate(-14px, 34px) rotate(-6deg); }
+  100% { transform: translateY(150px); }
+}
+// Both hands out to the sides, palms up, as the shoulders rise.
+@keyframes shrug {
+  0% { transform: translateY(150px); }
+  25%, 75% { transform: translate(6px, 64px) rotate(38deg); }
+  100% { transform: translateY(150px); }
+}
+// Both hands up and shaking with joy.
+@keyframes cheer {
+  0% { transform: translateY(150px); }
+  14% { transform: translate(6px, -6px) rotate(14deg); }
+  28% { transform: translate(6px, -10px) rotate(6deg); }
+  42% { transform: translate(6px, -6px) rotate(16deg); }
+  56% { transform: translate(6px, -10px) rotate(6deg); }
+  70% { transform: translate(6px, -6px) rotate(14deg); }
+  86% { transform: translate(6px, -6px) rotate(10deg); }
+  100% { transform: translateY(150px); }
+}
+// A hand on her heart (on the chest, a little to her left).
+@keyframes heart {
+  0% { transform: translateY(150px); }
+  22%, 80% { transform: translate(-86px, 62px) rotate(-12deg); }
+  100% { transform: translateY(150px); }
+}
+// Thinking: a hand to her chin (held until she starts to answer).
+@keyframes chin-in {
+  0% { transform: translateY(150px); }
+  100% { transform: translate(-66px, 36px) rotate(-6deg); }
 }
 @keyframes raise {
   0%, 100% { transform: translateY(150px); }

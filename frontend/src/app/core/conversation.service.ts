@@ -37,6 +37,8 @@ export class ConversationService {
   readonly loaded: Promise<void> = this.load();
   /** Counts fresh starts (New conversation), so the avatar can wave hello. */
   readonly fresh = signal(0);
+  /** The message the user has just sent (`n` counts up), so the avatar can react to it. */
+  readonly lastSent = signal<{ text: string; n: number } | null>(null);
   /** True while a reply is being generated. */
   readonly generating = signal(false);
   /** Id of the reply whose speech is being prepared for replay. */
@@ -52,6 +54,8 @@ export class ConversationService {
 
     this.player.resumeAudio(); // inside the user's gesture, before any await
     this.player.stop();
+
+    this.lastSent.update((last) => ({ text, n: (last?.n ?? 0) + 1 }));
 
     const user: ChatMessage = { id: newId(), role: 'user', text, state: 'done', createdAt: Date.now() };
     const reply: ChatMessage = { id: newId(), role: 'assistant', text: '', state: 'streaming', createdAt: Date.now() };

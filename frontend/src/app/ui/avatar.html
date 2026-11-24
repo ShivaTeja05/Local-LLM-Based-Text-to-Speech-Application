@@ -93,6 +93,7 @@
       }
     }
   </g>
+  <g class="lean"><g class="life">
   <g class="nodder">
   <g class="head">
     <!-- clothes -->
@@ -233,6 +234,8 @@
       <ellipse class="eye" cx="138" cy="116" rx="5" ry="6.5" />
       <circle class="glint" cx="103.6" cy="113.6" r="1.6" />
       <circle class="glint" cx="139.6" cy="113.6" r="1.6" />
+      <!-- laughing: happy, closed eyes -->
+      <path class="happy-eye" d="M95.5 118 Q102 109 108.5 118 M131.5 118 Q138 109 144.5 118" />
     </g>
     @if (look().glasses) {
       <g class="glasses">
@@ -248,9 +251,12 @@
   </g>
   </g>
 
-  <!-- a waving hand, raised beside the face -->
+  </g></g>
+
+  <!-- her hands: the right one (viewer's right) waves, explains, holds her heart or chin, gives a
+       thumbs up; both together cheer and shrug (the left is the same arm, mirrored) -->
   <g class="arm-clip" [attr.clip-path]="'url(#' + faceClip + '-card)'">
-    <g class="arm">
+    <g class="arm arm-r">
       <path class="sleeve" d="M196 250 L224 250 L214 176 L194 176 Z" />
       <path class="cuff" d="M193.5 176 L214.5 176 L215.5 184 L192.5 184 Z" />
       <g class="hand">
@@ -260,6 +266,25 @@
         <rect x="202" y="118" width="5.5" height="29" rx="2.75" />
         <rect x="208" y="124" width="5.2" height="24" rx="2.6" />
         <rect x="181" y="146" width="16" height="7" rx="3.5" transform="rotate(-38 189 150)" />
+      </g>
+      <g class="thumb-hand">
+        <rect x="190" y="148" width="25" height="30" rx="9" />
+        <rect x="193" y="124" width="7.5" height="30" rx="3.75" />
+        <path class="knuckles" d="M201 156 h12 M201 163 h12 M201 170 h12" />
+      </g>
+    </g>
+    <g transform="translate(240 0) scale(-1 1)">
+      <g class="arm arm-l">
+        <path class="sleeve" d="M196 250 L224 250 L214 176 L194 176 Z" />
+        <path class="cuff" d="M193.5 176 L214.5 176 L215.5 184 L192.5 184 Z" />
+        <g class="hand">
+          <rect x="190" y="140" width="24" height="38" rx="10" />
+          <rect x="190" y="122" width="5.5" height="26" rx="2.75" />
+          <rect x="196" y="117" width="5.5" height="30" rx="2.75" />
+          <rect x="202" y="118" width="5.5" height="29" rx="2.75" />
+          <rect x="208" y="124" width="5.2" height="24" rx="2.6" />
+          <rect x="181" y="146" width="16" height="7" rx="3.5" transform="rotate(-38 189 150)" />
+        </g>
       </g>
     </g>
   </g>

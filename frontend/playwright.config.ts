@@ -34,6 +34,15 @@ export default defineConfig({
       testIgnore: /mobile\.spec\.ts/,
     },
     { name: 'phone', use: { ...devices['Pixel 7'] }, testMatch: /mobile\.spec\.ts/ },
+    // Safari (WebKit) and Firefox, for the core flows: CROSS_BROWSER=1 npx playwright test
+    ...(process.env['CROSS_BROWSER'] ? [
+      { name: 'safari', use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 }, launchOptions: { args: [] } },
+        testMatch: /(app|gaze|gestures|early-speech|your-data)\.spec\.ts/ },
+      // Firefox takes no Chrome flags: allow audio without a click through its own preference instead.
+      { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 },
+          launchOptions: { args: [], firefoxUserPrefs: { 'media.autoplay.default': 0, 'media.autoplay.blocking_policy': 0 } } },
+        testMatch: /(app|gaze|gestures|early-speech|your-data)\.spec\.ts/ },
+    ] : []),
   ],
   webServer: target ? [] : [
     {

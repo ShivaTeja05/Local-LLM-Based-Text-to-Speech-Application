@@ -579,6 +579,24 @@ stateDiagram-v2
 
 ---
 
+### 7.2 Reactions and body language (built)
+
+The illustrated avatar behaves like an animated character: never frozen, and reacting to the user
+as well as to her own words. All rules are plain functions in `ui/gesture.ts`, unit-tested, and
+every behaviour has a browser test (`e2e/reactions.spec.ts`, `e2e/gestures.spec.ts`).
+
+| Trigger | Behaviour |
+|---|---|
+| Always (at rest) | Breathing and a slight sway; blinks every 2.5–6 s, sometimes a double blink |
+| The user types | Leans in; a small nod every few words |
+| The user's message, when sent (`reactionFor`) | Sad news → head tilt, hand on heart, concerned brows (checked first: "passed away" is not good news); good news → cheering, both hands up; a joke → laughing, happy closed eyes; a compliment → blush; thanks → hand on heart; hello → wave. Ordinary messages get no reaction (reacting to everything looks like a tic) |
+| Thinking for more than 0.9 s | Hand to her chin, one brow up, eyes up |
+| Each sentence she speaks (`handFor`, `moodFor`) | A nod; brows and smile for the sentence's feeling; a wave (hello/goodbye), thumbs up (praise), open palm (question), shrug (unsure) or explaining hand |
+
+Priorities: a reaction to the user is never cut short by a speech gesture; a new sentence's gesture
+replaces the last one; the first-reply hello wave only happens when her first sentence has no
+gesture of its own. Respects *reduce motion*.
+
 ## 8. Voice input — "listening" (optional enhancement)
 
 ### Is this a speech-to-speech system?

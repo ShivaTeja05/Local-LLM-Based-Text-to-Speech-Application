@@ -11,6 +11,7 @@ import { SettingsService } from './core/settings.service';
 import { StatusService } from './core/status.service';
 import { VoiceInputService } from './core/voice-input.service';
 import { Avatar } from './ui/avatar';
+import { handFor } from './ui/gesture';
 import { Conversation } from './ui/conversation';
 import { Icon } from './ui/icon';
 import { SettingsPanel } from './ui/settings-panel';
@@ -48,13 +49,15 @@ export class App {
     setTimeout(() => this.hello.update((n) => n + 1), 400);
   });
   private readonly greetOnFirstReply = effect(() => {
-    const id = this.player.sentence() && this.player.speakingId();
+    const sentence = this.player.sentence();
+    const id = sentence && this.player.speakingId();
     if (!id) return;
     untracked(() => {
       const first = this.chat.messages().find((m) => m.role === 'assistant');
       if (first?.id === id && this.greetedReply !== id) {
         this.greetedReply = id;
-        this.hello.update((n) => n + 1);
+        // Only if her first sentence has no gesture of its own (a thumbs up, a question's open palm...).
+        if (!handFor(sentence.text, sentence.n)) this.hello.update((n) => n + 1);
       }
     });
   });

@@ -30,6 +30,7 @@ to it. No cloud AI service is used at any step.
 
 ## Contents
 
+- [How this meets the brief](#how-this-meets-the-brief)
 - [What it does](#what-it-does)
 - [How it works](#how-it-works)
 - [Run it yourself](#run-it-yourself)
@@ -37,6 +38,29 @@ to it. No cloud AI service is used at any step.
 - [Tests](#tests)
 - [Documentation](#documentation)
 - [Known limitations](#known-limitations)
+
+## How this meets the brief
+
+Every requirement of the technical task, where it is built, and how it is checked.
+
+| The brief asks for | Built | Checked by |
+|---|---|---|
+| A web prototype in JavaScript with Angular | Angular 21 front end ([`frontend/`](frontend/)) | Unit tests (Vitest) and browser tests (Playwright) |
+| Natural-language input, a response in writing **and** spoken British English | Text box (and optional push-to-talk); the reply streams in as text and is spoken as it is written | `e2e/app.spec.ts`: *the brief example* |
+| A **small, locally running LLM**, not a cloud API | `llama3.2:3b` (3B parameters) in Ollama, in our own container; optional LoRA fine-tune | `backend/tests/test_e2e.py` against the real model |
+| Coherent replies to basic conversation | British persona prompt, context window and memory; evaluated on 40 prompts × 3 samples | [`training/eval`](training/eval/), memory tests |
+| Input sent to the model, response returned to the front end | FastAPI, streamed over Server-Sent Events | API and end-to-end tests |
+| British English speech, a natural UK voice, generated locally | Piper (local, no cloud TTS): five regional UK voices; natural pauses tuned to measured speech | `test_piper_engine.py`, `e2e/pauses.spec.ts` |
+| A **button to play** the spoken response | ▶ Play / ■ Stop on every reply (replays from a cache) | `e2e/app.spec.ts`: *replay uses the cached audio* |
+| An option to **switch speech on or off** | *Speak replies aloud* switch (remembered) | `e2e/app.spec.ts`: *speech off* |
+| The example: "How are you?" → "I'm very well, thank you. How are you?" spoken aloud | A starter button for exactly this prompt | `e2e/app.spec.ts`: written, spoken sentence by sentence, lips moving |
+| *(Optional)* An animated avatar with lip movements and facial expressions | Lip-sync from the audio's loudness, blinks, moods per sentence, nods, gestures, eyes that follow you; a character for each voice | `e2e/gestures.spec.ts`, `e2e/gaze.spec.ts` |
+| A web application suitable for deployment on a web server | `docker compose up` (nginx + backend + Ollama); live on Cloud Run + Vercel | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| Front-end **and** back-end components | `frontend/` (Angular) and `backend/` (FastAPI) | CI on every push |
+| Source code and brief instructions to install, configure and run | This repository; [Run it yourself](#run-it-yourself), [docs/INSTALL.md](docs/INSTALL.md), `.env.example` | |
+
+**Browsers tested:** Chrome/Edge (Chromium) and Safari (WebKit) run the core browser suite;
+phone and tablet layouts are tested too. Firefox is not yet covered by the automated tests.
 
 ## What it does
 
@@ -56,6 +80,10 @@ to it. No cloud AI service is used at any step.
   scene: a navy blazer by the London Eye, a striped scarf under the Tyne Bridge, a flat cap and
   waistcoat on a Birmingham canal, a fisherman's jumper by Suffolk beach huts, a yellow oilskin in
   a Cornish cove.
+- **She reacts to you, not just to her own words:** she laughs at a joke (happy closed eyes),
+  cheers good news with both hands up, puts a hand on her heart for sad news or thanks, blushes at a
+  compliment, leans in and nods along while you type, rests her chin on her hand while she thinks,
+  gives a thumbs up for praise and shrugs when unsure. At rest she breathes, sways and blinks.
 - **Eyes that watch you**: while quiet, the avatar follows your pointer and your typing; while
   speaking, it looks straight at you.
 - **Natural pauses and breaths**: each clip's own silence is trimmed, then pauses follow measured

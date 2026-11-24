@@ -1,4 +1,4 @@
-import { handFor, isGreeting, isQuestion, moodFor } from './gesture';
+import { handFor, isGreeting, isQuestion, moodFor, reactionFor } from './gesture';
 
 describe('isQuestion', () => {
   it('spots a question, even with a closing quote or bracket', () => {
@@ -57,5 +57,34 @@ describe('moodFor', () => {
 
   it('reads a surprised question as surprise', () => {
     expect(moodFor('Really? You climbed Ben Nevis?')).toBe('surprise');
+  });
+});
+
+describe('more hand gestures', () => {
+  it('gives a thumbs up for praise and shrugs when unsure', () => {
+    expect(handFor('Well done, that is brilliant news!', 2)).toBe('thumbs');
+    expect(handFor("Hmm, I'm not entirely sure about that.", 2)).toBe('shrug');
+    expect(handFor('Brilliant, shall we go?', 2)).toBe('offer'); // a question still offers the palm
+  });
+});
+
+describe('reactionFor: how she reacts to what you say', () => {
+  it('comforts sad news, even when it contains a happy-looking word', () => {
+    expect(reactionFor('My grandad passed away last week.')).toBe('comfort');
+    expect(reactionFor("I'm really stressed about my exams")).toBe('comfort');
+  });
+
+  it('cheers good news, laughs at jokes, blushes at compliments, thanks with a hand on heart', () => {
+    expect(reactionFor('I passed my driving test!')).toBe('cheer');
+    expect(reactionFor('I got the job!!')).toBe('cheer');
+    expect(reactionFor('hahaha that is hilarious')).toBe('laugh');
+    expect(reactionFor("You're so clever, Ellie")).toBe('blush');
+    expect(reactionFor('Thanks a lot!')).toBe('thanks');
+    expect(reactionFor('Hello Ellie')).toBe('wave');
+  });
+
+  it('does not react to ordinary messages', () => {
+    expect(reactionFor('What time is it in London?')).toBeNull();
+    expect(reactionFor('Tell me about the Lake District')).toBeNull();
   });
 });
