@@ -543,7 +543,10 @@ flowchart LR
   reference encoder). The closest of the five regional voices (cosine similarity of fingerprints)
   becomes the base voice, so a deep voice is converted from a male British speaker, and so on.
 - **Speak** (`POST /api/tts` with `fingerprint`): Piper says the sentence in the base voice, then the
-  converter re-voices it. About 0.6 s for a sentence on the Mac, roughly 0.13× real time.
+  converter re-voices it. About 0.6 s for a sentence on the Mac (roughly 0.13× real time); on the
+  live CPU server, while the LLM is also writing, closer to 0.8× real time. So with my voice the
+  reply is spoken in short pieces throughout (6–12 words), each ready before the previous one ends:
+  measured live, the voice starts after about 5 s and the gaps stay human-sized.
 - **Nothing is stored on the server.** The recording is used once and discarded; the fingerprint
   goes back to the browser and is sent with each speech request. Delete removes it from the browser.
 - **Consent first:** recording and upload are disabled until the user confirms it is their own voice.

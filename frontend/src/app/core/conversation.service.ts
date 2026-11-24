@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { ApiError, ApiService } from './api.service';
 import { AudioPlayerService, Clip } from './audio-player.service';
-import { ChatMessage, Memory, newId } from './models';
+import { ChatMessage, Memory, newId, MY_VOICE } from './models';
 import { LocalDbService } from './local-db.service';
 import { MyVoiceService } from './my-voice.service';
 import { SentenceSplitter, splitSentences } from './sentence-splitter';
@@ -61,8 +61,9 @@ export class ConversationService {
     const speak = this.settings.speechEnabled();
     const voice = this.settings.voiceId();
     const clips: Clip[] = [];
-    // Start speaking after the first few words; after that, whole sentences.
-    const splitter = new SentenceSplitter({ earlyStart: true });
+    // Start speaking after the first few words; after that, whole sentences (short pieces throughout
+    // for "my voice", which takes longer to make, so it never falls behind).
+    const splitter = new SentenceSplitter({ earlyStart: true, shortPieces: voice === MY_VOICE });
     // Speech is requested one piece at a time, in the order it will be heard. Sent all at once, the
     // pieces competed for the server's CPU, and the one needed next could take 8 s instead of 1 s.
     let queue: Promise<unknown> = Promise.resolve();

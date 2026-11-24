@@ -98,6 +98,17 @@ describe('SentenceSplitter', () => {
     ]);
   });
 
+  it('short pieces: every long sentence is cut at a comma or after about twelve words', () => {
+    const s = new SentenceSplitter({ earlyStart: true, shortPieces: true });
+    const text = 'Tea is lovely. It arrived in Britain in the seventeenth century as a rather costly luxury, ' +
+      'and within a hundred years it was drunk by almost everyone in the whole of the country. Bye';
+    const out: string[] = [];
+    for (const w of text.split(' ')) out.push(...s.push(w + ' '));
+    out.push(...s.flush());
+    expect(out.every((p) => p.split(' ').length <= 12)).toBe(true);
+    expect(out.join(' ')).toBe(text);
+  });
+
   it('early start waits for a short first sentence rather than splitting it', () => {
     const s = new SentenceSplitter({ earlyStart: true });
     expect(s.push('Hello, ')).toEqual([]);

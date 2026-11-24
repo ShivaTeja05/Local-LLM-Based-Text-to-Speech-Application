@@ -46,6 +46,12 @@ export interface SplitterOptions {
   maxChars?: number;
   /** Send the first piece after a few words instead of waiting for the first full sentence. */
   earlyStart?: boolean;
+  /**
+   * Keep every piece short (the first piece's rule throughout). For voices that take longer to make,
+   * like "my voice" (Piper plus a voice converter): a short piece is ready before the previous one
+   * has finished playing, so there are no silences.
+   */
+  shortPieces?: boolean;
 }
 const CLOSERS = '"\'”’)]';
 
@@ -55,11 +61,13 @@ export class SentenceSplitter {
   private emitted = 0;
   private readonly maxChars: number;
   private readonly earlyStart: boolean;
+  private readonly shortPieces: boolean;
 
   constructor(options: SplitterOptions | number = {}) {
     const o = typeof options === 'number' ? { maxChars: options } : options;
     this.maxChars = o.maxChars ?? 220;
     this.earlyStart = o.earlyStart ?? false;
+    this.shortPieces = o.shortPieces ?? false;
   }
 
   /** How many characters of the input have been handed out as pieces so far. */
@@ -101,7 +109,8 @@ export class SentenceSplitter {
     this.buffer = this.buffer.slice(start);
 
     if (this.earlyStart && out.length === 0) {
-      const [minWords, minChars, forceWords] = SCHEDULE[Math.min(this.emitted, SCHEDULE.length - 1)];
+      const step = this.shortPieces ? 0 : Math.min(this.emitted, SCHEDULE.length - 1);
+      const [minWords, minChars, forceWords] = SCHEDULE[step];
       const early = this.earlyPiece(minWords, minChars, forceWords);
       if (early) out.push(early);
     }
