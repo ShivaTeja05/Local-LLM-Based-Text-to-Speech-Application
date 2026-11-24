@@ -44,6 +44,9 @@ class ChatResponse(BaseModel):
 class TTSRequest(BaseModel):
     text: str = Field(min_length=1, max_length=1000)
     voice: str | None = Field(default=None, max_length=100, pattern=r"^[A-Za-z0-9_\-]+$")
+    # Use my voice: the fingerprint from POST /api/my-voice (256 float32, base64). With it, `voice`
+    # is the British base voice, re-voiced to sound like the user.
+    fingerprint: str | None = Field(default=None, max_length=1400, pattern=r"^[A-Za-z0-9+/]+={0,2}$")
 
 
 class Voice(BaseModel):

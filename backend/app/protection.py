@@ -25,6 +25,7 @@ LIMITS: dict[tuple[str, str], list[tuple[int, int]]] = {
     ("POST", "/api/tts"): [(120, 60)],
     ("POST", "/api/stt"): [(10, 60), (100, 3600)],
     ("POST", "/api/memory"): [(10, 60)],
+    ("POST", "/api/my-voice"): [(5, 60), (20, 3600)],
     ("GET", "/api/health"): [(120, 60)],  # the app polls every 15 s; several tabs must fit
     ("GET", "/api/voices"): [(30, 60)],
 }
@@ -35,6 +36,7 @@ GLOBAL_LIMITS: dict[tuple[str, str], list[tuple[int, int]]] = {
     ("POST", "/api/chat"): [(600, 3600), (3000, 86400)],
     ("POST", "/api/tts"): [(4000, 3600), (20000, 86400)],
     ("POST", "/api/stt"): [(300, 3600), (1500, 86400)],
+    ("POST", "/api/my-voice"): [(200, 3600), (1000, 86400)],
     ("POST", "/api/memory"): [(300, 3600), (1500, 86400)],
 }
 GENERATION_ROUTES = {"/api/chat/stream", "/api/chat", "/api/memory"}

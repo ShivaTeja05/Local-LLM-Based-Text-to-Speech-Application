@@ -33,14 +33,22 @@ RUN ollama serve > /tmp/ollama.log 2>&1 & pid=$!; \
 USER root
 
 WORKDIR /app
-COPY backend/requirements.txt .
-RUN pip install -r requirements.txt
+COPY backend/requirements.txt backend/requirements-clone.txt ./
+RUN pip install -r requirements.txt \
+ && pip install -r requirements-clone.txt --index-url https://download.pytorch.org/whl/cpu
 
 # The five regional voices (one 77 MB model) and the Whisper model for voice input.
 ARG VOICES="en_GB-vctk-medium"
 RUN python -m piper.download_voices --data-dir /app/voices $VOICES
 COPY backend/scripts/download_models.py ./scripts/
 RUN python scripts/download_models.py --voices-dir /app/voices
+# Use my voice: the OpenVoice v2 converter (131 MB, MIT), at a pinned revision, checksummed.
+ARG OPENVOICE=https://huggingface.co/myshell-ai/OpenVoiceV2/resolve/f36e7edfe1684461a8343844af60babc2efbb727/converter
+RUN mkdir -p /app/voices/openvoice && cd /app/voices/openvoice \
+ && python -c "import urllib.request as u, sys; [u.urlretrieve(f'$OPENVOICE/{f}', f) for f in ('checkpoint.pth', 'config.json')]" \
+ && printf '%s  %s\n' \
+      9652c27e92b6b2a91632590ac9962ef7ae2b712e5c5b7f4c34ec55ee2b37ab9e checkpoint.pth \
+      9dfff60350b8c63f2c664efd92a61b2516efb22671466960f0e5dfebd881fa47 config.json | sha256sum -c -
 ENV HF_HUB_OFFLINE=1
 
 COPY backend/app ./app

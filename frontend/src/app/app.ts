@@ -5,7 +5,8 @@ import {
 import { AudioPlayerService } from './core/audio-player.service';
 import { ConversationService } from './core/conversation.service';
 import { expressionFor } from './core/expression';
-import { AvatarState } from './core/models';
+import { AvatarState, MY_VOICE } from './core/models';
+import { MyVoiceService } from './core/my-voice.service';
 import { SettingsService } from './core/settings.service';
 import { StatusService } from './core/status.service';
 import { VoiceInputService } from './core/voice-input.service';
@@ -27,11 +28,15 @@ export class App {
   protected readonly settings = inject(SettingsService);
   protected readonly status = inject(StatusService);
   protected readonly voice = inject(VoiceInputService);
+  private readonly myVoice = inject(MyVoiceService);
 
   private readonly sheet = viewChild.required<ElementRef<HTMLDialogElement>>('sheet');
   protected readonly drafting = signal(false);
   /** The voice in use, so the avatar can show its character. */
-  protected readonly voiceId = computed(() => this.settings.voiceId() ?? this.status.defaultVoice()?.id ?? null);
+  protected readonly voiceId = computed(() => {
+    const id = this.settings.voiceId() ?? this.status.defaultVoice()?.id ?? null;
+    return id === MY_VOICE ? (this.myVoice.voice()?.base ?? null) : id; // my voice: the base voice's character
+  });
   /** Cues a hello wave: when Ellie is ready, on her first reply, and on New conversation. */
   private readonly hello = signal(0);
   protected readonly waveCue = computed(() => this.hello() + this.chat.fresh());
@@ -77,7 +82,9 @@ export class App {
           ? `Ellie can write with ${h.llm.model}, but speech is unavailable.`
           : "Ellie's language model isn't available right now.";
       default:
-        return `Ellie runs privately, with ${h?.llm.model} and the ${this.status.voiceLabel(this.settings.voiceId())} voice, with no cloud AI services.`;
+        return this.settings.voiceId() === MY_VOICE
+          ? `Ellie runs privately, with ${h?.llm.model}, speaking British English in your own voice.`
+          : `Ellie runs privately, with ${h?.llm.model} and the ${this.status.voiceLabel(this.settings.voiceId())} voice, with no cloud AI services.`;
     }
   });
 

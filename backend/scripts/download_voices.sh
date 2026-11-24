@@ -5,10 +5,14 @@
 #           multi-speaker voice (77 MB), which holds the app's five regional accents
 #           (South, North, Midlands, East, West: see app/tts/piper_engine.py).
 #   Kokoro: optional, kokoro-onnx release files on GitHub (~120 MB), checksummed
+#   Clone:  optional, the OpenVoice v2 voice converter for "Use my voice" (131 MB, MIT licence,
+#           myshell-ai/OpenVoiceV2 on Hugging Face at a pinned revision), checksummed. Also needs
+#           PyTorch: pip install -r requirements-clone.txt
 #
 # Usage:
 #   ./scripts/download_voices.sh                      # the five regional voices
 #   ./scripts/download_voices.sh --kokoro             # ... plus Kokoro (TTS_ENGINE=piper+kokoro)
+#   ./scripts/download_voices.sh --clone              # ... plus the converter for Use my voice
 #   ./scripts/download_voices.sh en_GB-alba-medium    # specific Piper voice(s) only
 set -euo pipefail
 
@@ -17,10 +21,12 @@ cd "$(dirname "$0")/.."
 VOICES_DIR="${VOICES_DIR:-voices}"
 PYTHON="${PYTHON:-.venv/bin/python}"
 KOKORO=0
+CLONE=0
 VOICES=()
 for arg in "$@"; do
   case "$arg" in
     --kokoro) KOKORO=1 ;;
+    --clone) CLONE=1 ;;
     *) VOICES+=("$arg") ;;
   esac
 done
@@ -49,4 +55,20 @@ if [ "$KOKORO" -eq 1 ]; then
 bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d voices-v1.0.bin
 EOF
 fi
-ls -lh "$VOICES_DIR" "$VOICES_DIR/kokoro" 2>/dev/null || true
+if [ "$CLONE" -eq 1 ]; then
+  ODIR="$VOICES_DIR/openvoice"
+  BASE="https://huggingface.co/myshell-ai/OpenVoiceV2/resolve/f36e7edfe1684461a8343844af60babc2efbb727/converter"
+  mkdir -p "$ODIR"
+  while read -r sha file; do
+    if [ ! -f "$ODIR/$file" ]; then
+      echo "Downloading OpenVoice v2 converter $file ..."
+      curl -fL --retry 3 -o "$ODIR/$file.part" "$BASE/$file"
+      mv "$ODIR/$file.part" "$ODIR/$file"
+    fi
+    echo "$sha  $ODIR/$file" | shasum -a 256 -c -
+  done <<'EOF'
+9652c27e92b6b2a91632590ac9962ef7ae2b712e5c5b7f4c34ec55ee2b37ab9e checkpoint.pth
+9dfff60350b8c63f2c664efd92a61b2516efb22671466960f0e5dfebd881fa47 config.json
+EOF
+fi
+ls -lh "$VOICES_DIR" "$VOICES_DIR/kokoro" "$VOICES_DIR/openvoice" 2>/dev/null || true

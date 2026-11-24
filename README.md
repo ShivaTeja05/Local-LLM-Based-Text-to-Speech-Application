@@ -64,6 +64,14 @@ to it. No cloud AI service is used at any step.
   to check before sending.
 - **Conversation memory**: follow-ups work, and long chats are folded into a short memory note so
   Ellie still remembers your name later.
+- **Your data stays on your device**: the conversation, memory note and voice fingerprint live in a
+  small database in your own browser (IndexedDB), deleted after 30 days unused. A **Your data** panel
+  shows each item with its own delete button, and the server keeps nothing ([privacy](docs/PRIVACY.md)).
+- **🎙️ Use my voice: hear yourself speak British English.** Read a short passage (or upload a
+  recording) and Ellie answers *in your voice*, with her British pronunciation: Piper speaks, then
+  an open voice converter (OpenVoice v2) gives it your voice quality. No training, about 0.6 s per
+  sentence; the recording is never stored, and the voice fingerprint stays in your browser
+  ([how it works](docs/ARCHITECTURE.md#63-use-my-voice-hear-yourself-speak-british-english-built)).
 - **A LoRA fine-tune** of the model that behaves like Ellie with a one-line prompt instead of a
   256-token one ([training/](training/README.md)).
 - Light, dark and system themes; works on desktop, tablet and phone; keyboard accessible.
@@ -186,6 +194,7 @@ The unit suites run on every push in [GitHub Actions](.github/workflows/ci.yml).
 | [docs/INSTALL.md](docs/INSTALL.md) | Full local setup, configuration, tests and the HTTP API |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | How the live demo runs on Cloud Run + Vercel, cost, monitoring, redeploying |
 | [docs/SECURITY.md](docs/SECURITY.md) | Rate limits, the cost ceiling, headers, and the results of a security review |
+| [docs/PRIVACY.md](docs/PRIVACY.md) | What is stored, where (your browser's own database), for how long, and how to delete it |
 | [training/README.md](training/README.md) | The LoRA fine-tune: dataset, training, evaluation and results |
 
 ## Known limitations

@@ -27,3 +27,16 @@ export async function noHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 }
+
+/** One record from Ellie's local database (IndexedDB "ellie", store "records"), or null. */
+export function storedRecord<T = unknown>(page: Page, key: string): Promise<T | null> {
+  return page.evaluate((k) => new Promise<T | null>((resolve) => {
+    const req = indexedDB.open('ellie');
+    req.onsuccess = () => {
+      const get = req.result.transaction('records', 'readonly').objectStore('records').get(k);
+      get.onsuccess = () => resolve(get.result ? (get.result.value as T) : null);
+      get.onerror = () => resolve(null);
+    };
+    req.onerror = () => resolve(null);
+  }), key);
+}

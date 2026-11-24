@@ -1,8 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, output, signal, viewChild,
+} from '@angular/core';
 
 import { ApiService } from '../core/api.service';
 import { AudioPlayerService } from '../core/audio-player.service';
 import { ConversationService } from '../core/conversation.service';
+import { LocalDbService, RETENTION_DAYS } from '../core/local-db.service';
+import { ChatMessage, MY_VOICE, MyVoice } from '../core/models';
+import { MyVoiceService, PASSAGE } from '../core/my-voice.service';
 import { SettingsService, ThemeChoice } from '../core/settings.service';
 import { StatusService, shortName } from '../core/status.service';
 import { Avatar } from './avatar';
@@ -23,6 +28,89 @@ export class SettingsPanel {
   protected readonly player = inject(AudioPlayerService);
   private readonly conversation = inject(ConversationService);
   private readonly api = inject(ApiService);
+  protected readonly myVoice = inject(MyVoiceService);
+  protected readonly MY_VOICE = MY_VOICE;
+  protected readonly passage = PASSAGE;
+  protected readonly consent = signal(false);
+  private readonly recorder = viewChild.required<ElementRef<HTMLDialogElement>>('recorder');
+  private readonly dataDialog = viewChild.required<ElementRef<HTMLDialogElement>>('data');
+  private readonly db = inject(LocalDbService);
+  protected readonly retentionDays = RETENTION_DAYS;
+  protected readonly confirmAll = signal(false);
+  protected readonly storageLabel = computed(() => ({
+    indexeddb: "this browser's built-in database (IndexedDB)",
+    localstorage: "this browser's local storage",
+    none: 'nothing: storage is blocked, so everything is forgotten when you close the tab',
+  })[this.db.backend()]);
+
+  /** One row per thing stored, each with its own delete (Your data panel). */
+  protected readonly dataRows = computed(() => {
+    const rows: { id: string; name: string; detail: string; action: string; run: () => void }[] = [];
+    const records = new Map(this.db.records().map((r) => [r.key, r]));
+    const chat = records.get('conversation');
+    if (chat) {
+      const n = (chat.value as ChatMessage[]).length;
+      const note = records.has('memory') ? ', with a memory note of the earlier part' : '';
+      rows.push({ id: 'chat', name: 'Conversation', detail: `${n} messages${note} · saved ${ago(chat.updatedAt)}`,
+        action: 'Delete', run: () => this.conversation.reset() });
+    }
+    const voice = records.get('my-voice');
+    if (voice) {
+      rows.push({ id: 'voice', name: 'My voice',
+        detail: `A voice fingerprint (256 numbers), made ${ago((voice.value as MyVoice).createdAt)}. Your recording was not kept.`,
+        action: 'Delete', run: () => this.myVoice.remove() });
+    }
+    rows.push({ id: 'prefs', name: 'Preferences', detail: 'Voice, theme and speech switches', action: 'Reset',
+      run: () => this.settings.reset() });
+    return rows;
+  });
+  protected readonly clock = computed(() => {
+    const s = this.myVoice.seconds();
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  });
+
+  constructor() {
+    // Close the recorder once the new voice is ready (it is then selected).
+    effect(() => {
+      if (this.myVoice.voice() && this.myVoice.state() === 'idle') this.recorder().nativeElement.close();
+    });
+  }
+
+  protected openData(): void {
+    this.confirmAll.set(false);
+    void this.db.refresh();
+    this.dataDialog().nativeElement.showModal();
+  }
+
+  protected closeData(): void {
+    this.dataDialog().nativeElement.close();
+  }
+
+  /** Two clicks, so it can't happen by accident. */
+  protected deleteEverything(): void {
+    if (!this.confirmAll()) return this.confirmAll.set(true);
+    this.conversation.reset();
+    this.myVoice.remove();
+    this.settings.reset();
+    void this.db.clear();
+    this.confirmAll.set(false);
+  }
+
+  protected openRecorder(): void {
+    this.consent.set(false);
+    this.recorder().nativeElement.showModal();
+  }
+
+  protected uploadFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // the same file can be chosen again after a problem
+    if (file) void this.myVoice.upload(file);
+  }
+
+  protected closeRecorder(): void {
+    this.recorder().nativeElement.close();
+  }
 
   /** Emitted after an action that should close the phone sheet. */
   readonly done = output<void>();
@@ -80,8 +168,10 @@ export class SettingsPanel {
       this.player.stop();
       return;
     }
-    const text = `Hello, this is the ${shortName(label)} voice. Lovely to meet you.`;
-    this.player.play(previewId, [{ audio: this.api.tts(text, id), text }]);
+    const text = id === MY_VOICE
+      ? 'Hello! This is your own voice, speaking British English. Lovely to meet you.'
+      : `Hello, this is the ${shortName(label)} voice. Lovely to meet you.`;
+    this.player.play(previewId, [{ audio: this.myVoice.tts(text, id), text }]);
   }
 
   protected name(label: string): string {
@@ -123,4 +213,14 @@ export class SettingsPanel {
       { id: 'kokoro', title: 'Kokoro · more natural', voices: all.filter((v) => v.id.startsWith('kokoro-')) },
     ].filter((g) => g.voices.length);
   });
+}
+
+/** "just now", "5 min ago", "3 h ago", "2 days ago". */
+function ago(ms: number): string {
+  const s = Math.max(0, (Date.now() - ms) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.round(s / 60)} min ago`;
+  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+  const d = Math.round(s / 86400);
+  return `${d} day${d === 1 ? '' : 's'} ago`;
 }

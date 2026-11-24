@@ -253,15 +253,20 @@ describe('ConversationService', () => {
     expect(service.memory()).toEqual({ note: '', turns: 0 });
   });
 
-  it('keeps the conversation across a page refresh, and new conversation clears it', async () => {
+  it('keeps the conversation in the local database across a refresh, and new conversation deletes it', async () => {
+    const settle = () => new Promise((r) => setTimeout(r, 0)); // writes finish in the background
     await service.send('How are you?');
+    await settle();
     TestBed.resetTestingModule();
-    setup(); // a fresh service reads sessionStorage
+    setup(); // a fresh service reads the local database
+    await service.loaded;
     expect(service.messages().length).toBe(2);
     service.reset();
+    await settle();
     expect(service.messages()).toEqual([]);
     TestBed.resetTestingModule();
     setup();
-    expect(service.messages()).toEqual([]);
+    await service.loaded;
+    expect(service.messages()).toEqual([]); // deleted, not just hidden
   });
 });

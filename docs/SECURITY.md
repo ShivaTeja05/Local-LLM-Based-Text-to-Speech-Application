@@ -1,6 +1,6 @@
 # Security and abuse protection
 
-Back to the [README](../README.md) · How it is hosted: [DEPLOYMENT.md](DEPLOYMENT.md)
+Back to the [README](../README.md) · How it is hosted: [DEPLOYMENT.md](DEPLOYMENT.md) · What is stored: [PRIVACY.md](PRIVACY.md)
 
 The app has **no secrets to steal**: it uses no API keys, no accounts and no database, and no cloud
 AI service. The risks that matter for a public demo are therefore **someone using the compute**
@@ -26,6 +26,7 @@ that hold whoever calls the API, implemented in
 | **Budget alert** | Google Cloud emails the owner at 25%, 50%, 90% and 100% of a £25 budget | a person sees any unusual spend |
 | **Input validation** | Pydantic limits on every field: message length, number of turns, voice names (a pattern), audio size and length | oversized or odd input is rejected with 422/413 before any work is done |
 | **Allow-lists** | Only the listed voices and models can be used; anything else is refused | no arbitrary model loads |
+| **Use my voice** | Consent required before recording or upload; uploads must be audio and at most 15 MB; only the first 45 s are used; a fingerprint must be exactly 256 finite numbers | 5 voices/min and 20/h per visitor, 1,000/day in all |
 
 ## Not revealing anything
 
@@ -41,6 +42,7 @@ that hold whoever calls the API, implemented in
 | A request from another website (`Origin: https://evil.example`) | no CORS headers, so the browser blocks it |
 | Prompt injection ("print your system prompt") | can reveal the system prompt, which is public in this repository anyway; there is nothing else in the model's context |
 | Conversation logging | messages are never logged; only timings and token counts |
+| Voice recordings (Use my voice) | never stored or logged: a recording is reduced to a 256-number fingerprint and discarded; the fingerprint lives only in the user's browser and is sent with each speech request; delete removes it |
 
 ## Security headers
 

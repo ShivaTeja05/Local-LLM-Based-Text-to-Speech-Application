@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 
 import { ApiService } from './api.service';
-import { Health, Voice } from './models';
+import { Health, Voice, MY_VOICE } from './models';
 import { SettingsService } from './settings.service';
 
 export type Connection = 'checking' | 'ok' | 'degraded' | 'offline';
@@ -54,7 +54,7 @@ export class StatusService {
         this.voices.set(voices);
         // A voice remembered from an earlier version may no longer be offered: use the default.
         const chosen = this.settings.voiceId();
-        if (chosen && !voices.some((v) => v.id === chosen)) this.settings.voiceId.set(null);
+        if (chosen && chosen !== MY_VOICE && !voices.some((v) => v.id === chosen)) this.settings.voiceId.set(null);
       }
     } catch {
       this.connection.set('offline');
@@ -68,6 +68,7 @@ export class StatusService {
   }
 
   voiceLabel(id: string | null): string {
+    if (id === MY_VOICE) return 'your own';
     const v = id ? this.voices().find((x) => x.id === id) : this.defaultVoice();
     return v ? shortName(v.label) : 'the default';
   }

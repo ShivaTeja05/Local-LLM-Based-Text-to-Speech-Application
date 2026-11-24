@@ -74,6 +74,13 @@ class Settings(BaseSettings):
     # CPU threads for Piper. 0 = automatic: a third of the cores. Its threads never spin-wait.
     tts_threads: int = 0
 
+    # --- Use my voice (§6.3): OpenVoice v2 converter -------------------------------------------
+    voice_clone: bool = True                 # on when the model is downloaded and torch installed
+    voice_clone_dir: Path = BACKEND_DIR / "voices" / "openvoice"
+    voice_clone_min_seconds: float = 6.0     # of actual speech in the recording
+    voice_clone_max_seconds: float = 45.0    # longer recordings: the first 45 s are used
+    voice_clone_max_bytes: int = 15_000_000  # an uploaded WAV of 45 s can be ~8 MB
+
     # --- Voice input (§8) ---------------------------------------------------
     stt_engine: str = "whisper"      # "none" switches voice input off
     stt_model: str = "base.en"       # faster-whisper model name (or a local folder)

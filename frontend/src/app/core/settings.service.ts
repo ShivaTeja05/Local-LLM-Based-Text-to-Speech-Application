@@ -26,6 +26,16 @@ export class SettingsService {
   /** Pause between sentences like a person would, with a soft breath before long ones. */
   readonly naturalPauses = signal<boolean>(this.initial.naturalPauses);
 
+  /** Back to the defaults (Your data → reset preferences). */
+  reset(): void {
+    const d = defaults();
+    this.speechEnabled.set(d.speechEnabled);
+    this.voiceId.set(d.voiceId);
+    this.theme.set(d.theme);
+    this.model.set(d.model);
+    this.naturalPauses.set(d.naturalPauses);
+  }
+
   constructor() {
     effect(() => {
       const value: Stored = {
@@ -47,20 +57,24 @@ export class SettingsService {
   }
 }
 
+function defaults(): Stored {
+  return { speechEnabled: true, voiceId: null, theme: 'system', model: null, naturalPauses: true };
+}
+
 function load(): Stored {
-  const defaults: Stored = { speechEnabled: true, voiceId: null, theme: 'system', model: null, naturalPauses: true };
+  const defaults_ = defaults();
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return defaults;
+    if (!raw) return defaults_;
     const v = JSON.parse(raw) as Partial<Stored>;
     return {
-      speechEnabled: typeof v.speechEnabled === 'boolean' ? v.speechEnabled : defaults.speechEnabled,
+      speechEnabled: typeof v.speechEnabled === 'boolean' ? v.speechEnabled : defaults_.speechEnabled,
       voiceId: typeof v.voiceId === 'string' ? v.voiceId : null,
-      theme: v.theme === 'light' || v.theme === 'dark' || v.theme === 'system' ? v.theme : defaults.theme,
+      theme: v.theme === 'light' || v.theme === 'dark' || v.theme === 'system' ? v.theme : defaults_.theme,
       model: typeof v.model === 'string' ? v.model : null,
-      naturalPauses: typeof v.naturalPauses === 'boolean' ? v.naturalPauses : defaults.naturalPauses,
+      naturalPauses: typeof v.naturalPauses === 'boolean' ? v.naturalPauses : defaults_.naturalPauses,
     };
   } catch {
-    return defaults;
+    return defaults_;
   }
 }

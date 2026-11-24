@@ -19,6 +19,7 @@ venv/
 backend/voices/*.onnx
 backend/voices/*.onnx.json
 backend/voices/kokoro/
+backend/voices/openvoice/
 models/
 *.gguf
 *.safetensors

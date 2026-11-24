@@ -9,7 +9,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api import chat, health, memory, stt, tts
+from app.api import chat, health, memory, my_voice, stt, tts
 from app.config import Settings, get_settings
 from app.llm.base import LLMAdapter
 from app.llm.ollama_adapter import OllamaAdapter
@@ -51,6 +51,19 @@ def create_tts(settings: Settings) -> TTSEngine:
     return CuratedVoices(engine, settings.voices, settings.default_voice) if settings.voices else engine
 
 
+def create_cloner(settings: Settings, tts: TTSEngine):
+    """Use my voice (OpenVoice v2 converter): on when its model is downloaded and torch installed."""
+    if not settings.voice_clone:
+        return None
+    from app.voiceclone.cloner import VoiceCloner
+
+    cloner = VoiceCloner(settings, tts)
+    if not cloner.available():
+        log.info("Use my voice is off: no converter model in %s (or torch not installed)", cloner.dir)
+        return None
+    return cloner
+
+
 def create_stt(settings: Settings) -> STTEngine | None:
     if settings.stt_engine == "none":
         return None
@@ -68,6 +81,10 @@ async def lifespan(app: FastAPI):
     app.state.tts = create_tts(settings)
     await run_in_threadpool(app.state.tts.preload)  # load the default voice once
     app.state.stt = create_stt(settings)
+    app.state.cloner = create_cloner(settings, app.state.tts)
+    clone_load = None
+    if app.state.cloner:  # load the converter and the base voices' fingerprints in the background
+        clone_load = asyncio.create_task(run_in_threadpool(app.state.cloner.preload))
     stt_load = None
     if app.state.stt:  # load Whisper in the background, so the first recording is quick
         stt_load = asyncio.create_task(run_in_threadpool(app.state.stt.preload))
@@ -78,7 +95,7 @@ async def lifespan(app: FastAPI):
     log.info("Ready: llm=%s/%s tts=%s voice=%s", app.state.llm.name, app.state.llm.model,
              app.state.tts.name, app.state.tts.default_voice)
     yield
-    for task in (warm_up, stt_load):
+    for task in (warm_up, stt_load, clone_load):
         if task and not task.done():
             task.cancel()
     await app.state.llm.aclose()
@@ -106,6 +123,7 @@ def create_app() -> FastAPI:
     app.include_router(memory.router)
     app.include_router(tts.router)
     app.include_router(stt.router)
+    app.include_router(my_voice.router)
     if (settings.frontend_dist / "index.html").exists():
         # Mounted last, so /api/* routes always win.
         app.mount("/", StaticFiles(directory=settings.frontend_dist, html=True), name="frontend")

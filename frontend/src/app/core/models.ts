@@ -24,6 +24,20 @@ export interface Health {
   tts: { ok: boolean; engine: string; voices: number; error?: string };
   /** Voice input (optional: older backends do not report it). */
   stt?: { ok: boolean; engine: string; model?: string; error?: string };
+  /** Use my voice: the voice converter (optional). */
+  clone?: { ok: boolean; engine: string; error?: string };
+}
+
+/** The voice id for "my voice" (a British base voice, re-voiced to sound like the user). */
+export const MY_VOICE = 'my-voice';
+
+/** The user's voice fingerprint, kept only in this browser. */
+export interface MyVoice {
+  fingerprint: string;
+  /** The British regional voice closest to the user's, which the converter re-voices. */
+  base: string;
+  seconds: number;
+  createdAt: number;
 }
 
 /** Rolling note of the oldest `turns` turns, which no longer fit the model's context window. */

@@ -1,0 +1,3 @@
+# Use my voice (optional): the OpenVoice v2 voice converter needs PyTorch. CPU-only is enough.
+#   pip install -r requirements-clone.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0

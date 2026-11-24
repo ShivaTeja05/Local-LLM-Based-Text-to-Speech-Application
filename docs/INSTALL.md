@@ -78,6 +78,17 @@ Whisper model for voice input (~145 MB) downloads itself the first time the back
 ./scripts/download_voices.sh
 ```
 
+**Optional, Use my voice:** PyTorch (CPU) and the OpenVoice v2 converter (131 MB). Without them the
+app works as before and the "Use my voice" button is simply not shown.
+
+```bash
+uv pip install --python .venv/bin/python -r requirements-clone.txt --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+```bash
+./scripts/download_voices.sh --clone
+```
+
 ### 4. (Optional) configure
 
 ```bash

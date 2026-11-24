@@ -26,7 +26,7 @@ that is mostly idle, CPUs that scale to zero are the better trade.
 
 | Setting | Value | Why |
 |---|---|---|
-| Image | [`deploy/cloudrun/Dockerfile`](../deploy/cloudrun/Dockerfile) | Three stages: build the frontend, take the Ollama binary (CPU only), then Python + the model, voices and Whisper |
+| Image | [`deploy/cloudrun/Dockerfile`](../deploy/cloudrun/Dockerfile) | Three stages: build the frontend, take the Ollama binary (CPU only), then Python + the model, voices, Whisper, and the OpenVoice v2 converter with CPU-only PyTorch for Use my voice |
 | Size | 8 vCPU, 16 GiB | The model writes about 5 words a second on 5 threads, about twice as fast as speech |
 | Instances | min 0, max 1 | Scales to zero; one instance at most caps the cost |
 | CPU split | `LLM_NUM_THREAD=5`, `TTS_THREADS=2`, `STT_THREADS=1` | Speech is made while the model is still writing, so each engine gets a fixed share ([ARCHITECTURE §10.2](ARCHITECTURE.md#102-sharing-the-cpu-between-the-llm-and-piper)). With 7/1, a long sentence could take 5 s to synthesise during writing and leave a silence; with 5/2 every gap measured stayed under 0.75 s |

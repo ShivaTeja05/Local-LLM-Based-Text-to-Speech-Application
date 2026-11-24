@@ -27,13 +27,12 @@ export class ApiService {
     return this.json<Voice[]>(await fetch(API + '/api/voices'));
   }
 
-  /** WAV bytes for one piece of text. */
-  async tts(text: string, voice: string | null, signal?: AbortSignal): Promise<ArrayBuffer> {
+  /** WAV bytes for one piece of text; with a fingerprint, in the user's own voice. */
+  async tts(text: string, voice: string | null, fingerprint?: string): Promise<ArrayBuffer> {
     const res = await fetch(API + '/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(voice ? { text, voice } : { text }),
-      signal,
+      body: JSON.stringify({ text, ...(voice ? { voice } : {}), ...(fingerprint ? { fingerprint } : {}) }),
     });
     if (!res.ok) throw new ApiError(await detail(res), res.status);
     return res.arrayBuffer();
@@ -76,6 +75,16 @@ export class ApiService {
   /** Transcribe a recording with the backend's local Whisper. */
   async stt(audio: Blob): Promise<{ text: string; seconds: number }> {
     const res = await fetch(API + '/api/stt', {
+      method: 'POST',
+      headers: { 'Content-Type': audio.type.split(';')[0] || 'audio/webm' },
+      body: audio,
+    });
+    return this.json(res);
+  }
+
+  /** Use my voice: a short reading in, its voice fingerprint and closest British base voice out. */
+  async myVoice(audio: Blob): Promise<{ fingerprint: string; base: string; seconds: number }> {
+    const res = await fetch(API + '/api/my-voice', {
       method: 'POST',
       headers: { 'Content-Type': audio.type.split(';')[0] || 'audio/webm' },
       body: audio,

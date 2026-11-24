@@ -42,10 +42,84 @@
       }
     </div>
     }
+    @if (myVoice.voice(); as mine) {
+      <h3 class="voice-group" [id]="uid + '-mine'">Your voice</h3>
+      <div class="voices" role="radiogroup" [attr.aria-labelledby]="uid + '-voice ' + uid + '-mine'">
+        <div class="voice" [class.selected]="selectedVoice() === MY_VOICE">
+          <button type="button" class="voice-pick" role="radio" [attr.aria-checked]="selectedVoice() === MY_VOICE"
+                  (click)="chooseVoice(MY_VOICE)">
+            <app-avatar class="voice-face" [voice]="mine.base" still />
+            <span class="voice-text">
+              <span class="voice-name">My voice</span>
+              <span class="voice-accent">British, in your voice</span>
+            </span>
+          </button>
+          <button type="button" class="voice-preview btn-icon"
+                  [attr.aria-label]="player.speakingId() === 'preview:' + MY_VOICE ? 'Stop preview of my voice' : 'Preview my voice'"
+                  (click)="preview(MY_VOICE, 'My voice', $event)">
+            <app-icon [name]="player.speakingId() === 'preview:' + MY_VOICE ? 'stop' : 'play'" [size]="14" />
+          </button>
+          <button type="button" class="voice-preview btn-icon" aria-label="Delete my voice" title="Delete my voice"
+                  (click)="myVoice.remove()">
+            <app-icon name="close" [size]="14" />
+          </button>
+        </div>
+      </div>
+    } @else if (myVoice.available()) {
+      <button type="button" class="btn btn-quiet btn-small add-voice" (click)="openRecorder()">
+        <app-icon name="mic" [size]="14" />
+        Use my voice
+      </button>
+    }
   } @else {
     <p class="empty">{{ status.connection() === 'checking' ? 'Loading voices…' : 'No voices available.' }}</p>
   }
 </section>
+
+<dialog #recorder class="recorder" [attr.aria-labelledby]="uid + '-rec-title'" (close)="myVoice.cancel()">
+  <h2 [id]="uid + '-rec-title'">Hear yourself speak British English</h2>
+  <p>
+    Read the passage below aloud in your normal voice, somewhere quiet, or upload a recording of
+    yourself speaking (10 to 45 seconds). Ellie will then answer in <em>your</em> voice, with her
+    British pronunciation.
+  </p>
+  <blockquote class="passage">{{ passage }}</blockquote>
+  <label class="consent">
+    <input type="checkbox" [checked]="consent()" (change)="consent.set($any($event.target).checked)"
+           [disabled]="myVoice.state() !== 'idle'" />
+    <span>
+      This is my own voice, and I agree to it being used to make Ellie sound like me. The recording is
+      used once and not kept; a voice fingerprint is stored only in this browser, and I can delete it
+      at any time.
+    </span>
+  </label>
+  @if (myVoice.problem(); as problem) {
+    <p class="problem" role="alert">{{ problem }}</p>
+  }
+  <div class="rec-actions">
+    @switch (myVoice.state()) {
+      @case ('recording') {
+        <span class="rec-live" aria-live="polite"><span class="rec-dot" aria-hidden="true"></span>Recording {{ clock() }}</span>
+        <button type="button" class="btn btn-primary" (click)="myVoice.stop()">Done reading</button>
+      }
+      @case ('processing') {
+        <span class="rec-live" aria-live="polite">Making your voice…</span>
+      }
+      @default {
+        <button type="button" class="btn btn-quiet cancel" (click)="closeRecorder()">Cancel</button>
+        <input #file type="file" class="visually-hidden" accept="audio/*,.wav,.mp3,.m4a,.ogg,.webm,.flac"
+               tabindex="-1" aria-hidden="true" (change)="uploadFile($event)" />
+        <button type="button" class="btn btn-quiet" [disabled]="!consent()" (click)="file.click()">
+          Upload a recording
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="!consent()" (click)="myVoice.start()">
+          <app-icon name="mic" [size]="16" />
+          Start recording
+        </button>
+      }
+    }
+  </div>
+</dialog>
 
 <section class="group" [attr.aria-labelledby]="uid + '-speech'">
   <h2 [id]="uid + '-speech'" class="group-title">Speech</h2>
@@ -83,6 +157,43 @@
     }
   </div>
 </section>
+
+<button type="button" class="data-link" (click)="openData()">
+  Your data &amp; privacy
+</button>
+
+<dialog #data class="recorder data" [attr.aria-labelledby]="uid + '-data-title'">
+  <h2 [id]="uid + '-data-title'">Your data</h2>
+  <p>
+    Everything Ellie remembers is kept in a small database <strong>in this browser, on this device
+    only</strong>. Ellie's server keeps nothing: messages are answered and forgotten, and a voice
+    recording is discarded once its fingerprint is made. Anything unused for {{ retentionDays }} days
+    is deleted automatically.
+  </p>
+  <ul class="data-list">
+    @for (row of dataRows(); track row.id) {
+      <li>
+        <div class="data-text">
+          <span class="data-name">{{ row.name }}</span>
+          <span class="data-detail">{{ row.detail }}</span>
+        </div>
+        <button type="button" class="btn btn-quiet btn-small" [attr.aria-label]="row.action + ': ' + row.name"
+                (click)="row.run()">{{ row.action }}</button>
+      </li>
+    } @empty {
+      <li class="data-empty">Nothing is stored.</li>
+    }
+  </ul>
+  <p class="data-where">Stored with: {{ storageLabel() }}</p>
+  <div class="rec-actions">
+    @if (dataRows().length) {
+      <button type="button" class="btn btn-quiet danger cancel" (click)="deleteEverything()">
+        {{ confirmAll() ? 'Click again to delete everything' : 'Delete everything' }}
+      </button>
+    }
+    <button type="button" class="btn btn-primary" (click)="closeData()">Done</button>
+  </div>
+</dialog>
 
 <div class="status" [attr.data-connection]="status.connection()" aria-live="polite">
   <span class="dot" aria-hidden="true"></span>

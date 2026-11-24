@@ -515,6 +515,43 @@ flowchart LR
 
 ---
 
+### 6.3 Use my voice: hear yourself speak British English (built)
+
+**Idea.** In pronunciation teaching, learners improve more when they imitate *their own voice*
+speaking the target accent (the "golden speaker" approach) than a stranger's. Ellie can do that:
+record a short reading (or upload a recording) and she answers in your voice, with her British
+pronunciation.
+
+**Three separate layers** make this possible without any training:
+
+| Layer | Decides | Done by |
+|---|---|---|
+| What she says | words, British phrasing | the LLM (and the LoRA adapter, §5.2): the same for every voice |
+| How it is pronounced | the accent | Piper VCTK, a British regional speaker |
+| What the voice sounds like | timbre: pitch range, voice quality | the **OpenVoice v2 tone-colour converter** (MIT), with the user's fingerprint |
+
+```mermaid
+flowchart LR
+  R["Reading or upload<br/>10–45 s"] -->|"POST /api/my-voice"| F["Fingerprint<br/>256 numbers"]
+  F --> B["Browser only<br/>(localStorage)"]
+  T["Sentence"] --> P["Piper<br/>closest British voice"] --> C["Converter<br/>+ fingerprint"] --> A["Audio in your voice"]
+  B -.->|"sent with each /api/tts"| C
+```
+
+- **Enrol** (`POST /api/my-voice`): the recording (any format PyAV reads: WebM, WAV, MP3, M4A...)
+  is decoded, its silences removed, and reduced to a 256-number fingerprint (the converter's
+  reference encoder). The closest of the five regional voices (cosine similarity of fingerprints)
+  becomes the base voice, so a deep voice is converted from a male British speaker, and so on.
+- **Speak** (`POST /api/tts` with `fingerprint`): Piper says the sentence in the base voice, then the
+  converter re-voices it. About 0.6 s for a sentence on the Mac, roughly 0.13× real time.
+- **Nothing is stored on the server.** The recording is used once and discarded; the fingerprint
+  goes back to the browser and is sent with each speech request. Delete removes it from the browser.
+- **Consent first:** recording and upload are disabled until the user confirms it is their own voice.
+- **Measured** (synthetic speakers as "users"): after conversion, the fingerprint similarity to the
+  target voice rose from 0.10–0.28 to **0.80–0.84**.
+- **Limits:** the accent stays Piper's (that is the point), but a strong accent in the reading can
+  colour the timbre; quality depends on a clean recording.
+
 ## 7. Avatar (optional enhancement)
 
 ```mermaid

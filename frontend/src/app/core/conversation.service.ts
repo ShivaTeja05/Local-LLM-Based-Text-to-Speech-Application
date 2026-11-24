@@ -3,12 +3,12 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { ApiError, ApiService } from './api.service';
 import { AudioPlayerService, Clip } from './audio-player.service';
 import { ChatMessage, Memory, newId } from './models';
+import { LocalDbService } from './local-db.service';
+import { MyVoiceService } from './my-voice.service';
 import { SentenceSplitter, splitSentences } from './sentence-splitter';
 import { SettingsService } from './settings.service';
 import { StatusService } from './status.service';
 
-const STORE_KEY = 'ellie.conversation.v1';
-const MEMORY_KEY = 'ellie.memory.v1';
 const NO_MEMORY: Memory = { note: '', turns: 0 };
 export const MAX_CHARS = 500; // matches the backend's MAX_USER_CHARS
 export const BUSY_REPLY = "You're sending messages a little quickly for me. Give me a few seconds, then try again.";
@@ -22,13 +22,19 @@ export const OFFLINE_REPLY = "Sorry, I can't reach my brain just now. Is the bac
 @Injectable({ providedIn: 'root' })
 export class ConversationService {
   private readonly api = inject(ApiService);
+  private readonly myVoice = inject(MyVoiceService);
   private readonly player = inject(AudioPlayerService);
   private readonly settings = inject(SettingsService);
   private readonly status = inject(StatusService);
 
-  readonly messages = signal<ChatMessage[]>(restore());
+  private readonly db = inject(LocalDbService);
+
+  /** The conversation, kept in the local database in this browser (LocalDbService). */
+  readonly messages = signal<ChatMessage[]>([]);
   /** Rolling note of turns the model can no longer see (kept here: the backend is stateless). */
-  readonly memory = signal<Memory>(restoreMemory());
+  readonly memory = signal<Memory>(NO_MEMORY);
+  /** Resolves once the saved conversation (if any) has been read back. */
+  readonly loaded: Promise<void> = this.load();
   /** Counts fresh starts (New conversation), so the avatar can wave hello. */
   readonly fresh = signal(0);
   /** True while a reply is being generated. */
@@ -62,7 +68,7 @@ export class ConversationService {
     let queue: Promise<unknown> = Promise.resolve();
     const say = (sentence: string) => {
       if (!this.settings.speechEnabled()) return; // switched off mid-reply
-      const audio = queue.then(() => this.api.tts(sentence, voice));
+      const audio = queue.then(() => this.myVoice.tts(sentence, voice));
       queue = audio.catch(() => undefined);
       const clip: Clip = { audio, text: sentence };
       clip.audio.catch(() => undefined);
@@ -153,7 +159,7 @@ export class ConversationService {
     const voice = this.settings.voiceId();
     let clips = this.audio.get(key(id, voice));
     if (!clips) {
-      clips = splitSentences(msg.text).map((s) => ({ audio: this.api.tts(s, voice), text: s }));
+      clips = splitSentences(msg.text).map((s) => ({ audio: this.myVoice.tts(s, voice), text: s }));
       clips.forEach((c) => c.audio.catch(() => undefined));
       this.audio.set(key(id, voice), clips);
       // A failed synthesis must not stay cached.
@@ -172,6 +178,7 @@ export class ConversationService {
     void this.send(prompt.text);
   }
 
+  /** Start again: the conversation and its memory note are deleted from the local database. */
   reset(): void {
     this.abort?.abort();
     this.player.stop();
@@ -190,13 +197,19 @@ export class ConversationService {
     this.messages.update((list) => list.map((m) => (m.id === id ? { ...m, ...changes } : m)));
   }
 
+  /** Save to the local database; an empty conversation (or memory note) is deleted, not stored. */
   private persist(): void {
-    try {
-      sessionStorage.setItem(STORE_KEY, JSON.stringify(this.messages()));
-      sessionStorage.setItem(MEMORY_KEY, JSON.stringify(this.memory()));
-    } catch {
-      /* storage unavailable */
-    }
+    const messages = this.messages();
+    const memory = this.memory();
+    void (messages.length ? this.db.put('conversation', messages) : this.db.delete('conversation'));
+    void (memory.note ? this.db.put('memory', memory) : this.db.delete('memory'));
+  }
+
+  private async load(): Promise<void> {
+    const [messages, memory] = await Promise.all([this.db.get<ChatMessage[]>('conversation'), this.db.get<Memory>('memory')]);
+    if (this.messages().length) return; // the user started typing before it loaded: keep theirs
+    this.messages.set(cleanMessages(messages));
+    this.memory.set(cleanMemory(memory));
   }
 }
 
@@ -209,23 +222,14 @@ function key(id: string, voice: string | null): string {
   return `${id}|${voice ?? 'default'}`;
 }
 
-function restore(): ChatMessage[] {
-  try {
-    const raw = sessionStorage.getItem(STORE_KEY);
-    const list = raw ? (JSON.parse(raw) as ChatMessage[]) : [];
-    return list
-      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string')
-      .map((m) => (m.state === 'streaming' ? { ...m, state: 'stopped' as const } : m));
-  } catch {
-    return [];
-  }
+/** A saved conversation, checked: only well-formed messages; one cut off mid-reply counts as stopped. */
+function cleanMessages(list: unknown): ChatMessage[] {
+  if (!Array.isArray(list)) return [];
+  return (list as ChatMessage[])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string')
+    .map((m) => (m.state === 'streaming' ? { ...m, state: 'stopped' as const } : m));
 }
 
-function restoreMemory(): Memory {
-  try {
-    const m = JSON.parse(sessionStorage.getItem(MEMORY_KEY) ?? 'null') as Memory | null;
-    return m && typeof m.note === 'string' && Number.isInteger(m.turns) ? m : NO_MEMORY;
-  } catch {
-    return NO_MEMORY;
-  }
+function cleanMemory(m: Memory | null): Memory {
+  return m && typeof m.note === 'string' && Number.isInteger(m.turns) ? m : NO_MEMORY;
 }

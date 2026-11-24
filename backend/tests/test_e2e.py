@@ -52,8 +52,16 @@ REPORT: list[tuple[str, float]] = []
 
 @pytest.fixture(scope="module")
 def client():
-    with TestClient(create_app()) as c:  # context manager → real lifespan: real Ollama + Piper
-        yield c
+    # These tests send many requests a minute from one address: switch the rate limits off for
+    # them only (like the browser tests do), and restore the normal settings afterwards.
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setenv("RATE_LIMITS", "false")
+        get_settings.cache_clear()
+        try:
+            with TestClient(create_app()) as c:  # context manager → real lifespan: real Ollama + Piper
+                yield c
+        finally:
+            get_settings.cache_clear()
     print("\n\n  ── E2E latency report " + "─" * 40)
     for name, ms in REPORT:
         print(f"  {name:<52} {ms:>8.0f} ms")
