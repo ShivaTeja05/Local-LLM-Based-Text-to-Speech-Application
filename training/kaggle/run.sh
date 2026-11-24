@@ -10,6 +10,7 @@
 #   ACCEL=NvidiaTeslaP100 training/kaggle/run.sh    # on a P100 (Hugging Face PEFT), as its own job
 #   SKIP_DATA=1 training/kaggle/run.sh              # reuse the dataset already on Kaggle
 #   training/kaggle/run.sh --fetch                  # only download the output of the last run
+#   DATA_DIR=../data/out/v3 OUTDIR=output-v3 training/kaggle/run.sh   # train on another dataset
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -22,7 +23,8 @@ ACCEL="${ACCEL:-NvidiaTeslaT4}"
 case "$ACCEL" in *P100*) SUFFIX="-p100" ;; *) SUFFIX="" ;; esac  # each GPU type is its own job
 DATASET="$OWNER/ellie-british-chat"
 KERNEL="$OWNER/ellie-lora-train$SUFFIX"
-OUTDIR="output$SUFFIX"
+OUTDIR="${OUTDIR:-output$SUFFIX}"   # e.g. OUTDIR=output-v3 keeps an earlier run's output
+DATA="${DATA_DIR:-../data/out}"      # e.g. DATA_DIR=../data/out/v3
 BUILD="build$SUFFIX"
 echo "Kaggle account: $OWNER, job: $KERNEL on $ACCEL"
 
@@ -36,7 +38,7 @@ if [ "${1:-}" = "--fetch" ]; then fetch; exit 0; fi
 # 1. Dataset ---------------------------------------------------------------------------
 rm -rf "$BUILD" && mkdir -p "$BUILD/dataset" "$BUILD/kernel"
 if [ -z "${SKIP_DATA:-}" ]; then
-cp ../data/out/train.jsonl ../data/out/val.jsonl ../eval/prompts.jsonl ../eval/score.py "$BUILD/dataset/"
+cp "$DATA/train.jsonl" "$DATA/val.jsonl" ../eval/prompts.jsonl ../eval/score.py "$BUILD/dataset/"
 cat > "$BUILD/dataset/dataset-metadata.json" <<EOF
 {"title": "Ellie British chat (LoRA data)", "id": "$DATASET", "licenses": [{"name": "other"}]}
 EOF

@@ -42,6 +42,8 @@
 }
 
 .title-row { margin-bottom: 40px; }
+.compare-toggle { margin-top: 14px; }
+.comparison-view { flex: 1; min-height: 0; overflow-y: auto; }
 h1 {
   margin: 0;
   font-family: var(--font-greeting);

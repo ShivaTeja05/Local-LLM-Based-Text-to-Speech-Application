@@ -8,15 +8,18 @@ Writes:
 """
 
 import json
+import os
 import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 TRAINING = HERE.parent
+# The dataset to train on: data/out (v2), or another folder, e.g. ELLIE_DATASET=data/out/v3
+DATASET = TRAINING / os.environ.get("ELLIE_DATASET", "data/out")
 FILES = {
     "train.py": TRAINING / "kaggle" / "kernel" / "train.py",
-    "train.jsonl": TRAINING / "data" / "out" / "train.jsonl",
-    "val.jsonl": TRAINING / "data" / "out" / "val.jsonl",
+    "train.jsonl": DATASET / "train.jsonl",
+    "val.jsonl": DATASET / "val.jsonl",
     "prompts.jsonl": TRAINING / "eval" / "prompts.jsonl",
     "score.py": TRAINING / "eval" / "score.py",
 }

@@ -15,11 +15,12 @@ import { handFor } from './ui/gesture';
 import { Conversation } from './ui/conversation';
 import { Icon } from './ui/icon';
 import { SettingsPanel } from './ui/settings-panel';
+import { ModelComparison } from './ui/model-comparison';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Avatar, Conversation, Icon, SettingsPanel],
+  imports: [Avatar, Conversation, Icon, SettingsPanel, ModelComparison],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -33,6 +34,7 @@ export class App {
 
   private readonly sheet = viewChild.required<ElementRef<HTMLDialogElement>>('sheet');
   protected readonly drafting = signal(false);
+  protected readonly comparing = signal(false);
   /** The voice in use, so the avatar can show its character. */
   protected readonly voiceId = computed(() => {
     const id = this.settings.voiceId() ?? this.status.defaultVoice()?.id ?? null;
@@ -127,6 +129,12 @@ export class App {
     const on = !this.settings.speechEnabled();
     this.settings.speechEnabled.set(on);
     if (!on) this.player.stop();
+  }
+
+  protected toggleComparison(): void {
+    this.player.stop();
+    this.drafting.set(false);
+    this.comparing.update(open => !open);
   }
 
   protected openSheet(): void {

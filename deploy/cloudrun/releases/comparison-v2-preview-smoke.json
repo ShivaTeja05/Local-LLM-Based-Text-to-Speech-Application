@@ -1,0 +1,51 @@
+{
+  "url": "https://comparison-v2---ellie-w24xoisvtq-ew.a.run.app",
+  "api": "https://comparison-v2---ellie-w24xoisvtq-ew.a.run.app",
+  "health": {
+    "status": "ok",
+    "llm": {
+      "ok": true,
+      "backend": "ollama",
+      "model": "llama3.2:3b",
+      "models": [
+        "llama3.2:3b",
+        "ellie-british"
+      ]
+    },
+    "tts": {
+      "ok": true,
+      "engine": "piper",
+      "voices": 5
+    },
+    "stt": {
+      "ok": true,
+      "engine": "whisper",
+      "model": "base.en",
+      "loaded": false
+    },
+    "clone": {
+      "ok": true,
+      "engine": "openvoice-v2",
+      "loaded": false
+    },
+    "comparison": {
+      "version": 1
+    }
+  },
+  "results": [
+    {
+      "model": "Standard",
+      "text": "I'm lovely, thank you for askin'! Just enjoying a nice cuppa and chattin' with someone new. Can't complain about much, really. How 'bout you, then? How's your day been so far?",
+      "metrics": "Words\n31\nInput tokens\n43\nFirst text\n15.1 s\nFull reply\n22.4 s"
+    },
+    {
+      "model": "Fine-tuned v2",
+      "text": "I'm very well, thank you for asking! I don't have days off or feel tired like humans do, so that is lovely to hear. How about yourself? Are you doing something special today?",
+      "metrics": "Words\n33\nInput tokens\n43\nFirst text\n12.1 s\nFull reply\n18.6 s"
+    }
+  ],
+  "playbackVoice": "server-default",
+  "pageErrors": [],
+  "matchedPromptAndSeed": true,
+  "checkedAt": "2026-11-24T19:20:19.955Z"
+}

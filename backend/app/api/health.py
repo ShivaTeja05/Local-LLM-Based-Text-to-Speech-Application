@@ -16,4 +16,4 @@ async def health(request: Request) -> dict:
     clone = cloner.health() if cloner else {"ok": False, "engine": "none", "error": "switched off"}
     # Voice input and Use my voice are optional: they never make the app "degraded".
     return {"status": "ok" if llm["ok"] and tts["ok"] else "degraded", "llm": llm, "tts": tts, "stt": stt,
-            "clone": clone}
+            "clone": clone, "comparison": {"version": 1}}

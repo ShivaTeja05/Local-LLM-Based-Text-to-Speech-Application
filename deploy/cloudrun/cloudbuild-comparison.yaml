@@ -1,0 +1,23 @@
+# Build only; deployment and traffic changes are separate.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    env: ["DOCKER_BUILDKIT=1"]
+    args:
+      - build
+      - -f
+      - deploy/cloudrun/Dockerfile.comparison
+      - --build-arg
+      - BASE_IMAGE=${_BASE_IMAGE}
+      - --build-arg
+      - FINETUNE_SHA256=${_FINETUNE_SHA256}
+      - -t
+      - ${_IMAGE}
+      - .
+images: ["${_IMAGE}"]
+substitutions:
+  _BASE_IMAGE: europe-west1-docker.pkg.dev/ellie-tts-1123f2b4/ellie/ellie@sha256:a87cf6524e0850088cb836a024284d0889e571fbfecdbe6d03f04b73cd633163
+  _FINETUNE_SHA256: 80a361d34066198c10777a7021c8f1d94b293676a266b92c6fbadf0f41cf9b11
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3600s

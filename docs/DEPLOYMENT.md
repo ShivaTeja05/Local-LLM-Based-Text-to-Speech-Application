@@ -121,3 +121,80 @@ gcloud run services delete ellie --region=europe-west1
 ```
 
 Deleting the Google Cloud project removes the service, the images and the logs together.
+
+## Standard + v2 comparison release
+
+The comparison release keeps `llama3.2:3b` as the default and adds `ellie-british` (v2).
+`ellie-british-v3` stays experimental and is not bundled. Both models use the same Piper
+voices. The **Compare models** view provides:
+
+- The recorded 40-prompt × 3-sample local evaluation, exported from the saved raw records
+  with `backend/.venv/bin/python training/eval/export_demo.py`. Facts and name recall are
+  separate columns; these are small expected-answer checks, not general accuracy estimates.
+- A fresh live message sent to each model in isolation, with the same seed. **Same one-line
+  prompt** compares model weights under the same instructions; **App prompts** compares
+  Standard's detailed style prompt against v2's learned style and short prompt.
+- Independent reply cards, word/input-token counts, browser-observed first-text/full-reply
+  times, and playback in the selected voice. Requests are sequential and their order alternates.
+  Timings can include model loading; they are observations, not a speed benchmark. The normal
+  app cleanup still applies to live text, whereas recorded scores use raw output.
+
+The API accepts only the two server-owned prompt styles and a bounded integer seed; the
+model allowlist, message limits and generation rate limits still apply. Comparison history
+is never added to the user's saved conversation or memory. Health reports `comparison.version`
+so a newer frontend cannot silently claim a same-prompt comparison against an older backend.
+
+### Build
+
+`Dockerfile.comparison` extends the **digest-pinned v5 production image**, preserving its
+working dependencies, base model and speech models. It replaces the frontend/backend code
+and imports the checksummed v2 GGUF into Ollama. The temporary bind mount avoids keeping
+another raw GGUF copy in an image layer ([Docker build guidance](https://docs.docker.com/build/building/best-practices/#add-or-copy)).
+Cloud Build receives `DOCKER_BUILDKIT=1` through its build-step environment
+([Cloud Build schema](https://cloud.google.com/build/docs/build-config-file-schema#env)).
+For a future dependency update, build a new full image with the main Dockerfile, then update
+`_BASE_IMAGE` to its verified digest.
+
+```bash
+python3 deploy/cloudrun/prepare_comparison.py
+backend/.venv/bin/python training/eval/export_demo.py
+gcloud --configuration=ellie --project=ellie-tts-1123f2b4 builds submit \
+  --config=deploy/cloudrun/cloudbuild-comparison.yaml --region=europe-west1 \
+  --substitutions=_IMAGE=europe-west1-docker.pkg.dev/ellie-tts-1123f2b4/ellie/ellie:comparison-v2-20261124 .
+```
+
+The preparer verifies v2's SHA-256 before copying it into the build folder. The GGUF remains
+ignored by git. `.gcloudignore` allows only that exact model filename and excludes training,
+research, environment files and interview preparation. While this model is staged, other
+Cloud Build submissions from this checkout also include it; remove the staged copy when
+returning to base-only builds.
+
+### Roll out and verify
+
+Deploy the new image first with `--no-traffic --tag comparison-v2`, preserving the current
+service's CPU, memory, CORS and rate-limit configuration. Set `LLM_MODEL=llama3.2:3b`,
+`LLM_ALT_MODELS=["ellie-british"]`, `SHORT_PROMPT_MODELS=["ellie-british"]`,
+`OLLAMA_MAX_LOADED_MODELS=2` and `OLLAMA_NUM_PARALLEL=1`. Keep min instances at zero.
+Verify the tagged revision's health lists both models and run a paired text/voice smoke test
+before moving production traffic. Deploy the matching frontend to Vercel afterwards.
+Retain the previous revision as a rollback target.
+
+### Verified release: 24 November 2026
+
+Production uses revision `ellie-00010-kav` and image digest
+`sha256:fb4f7c898fbbf6aec870328c9d8355cd138c95821835a8d521816b87b6bc9f82`.
+Both the preview revision and public Vercel URL passed matched-message text and speech
+checks. The public site also passed the normal App prompts mode. Standard remains the
+default, both Standard and v2 are offered, and v3 is not deployed. The previous revision is
+`ellie-00009-6tx`.
+
+See the [release record](../deploy/cloudrun/releases/2026-11-24-comparison-v2.json) and
+[public App prompts check](../deploy/cloudrun/releases/comparison-v2-production-app-smoke.json).
+Recorded observations are single smoke-test runs, not a new aggregate benchmark.
+The temporary local build copy of the GGUF was removed after the successful build; its
+original training artifact remains available for `prepare_comparison.py`.
+
+```bash
+node deploy/cloudrun/smoke-comparison.cjs https://ellie-rosy.vercel.app /tmp/comparison.json /tmp/comparison.png short
+node deploy/cloudrun/smoke-comparison.cjs https://ellie-rosy.vercel.app /tmp/app-prompts.json /tmp/app-prompts.png default
+```

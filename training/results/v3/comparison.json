@@ -1,0 +1,320 @@
+{
+  "decision": "Keep v2 as the existing local fine-tune; retain v3 separately as an experimental corpus-guided variant. Leave the live base-model deployment unchanged.",
+  "evaluation": {
+    "tuned-short": {
+      "model": "ellie-british",
+      "prompt": "short",
+      "repeats": 3,
+      "avg_prompt_tokens": 52,
+      "correct_%": 75.0,
+      "replies": 120,
+      "clean_%": 86.7,
+      "american_%": 0.0,
+      "too_long_%": 10.0,
+      "markdown_%": 0.0,
+      "emoji_%": 0.0,
+      "invented_life_%": 0.0,
+      "robotic_%": 0.8,
+      "cut_off_%": 0.0,
+      "unhelpful_%": 3.3,
+      "ends_question_%": 92.5,
+      "avg_words": 34.9,
+      "lovely_per_reply": 0.32
+    },
+    "tuned-v3-short": {
+      "model": "ellie-british-v3",
+      "prompt": "short",
+      "repeats": 3,
+      "avg_prompt_tokens": 52,
+      "correct_%": 83.3,
+      "replies": 120,
+      "clean_%": 84.2,
+      "american_%": 0.0,
+      "too_long_%": 12.5,
+      "markdown_%": 0.0,
+      "emoji_%": 0.0,
+      "invented_life_%": 0.0,
+      "robotic_%": 0.0,
+      "cut_off_%": 0.0,
+      "unhelpful_%": 4.2,
+      "ends_question_%": 89.2,
+      "avg_words": 34.2,
+      "lovely_per_reply": 0.03
+    }
+  },
+  "known_answer_breakdown": {
+    "tuned-short": {
+      "factual_questions": {
+        "correct": 8,
+        "total": 9
+      },
+      "name_recall": {
+        "correct": 1,
+        "total": 3
+      },
+      "by_prompt": {
+        "facts-01": {
+          "correct": 3,
+          "total": 3
+        },
+        "facts-02": {
+          "correct": 3,
+          "total": 3
+        },
+        "facts-03": {
+          "correct": 2,
+          "total": 3
+        },
+        "turns-01": {
+          "correct": 1,
+          "total": 3
+        }
+      }
+    },
+    "tuned-v3-short": {
+      "factual_questions": {
+        "correct": 7,
+        "total": 9
+      },
+      "name_recall": {
+        "correct": 3,
+        "total": 3
+      },
+      "by_prompt": {
+        "facts-01": {
+          "correct": 3,
+          "total": 3
+        },
+        "facts-02": {
+          "correct": 3,
+          "total": 3
+        },
+        "facts-03": {
+          "correct": 1,
+          "total": 3
+        },
+        "turns-01": {
+          "correct": 3,
+          "total": 3
+        }
+      }
+    }
+  },
+  "corpus_comparison": {
+    "tuned-short": {
+      "words": 4175,
+      "words_per_reply": {
+        "mean": 34.8,
+        "median": 35.0
+      },
+      "britishness": {
+        "british": 28,
+        "american": 0,
+        "index": 1.0,
+        "british_forms": [
+          [
+            "favourite",
+            14
+          ],
+          [
+            "colour",
+            6
+          ],
+          [
+            "colours",
+            2
+          ],
+          [
+            "holidays",
+            2
+          ],
+          [
+            "theatre",
+            1
+          ],
+          [
+            "grey",
+            1
+          ],
+          [
+            "jewellery",
+            1
+          ],
+          [
+            "mum",
+            1
+          ]
+        ],
+        "american_forms": []
+      },
+      "disclosures": {
+        "ai_mentions": {
+          "replies": 19,
+          "percent": 15.8
+        },
+        "since_im_an_ai": {
+          "replies": 10,
+          "percent": 8.3
+        }
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 91.0,
+          "bnc_per_10k": 3.9,
+          "count": 38,
+          "log_ratio": 4.56,
+          "ll": 167.1
+        },
+        "brilliant": {
+          "per_10k": 26.3,
+          "bnc_per_10k": 1.5,
+          "count": 11,
+          "log_ratio": 4.15,
+          "ll": 42.5
+        },
+        "yeah": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 253.3,
+          "count": 0,
+          "log_ratio": -7.72,
+          "ll": 211.4
+        },
+        "you know": {
+          "per_10k": 9.6,
+          "bnc_per_10k": 44.6,
+          "count": 4,
+          "log_ratio": -2.22,
+          "ll": 17.0
+        },
+        "tag questions": {
+          "per_10k": 2.4,
+          "bnc_per_10k": 23.5,
+          "count": 1,
+          "log_ratio": -3.3,
+          "ll": 13.1
+        },
+        "i think": {
+          "per_10k": 2.4,
+          "bnc_per_10k": 34.4,
+          "count": 1,
+          "log_ratio": -3.84,
+          "ll": 21.4
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -3.98,
+          "ll": 15.8
+        }
+      }
+    },
+    "tuned-v3-short": {
+      "words": 4091,
+      "words_per_reply": {
+        "mean": 34.1,
+        "median": 33.5
+      },
+      "britishness": {
+        "british": 23,
+        "american": 0,
+        "index": 1.0,
+        "british_forms": [
+          [
+            "favourite",
+            15
+          ],
+          [
+            "colour",
+            2
+          ],
+          [
+            "mum",
+            2
+          ],
+          [
+            "holidays",
+            2
+          ],
+          [
+            "colours",
+            1
+          ],
+          [
+            "holiday",
+            1
+          ]
+        ],
+        "american_forms": []
+      },
+      "disclosures": {
+        "ai_mentions": {
+          "replies": 17,
+          "percent": 14.2
+        },
+        "since_im_an_ai": {
+          "replies": 11,
+          "percent": 9.2
+        }
+      },
+      "features": {
+        "lovely": {
+          "per_10k": 9.8,
+          "bnc_per_10k": 3.9,
+          "count": 4,
+          "log_ratio": 1.34,
+          "ll": 2.6
+        },
+        "brilliant": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 1.5,
+          "count": 0,
+          "log_ratio": -0.28,
+          "ll": 1.2
+        },
+        "yeah": {
+          "per_10k": 24.4,
+          "bnc_per_10k": 253.3,
+          "count": 10,
+          "log_ratio": -3.37,
+          "ll": 140.4
+        },
+        "you know": {
+          "per_10k": 14.7,
+          "bnc_per_10k": 44.6,
+          "count": 6,
+          "log_ratio": -1.61,
+          "ll": 11.2
+        },
+        "tag questions": {
+          "per_10k": 7.3,
+          "bnc_per_10k": 23.5,
+          "count": 3,
+          "log_ratio": -1.68,
+          "ll": 6.3
+        },
+        "i think": {
+          "per_10k": 2.4,
+          "bnc_per_10k": 34.4,
+          "count": 1,
+          "log_ratio": -3.81,
+          "ll": 20.8
+        },
+        "i mean": {
+          "per_10k": 0.0,
+          "bnc_per_10k": 18.9,
+          "count": 0,
+          "log_ratio": -3.95,
+          "ll": 15.5
+        }
+      }
+    }
+  },
+  "limitations": [
+    "120 replies but only 40 unique prompts; repetitions are not independent prompt coverage.",
+    "Only three factual questions and one memory question; expected-answer matches do not verify all claims.",
+    "The rewrite teacher also judged its own outputs.",
+    "Feature selection uses both training and validation data.",
+    "This is a practical comparison of model versions, not a fully controlled software-stack ablation."
+  ]
+}

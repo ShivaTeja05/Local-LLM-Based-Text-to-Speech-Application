@@ -19,8 +19,13 @@
       <header class="title-row">
         <h1>{{ greeting() }}</h1>
         <p class="subline" [attr.data-connection]="status.connection()">{{ subline() }}</p>
+        <button type="button" class="btn btn-quiet compare-toggle" [disabled]="chat.generating()"
+          [attr.aria-pressed]="comparing()" (click)="toggleComparison()">{{ comparing() ? 'Back to conversation' : 'Compare models' }}</button>
       </header>
 
+      @if (comparing()) {
+        <app-model-comparison class="comparison-view" />
+      } @else {
       <div class="grid">
         <section class="stage panel" aria-label="Ellie">
           <app-avatar class="portrait" [state]="avatarState()" [expression]="expression()" [level]="player.level()"
@@ -41,6 +46,7 @@
 
         <app-conversation class="talk panel" (drafting)="drafting.set($event)" />
       </div>
+      }
     </div>
   </main>
 </div>

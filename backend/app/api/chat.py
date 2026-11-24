@@ -32,7 +32,7 @@ def _context(req: ChatRequest, settings: Settings, model: str) -> ContextResult:
     try:
         note = req.memory.note if req.memory else None
         return build_messages([m.model_dump() for m in req.messages], settings, note,
-                              short=model in settings.short_prompt_models)
+                              short=req.prompt_style == "short" or model in settings.short_prompt_models)
     except ContextError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -68,7 +68,8 @@ async def chat_stream(
     async def events() -> AsyncIterator[str]:
         stats, parts, started = StreamStats(), [], time.perf_counter()
         try:
-            async for delta in llm.stream_chat(ctx.messages, stats, model=model):
+            async for delta in llm.stream_chat(ctx.messages, stats, model=model,
+                                               options={"seed": req.seed} if req.seed is not None else None):
                 cleaned = clean_delta(delta)
                 if cleaned:
                     parts.append(cleaned)
@@ -107,7 +108,8 @@ async def chat(req: ChatRequest, request: Request, settings: Settings = Depends(
     llm: LLMAdapter = request.app.state.llm
     stats, parts, started = StreamStats(), [], time.perf_counter()
     try:
-        async for delta in llm.stream_chat(ctx.messages, stats, model=model):
+        async for delta in llm.stream_chat(ctx.messages, stats, model=model,
+                                           options={"seed": req.seed} if req.seed is not None else None):
             parts.append(clean_delta(delta))
     except LLMError as exc:
         log.warning("chat failed: %s", exc)

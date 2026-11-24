@@ -23,6 +23,9 @@ class ChatRequest(BaseModel):
     memory: Memory | None = None
     # One of the server's allowed models (health.llm.models); omitted = the default model.
     model: str | None = Field(default=None, max_length=100)
+    # A controlled comparison may give both models the same server-owned one-line prompt.
+    prompt_style: Literal["default", "short"] = "default"
+    seed: int | None = Field(default=None, ge=0, le=2147483647)
 
 
 class MemoryRequest(BaseModel):

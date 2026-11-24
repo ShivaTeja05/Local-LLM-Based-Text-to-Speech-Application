@@ -1,0 +1,39 @@
+:host { display: block; }
+.comparison { padding-bottom: 24px; }
+h2 { margin: 0; font-size: 25px; font-weight: 500; }
+h3 { margin: 0 0 6px; font-size: 19px; font-weight: 500; }
+p { margin: 8px 0 14px; line-height: 1.55; }
+header > p, .model, .notes { color: var(--muted); }
+.evidence, .live { margin-top: 22px; padding: 22px; border-radius: var(--radius-card); background: var(--surface); }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-weight: 500; }
+td { white-space: nowrap; }
+tbody th { min-width: 155px; }
+.tuned { background: var(--active); }
+.notes { font-size: 12px; line-height: 1.6; }
+.tradeoff { border-left: 3px solid var(--accent); padding-left: 14px; margin-bottom: 0; }
+label { display: block; margin: 16px 0 7px; font-weight: 500; }
+select, textarea { width: 100%; border: 1px solid var(--control); border-radius: 12px; padding: 10px 12px; background: var(--raised); }
+textarea { resize: vertical; min-height: 80px; }
+.presets, .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.presets .btn { white-space: normal; height: auto; min-height: 32px; text-align: left; }
+.actions .notes { margin-left: auto; }
+.availability { color: var(--warning); }
+.submitted { margin-top: 24px; }
+.submitted span { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.replies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.reply-card { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--raised); }
+h4 { margin: 0; font-size: 17px; font-weight: 500; }
+.model { margin-top: 4px; font-size: 12px; overflow-wrap: anywhere; }
+.reply-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; }
+dl { display: flex; flex-wrap: wrap; gap: 12px 18px; font-size: 12px; }
+dt { color: var(--muted); }
+dd { margin: 3px 0 0; font-variant-numeric: tabular-nums; font-weight: 500; }
+.error { color: var(--pill-negative-ink); }
+@media (max-width: 767px) {
+  .evidence, .live { padding: 16px; margin-top: 16px; }
+  .replies { grid-template-columns: 1fr; }
+  h2 { font-size: 23px; }
+}

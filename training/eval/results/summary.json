@@ -78,5 +78,25 @@
     "ends_question_%": 92.5,
     "avg_words": 34.9,
     "lovely_per_reply": 0.32
+  },
+  "tuned-v3-short": {
+    "model": "ellie-british-v3",
+    "prompt": "short",
+    "repeats": 3,
+    "avg_prompt_tokens": 52,
+    "correct_%": 83.3,
+    "replies": 120,
+    "clean_%": 84.2,
+    "american_%": 0.0,
+    "too_long_%": 12.5,
+    "markdown_%": 0.0,
+    "emoji_%": 0.0,
+    "invented_life_%": 0.0,
+    "robotic_%": 0.0,
+    "cut_off_%": 0.0,
+    "unhelpful_%": 4.2,
+    "ends_question_%": 89.2,
+    "avg_words": 34.2,
+    "lovely_per_reply": 0.03
   }
 }

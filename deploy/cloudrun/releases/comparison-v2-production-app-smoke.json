@@ -1,0 +1,52 @@
+{
+  "url": "https://ellie-rosy.vercel.app",
+  "api": "https://ellie-537291504909.europe-west1.run.app",
+  "health": {
+    "status": "ok",
+    "llm": {
+      "ok": true,
+      "backend": "ollama",
+      "model": "llama3.2:3b",
+      "models": [
+        "llama3.2:3b",
+        "ellie-british"
+      ]
+    },
+    "tts": {
+      "ok": true,
+      "engine": "piper",
+      "voices": 5
+    },
+    "stt": {
+      "ok": true,
+      "engine": "whisper",
+      "model": "base.en",
+      "loaded": true
+    },
+    "clone": {
+      "ok": true,
+      "engine": "openvoice-v2",
+      "loaded": true
+    },
+    "comparison": {
+      "version": 1
+    }
+  },
+  "mode": "default",
+  "results": [
+    {
+      "model": "Standard",
+      "text": "I'm very well, thank you for asking! It's always lovely chatting with someone new. How about you, how's your day been so far?",
+      "metrics": "Words\n23\nInput tokens\n247\nFirst text\n0.8 s\nFull reply\n6.7 s"
+    },
+    {
+      "model": "Fine-tuned v2",
+      "text": "I'm doing very well, thank you for asking! I don't feel emotions like people do, but it's lovely to chat with someone who asks how I'm getting on. How about you?",
+      "metrics": "Words\n31\nInput tokens\n43\nFirst text\n0.2 s\nFull reply\n6.3 s"
+    }
+  ],
+  "playbackVoice": "server-default",
+  "pageErrors": [],
+  "matchedMessageAndSeed": true,
+  "checkedAt": "2026-11-24T19:24:21.329Z"
+}

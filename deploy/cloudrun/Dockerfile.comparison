@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Extend the exact working deployment: keep its model, voices and dependencies, add v2 and UI.
+ARG BASE_IMAGE
+FROM node:24-slim AS comparison-frontend
+WORKDIR /src
+ENV NG_CLI_ANALYTICS=false NG_BUILD_MAX_WORKERS=2
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY frontend/ ./
+RUN npx ng build
+
+FROM ${BASE_IMAGE}
+USER root
+COPY backend/app /app/app
+COPY --from=comparison-frontend /src/dist/frontend/browser /frontend/dist/frontend/browser
+COPY deploy/cloudrun/install-finetune.sh /tmp/install-finetune.sh
+USER ellie
+ARG FINETUNE_SHA256
+# The raw GGUF is temporary. Only Ollama's installed blobs persist in the image.
+RUN --mount=type=bind,source=deploy/cloudrun/finetune,target=/finetune \
+    FINETUNE_SHA256="$FINETUNE_SHA256" sh /tmp/install-finetune.sh
+ENV LLM_MODEL=llama3.2:3b LLM_ALT_MODELS='["ellie-british"]' SHORT_PROMPT_MODELS='["ellie-british"]' \
+    OLLAMA_MAX_LOADED_MODELS=2 OLLAMA_NUM_PARALLEL=1

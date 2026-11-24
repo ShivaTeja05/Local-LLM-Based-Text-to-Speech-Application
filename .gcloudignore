@@ -1,8 +1,12 @@
-# What Cloud Build uploads: the code only. Models are downloaded inside the build, not uploaded.
+# Normal builds upload code only; the comparison build also includes the verified v2 GGUF below.
 #!include:.gitignore
 .git
 training/
 docs/
+research/
+interview-prep/
+avatar3d/
+HANDOFF-training.md
 frontend/node_modules/
 frontend/dist/
 frontend/e2e/
@@ -13,3 +17,5 @@ backend/voices/
 backend/tests/
 *.gguf
 *.onnx
+# Deliberately allow only the prepared v2 artifact, never the training or corpus folders.
+!deploy/cloudrun/finetune/ellie-british-Q4_K_M.gguf

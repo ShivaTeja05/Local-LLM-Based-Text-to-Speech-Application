@@ -44,11 +44,13 @@ export class ApiService {
     signal: AbortSignal,
     memory?: Memory,
     model?: string | null,
+    comparison?: { promptStyle: 'default' | 'short'; seed: number },
   ): AsyncGenerator<ChatEvent> {
     const res = await fetch(API + '/api/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-      body: JSON.stringify({ messages: toApi(history), ...(memory?.note ? { memory } : {}), ...(model ? { model } : {}) }),
+      body: JSON.stringify({ messages: toApi(history), ...(memory?.note ? { memory } : {}), ...(model ? { model } : {}),
+        ...(comparison ? { prompt_style: comparison.promptStyle, seed: comparison.seed } : {}) }),
       signal,
     });
     if (!res.ok || !res.body) throw new ApiError(await detail(res), res.status);
@@ -63,7 +65,8 @@ export class ApiService {
           const data = JSON.parse(ev.data);
           if (ev.event === 'token') yield { type: 'token', text: data.t };
           else if (ev.event === 'done')
-            yield { type: 'done', text: data.text, truncated: data.truncated, model: data.model, turnsDropped: data.turns_dropped };
+            yield { type: 'done', text: data.text, truncated: data.truncated, model: data.model,
+              turnsDropped: data.turns_dropped, promptTokens: data.prompt_tokens };
           else if (ev.event === 'error') yield { type: 'error', code: data.code, message: data.message };
         }
       }

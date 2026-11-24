@@ -26,6 +26,7 @@ export interface Health {
   stt?: { ok: boolean; engine: string; model?: string; error?: string };
   /** Use my voice: the voice converter (optional). */
   clone?: { ok: boolean; engine: string; error?: string };
+  comparison?: { version: number };
 }
 
 /** The voice id for "my voice" (a British base voice, re-voiced to sound like the user). */
@@ -49,7 +50,7 @@ export interface Memory {
 /** Events produced by POST /api/chat/stream (see backend/app/api/chat.py). */
 export type ChatEvent =
   | { type: 'token'; text: string }
-  | { type: 'done'; text: string; truncated: boolean; model: string; turnsDropped: number }
+  | { type: 'done'; text: string; truncated: boolean; model: string; turnsDropped: number; promptTokens?: number }
   | { type: 'error'; code: string; message: string };
 
 export type AvatarState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';

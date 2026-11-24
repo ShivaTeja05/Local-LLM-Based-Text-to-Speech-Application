@@ -35,6 +35,7 @@ OUT = ROOT / "results"
 MODELS = {
     "base-full": "llama3.2:3b + full style prompt (the live app)",
     "tuned-short": "ellie-british LoRA fine-tune + one-line prompt",
+    "tuned-v3-short": "ellie-british-v3 (corpus-guided data) + one-line prompt",
     "base-short": "llama3.2:3b + one-line prompt (no fine-tune)",
     "teacher-full": "qwen3.5:35b + full prompt (wrote the training data)",
 }
@@ -181,7 +182,15 @@ def main() -> None:
         "models": {},
     }
     for name, label in MODELS.items():
-        m = profile(read_model(name))
+        texts = read_model(name)
+        m = profile(texts)
+        disclosures = {}
+        for key, pattern in {
+            "ai_mentions": r"\b(?:ai|artificial intelligence)\b",
+            "since_im_an_ai": r"\bsince i(?:'m| am) an ai\b",
+        }.items():
+            count = sum(bool(re.search(pattern, text.lower().replace("’", "'"))) for text in texts)
+            disclosures[key] = {"replies": count, "percent": round(100 * count / len(texts), 1)}
         feats = {}
         for k, v in m["features"].items():
             ref = bnc["features"][k]
@@ -192,6 +201,7 @@ def main() -> None:
             "label": label, "replies": len(m["lengths"]), "words": m["n"],
             "words_per_reply": {"mean": round(statistics.mean(m["lengths"]), 1), "median": statistics.median(m["lengths"])},
             "britishness": britishness(m["words"]),
+            "disclosures": disclosures,
             "features": feats,
             "keywords_vs_bnc": keywords(m, bnc),
         }

@@ -135,7 +135,7 @@ def stage_messages(n_oasst: int) -> None:
 # --- 2. teacher replies -------------------------------------------------------------------
 def acceptable(reply: str, done_reason: str, question_ok: bool = True, user: str = "",
                earlier_turns: bool = False) -> tuple[bool, str]:
-    s = score(reply, done_reason)
+    s = score(reply, done_reason, user, earlier_turns)
     if why := habit(reply, user, earlier_turns):
         return False, why
     if not question_ok and s.ends_question:

@@ -182,6 +182,26 @@ def test_chat_rejects_models_that_are_not_allowed(make_client):
     assert r.status_code == 422
 
 
+@pytest.mark.parametrize("endpoint", ["/api/chat", "/api/chat/stream"])
+def test_controlled_comparison_uses_the_same_short_prompt_and_seed(make_client, endpoint):
+    from app.llm.prompt import SHORT_PROMPT
+
+    llm = FakeLLM()
+    client = make_client(llm=llm)
+    for model in (get_settings().llm_model, "ellie-british"):
+        response = client.post(endpoint, json={**USER_HI, "model": model,
+                                               "prompt_style": "short", "seed": 1000})
+        assert response.status_code == 200
+        assert llm.last_messages[0]["content"] == SHORT_PROMPT
+        assert llm.last_options == {"seed": 1000}
+        assert llm.last_model == model
+
+
+@pytest.mark.parametrize("extra", [{"prompt_style": "arbitrary system prompt"}, {"seed": -1}, {"seed": 2147483648}])
+def test_comparison_options_remain_bounded(make_client, extra):
+    assert make_client().post("/api/chat/stream", json={**USER_HI, **extra}).status_code == 422
+
+
 def test_cors_allows_the_configured_frontend_pattern_only(monkeypatch):
     import app.main as main_mod
     from app.config import Settings

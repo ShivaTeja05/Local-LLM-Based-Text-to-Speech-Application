@@ -1,0 +1,85 @@
+<section aria-labelledby="comparison-heading" class="comparison">
+  <header>
+    <h2 id="comparison-heading">Standard or fine-tuned?</h2>
+    <p>Compare the measured results, then ask both models the same question.</p>
+  </header>
+
+  <section class="evidence" aria-labelledby="recorded-heading">
+    <h3 id="recorded-heading">Recorded evaluation</h3>
+    <p>40 fixed prompts × 3 samples = 120 replies per setup, evaluated locally on raw model output.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Recorded model results">
+      <table>
+        <caption class="visually-hidden">Standard and v2 fine-tune: saved evaluation results</caption>
+        <thead><tr><th scope="col">Setup</th><th scope="col">Prompt tokens¹</th><th scope="col">Clean²</th>
+          <th scope="col">Too long</th><th scope="col">Avg words</th><th scope="col">Facts³</th><th scope="col">Name recall³</th></tr></thead>
+        <tbody>
+          @for (r of recorded; track r.name) {
+            <tr [class.tuned]="r.name === 'tuned-short'"><th scope="row">{{ r.label }}</th>
+              <td>{{ r.promptTokens }}</td><td>{{ r.clean }}%</td><td>{{ r.tooLong }}%</td><td>{{ r.words }}</td>
+              <td>{{ r.factsCorrect }}/{{ r.factsTotal }}</td><td>{{ r.memoryCorrect }}/{{ r.memoryTotal }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="notes">¹ Average input tokens. ² Passes every automatic style check; this does not establish truth.
+      ³ Just three factual questions and one name-recall question, each sampled three times. Answer matching does not verify every claim.</p>
+    <p class="tradeoff"><strong>The trade-off:</strong> the fine-tune gives shorter, more consistent British replies with a smaller prompt,
+      but loses some factual accuracy and name recall in this small evaluation. Standard remains the default.</p>
+  </section>
+
+  <section class="live" aria-labelledby="live-heading">
+    <h3 id="live-heading">Try both live</h3>
+    <p>Fresh conversations, the same message and sampling seed. Play either reply in your selected voice.</p>
+    <label for="comparison-mode">Comparison</label>
+    <select id="comparison-mode" [value]="mode()" (change)="chooseMode($event)" [disabled]="comparison.busy()">
+      <option value="short">Same one-line prompt · isolate the fine-tune</option>
+      <option value="default">App prompts · compare the shipped behaviour</option>
+    </select>
+    <p class="notes">{{ mode() === 'short'
+      ? 'Both models get the same one-line persona prompt.'
+      : 'Standard gets the detailed style prompt; Fine-tuned v2 gets the one-line prompt.' }}</p>
+    <div class="presets" aria-label="Example comparison messages">
+      @for (p of presets; track p) { <button type="button" class="btn btn-quiet btn-small"
+        [disabled]="comparison.busy()" (click)="draft.set(p)">{{ p }}</button> }
+    </div>
+    <label for="comparison-message">Message for both models</label>
+    <textarea id="comparison-message" rows="2" maxlength="500" [value]="draft()" (input)="input($event)"
+      [disabled]="comparison.busy()"></textarea>
+    <div class="actions">
+      <button type="button" class="btn btn-primary" (click)="run()"
+        [disabled]="comparison.busy() || !comparison.available() || !draft().trim()">Compare replies</button>
+      @if (comparison.busy()) { <button type="button" class="btn btn-quiet" (click)="comparison.cancel()">Stop comparison</button> }
+      <span class="notes">{{ draft().length }}/500</span>
+    </div>
+    @if (!comparison.available()) { <p role="status" class="availability">Live comparison needs both models on this server. The recorded results remain available above.</p> }
+
+    @if (comparison.replies().length) {
+      <p class="submitted"><strong>Asked both:</strong> {{ comparison.prompt() }}
+        <span>{{ comparison.mode() === 'short' ? 'Same one-line prompt' : 'App prompts' }}</span></p>
+      <div class="replies">
+        @for (r of comparison.replies(); track r.model) {
+          <article class="reply-card" [attr.aria-label]="r.label + ' comparison reply'" [attr.data-state]="r.state">
+            <h4>{{ r.label }}</h4><p class="model">{{ r.model }}</p>
+            @if (r.state === 'queued') { <p role="status">Waiting for its turn…</p> }
+            @if (r.state === 'running') { <p role="status">Writing…</p> }
+            <p class="reply-text">{{ r.text }}</p>
+            @if (r.error) { <p class="error" role="alert">{{ r.error }}</p> }
+            @if (r.state === 'stopped') { <p>Stopped before completion.</p> }
+            @if (r.state === 'done') {
+              <dl><div><dt>Words</dt><dd>{{ words(r.text) }}</dd></div>
+                @if (r.promptTokens !== null) { <div><dt>Input tokens</dt><dd>{{ r.promptTokens }}</dd></div> }
+                @if (r.firstTokenMs !== null) { <div><dt>First text</dt><dd>{{ seconds(r.firstTokenMs) }} s</dd></div> }
+                @if (r.totalMs !== null) { <div><dt>Full reply</dt><dd>{{ seconds(r.totalMs) }} s</dd></div> }</dl>
+              @if (r.truncated) { <p class="error">The model reached its output limit.</p> }
+              <button type="button" class="btn btn-quiet btn-small" [disabled]="comparison.busy()" (click)="play(r.model)">
+                {{ player.speakingId() === 'compare:' + r.model ? 'Stop' : 'Play reply' }}</button>
+            }
+          </article>
+        }
+      </div>
+      <p class="notes">Replies use the app's normal text cleanup. Word counts describe the displayed text; the recorded evaluation scores raw output.
+        Timings are browser-observed for this run and may include model loading. Requests run one after another; the first model alternates between runs.
+        Comparison replies are not added to your saved conversation.</p>
+    }
+  </section>
+</section>

@@ -1,0 +1,40 @@
+{
+  "deployed_at_utc": "2026-11-24T19:24:21Z",
+  "public_url": "https://ellie-rosy.vercel.app",
+  "project": "ellie-tts-1123f2b4",
+  "gcloud_configuration": "ellie",
+  "region": "europe-west1",
+  "build_id": "8bfb1a94-02b3-4436-8b93-1f63b6817a77",
+  "image": "europe-west1-docker.pkg.dev/ellie-tts-1123f2b4/ellie/ellie@sha256:fb4f7c898fbbf6aec870328c9d8355cd138c95821835a8d521816b87b6bc9f82",
+  "revision": "ellie-00010-kav",
+  "previous_revision": "ellie-00009-6tx",
+  "production_traffic_percent": 100,
+  "models": [
+    "llama3.2:3b",
+    "ellie-british"
+  ],
+  "default_model": "llama3.2:3b",
+  "experimental_v3_deployed": false,
+  "fine_tune_gguf_sha256": "80a361d34066198c10777a7021c8f1d94b293676a266b92c6fbadf0f41cf9b11",
+  "vercel_deployment": {
+    "id": "dpl_Da1r61WABvrjftujASRPEMaqQfpV",
+    "url": "https://ellie-1bb5jclqw-shivateja05s-projects.vercel.app",
+    "productionUrl": "https://ellie-rosy.vercel.app",
+    "readyState": "READY"
+  },
+  "tests": {
+    "backend": 119,
+    "frontend_unit": 76,
+    "browser_desktop": 35,
+    "browser_phone": 3,
+    "preview_and_public_text_and_speech_smokes": "passed",
+    "public_modes": [
+      "short",
+      "default"
+    ]
+  },
+  "working_tree_changes_included": true,
+  "evaluation_results_sha256": "0e98abf57faf71d6b5c49dd5356d47bc2c0bc02e9121aeb989782c578c19b79d",
+  "git_head_at_deployment": "888544e828394fe01988262a107c1c6ca6d90440",
+  "committed_or_pushed_at_deployment": false
+}

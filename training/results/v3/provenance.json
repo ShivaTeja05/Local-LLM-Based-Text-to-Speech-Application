@@ -1,0 +1,51 @@
+{
+  "kernel": "idfc005/ellie-lora-train",
+  "kernel_version": 4,
+  "model": "ellie-british-v3",
+  "gguf_bytes": 2019377312,
+  "gguf_sha256": "71c4351e24c6158be89353d3d74ccafa13031e97517e7c548c7b86164049cd1e",
+  "ollama": {
+    "version": "0.40.4"
+  },
+  "models": [
+    {
+      "name": "ellie-british-v3:latest",
+      "digest": "1a22771efafe31a094799f3d808abf974ca83ad726ceb99c7708ef0d3f58b69c",
+      "size": 2019392679
+    },
+    {
+      "name": "ellie-british:latest",
+      "digest": "89d2310a1374e2cc74894b2a99147d25bf9373c9f75f6d86c440d31f91de4c8e",
+      "size": 2019392679
+    },
+    {
+      "name": "llama3.2:3b",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size": 2019393189
+    }
+  ],
+  "template_matches_base": true,
+  "stop_parameters_match_base": true,
+  "evaluation": {
+    "name": "tuned-v3-short",
+    "prompt": "short",
+    "repeats": 3,
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ],
+    "options": {
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "num_predict": 160,
+      "repeat_penalty": 1.1,
+      "num_ctx": 4096
+    },
+    "sha256": {
+      "training/eval/run_eval.py": "44fec1462b8ae751ce35159b67fe46c083ed07ea69630c708bafea489c706a6d",
+      "training/eval/score.py": "3caa6bc7444745b149d3fb04062b8c43f9e162575150a2f52b9fa979f756f0ff",
+      "training/eval/prompts.jsonl": "cb9f73bc1224e4d04df752eda92eca612b14277be99a258e28a900e168e16877"
+    }
+  }
+}

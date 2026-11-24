@@ -1,0 +1,35 @@
+{
+  "dataset": "v3",
+  "kernel": "idfc005/ellie-lora-train",
+  "kernel_version": 4,
+  "splits": {
+    "train": {
+      "conversations": 855,
+      "assistant_replies": 1202,
+      "changed_replies": 433,
+      "user_and_system_turns_unchanged": true,
+      "context_aware_gate_failures": 0,
+      "uploaded_matches": true,
+      "sha256": "5beedc94b4e388e447db25fb0755a4b89b2662c5781b0ad2f44f8a8022af453e"
+    },
+    "val": {
+      "conversations": 94,
+      "assistant_replies": 137,
+      "changed_replies": 54,
+      "user_and_system_turns_unchanged": true,
+      "context_aware_gate_failures": 0,
+      "uploaded_matches": true,
+      "sha256": "85a2ac6766a98d1bc947a9c2bf602ab1a615b12bcc6623ad9f060d5cb8e9e29e"
+    }
+  },
+  "word_pass_audit": {
+    "exact_original_or_approved": 1186,
+    "strict_word_only_edits": 153,
+    "unexpected_edits": 0
+  },
+  "uploaded_code_sha256": {
+    "train.py": "3f39af95bdbee13cea0a6f9ccca2498beefef9dcb9ecd7479dc9ba09f231bdcb",
+    "score.py": "3caa6bc7444745b149d3fb04062b8c43f9e162575150a2f52b9fa979f756f0ff",
+    "prompts.jsonl": "cb9f73bc1224e4d04df752eda92eca612b14277be99a258e28a900e168e16877"
+  }
+}

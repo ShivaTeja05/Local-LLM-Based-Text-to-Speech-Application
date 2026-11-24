@@ -16,10 +16,11 @@ measures Ellie's replies against **real British conversation**: the **Spoken BNC
 | `base-short` | `llama3.2:3b` with a one-line prompt (no fine-tune) | 10,695 | 120 |
 | `base-full` | `llama3.2:3b` with the full style prompt (**the live app**) | 5,333 | 120 |
 | `tuned-short` | **`ellie-british` LoRA fine-tune** with a one-line prompt | 4,175 | 120 |
+| `tuned-v3-short` | **Corpus-guided v3 fine-tune** with a one-line prompt | 4,091 | 120 |
 | `teacher-full` | `qwen3.5:35b` with the full prompt (wrote the fine-tune's training data) | 4,507 | 120 |
 
 The model samples are the replies to the 40 evaluation prompts × 3 samples from
-[`training/eval`](../training/eval/), so all four setups answered exactly the same questions.
+[`training/eval`](../training/eval/), so all five setups answered exactly the same questions.
 
 ## Method
 
@@ -37,7 +38,7 @@ pauses and truncated words are removed first.
    minimum frequency 5).
 4. **Turn length**: words per reply against words per conversational turn.
 
-## Results
+## Initial results (v2)
 
 ### 1. Spelling and vocabulary: the fine-tune is fully British
 
@@ -73,7 +74,7 @@ Rates per 10,000 words (count in brackets), with Log Ratio against the corpus:
 
 ### 3. What each setup over- and under-uses (keywords against the corpus)
 
-- **Fine-tune overuses:** *ai* (LR +13.9: "since I'm an AI", in 19 of 120 replies), *specific*,
+- **Fine-tune overuses:** *ai* (LR +13.9; AI is mentioned in 19 of 120 replies), *specific*,
   *personal*, *access*, *news*, *check*, *tips*, *chat*, *asking*, *lovely*, *favourite*: the
   vocabulary of an assistant explaining what it can and cannot do.
 - **Live app overuses:** *favourite*, *brilliant*, *chat*, *plans*, *experiences*, *how's*.
@@ -104,9 +105,68 @@ Rates per 10,000 words (count in brackets), with Log Ratio against the corpus:
    and filled pauses are odd in synthesised speech). Some is not: tag questions and *you know*
    would make her sound more natural.
 4. **The fine-tune traded one habit for another.** It stopped inventing a life (the goal), but by
-   saying "since I'm an AI" in 16% of replies, which a corpus comparison spots immediately.
+   mentioning AI in 19 of 120 replies (15.8%). The specific phrase "since I'm an AI"
+   occurs in 10 replies (8.3%); these are different measures.
 
-## Next steps this suggests
+## v3: using aggregate corpus rates to guide the data
+
+The v3 experiment keeps the same 949 conversations and changes only assistant replies.
+The local teacher proposes rewrites; guards check surface quality and facts, and the same
+teacher judges meaning and tone. Greedy selection chooses 351 approved candidates, followed
+by 153 narrow edits to *lovely* and *brilliant*. No corpus excerpts are given to the teacher,
+uploaded to Kaggle or included in training. The corpus supplies aggregate targets only.
+
+In the final training data, *lovely* falls from 38.5 to 5.5 per 10k words, *brilliant* from
+42.5 to 8.1, and *yeah* rises from 0 to 40.6. *You know* rises from 4.8 to 9.9 and tag
+questions from 5.5 to 8.5. Mean length falls from 35.5 to 32.4 words, still well above
+corpus turns. These dataset changes do not establish that the trained model improves:
+the unchanged 120-reply evaluation and this corpus analysis must measure that separately.
+See [training methodology](../training/README.md#v3-corpus-guided-training-data).
+
+### Measured v3 output
+
+The same 40 prompts × three samples give 120 v3 replies. Britishness stays at **1.00**
+(23 British variant tokens, zero American), compared with v2's 28/0. This describes
+these small samples, not all possible outputs.
+
+Rates per 10k words; cells show **rate (count; Log Ratio; G²)** against the same corpus:
+
+| Feature | Spoken BNC2014 | v2 | v3 |
+|---|---|---|---|
+| *lovely* | 3.9 | 91.0 (38; +4.56; 167.1) | 9.8 (4; +1.34; 2.6) |
+| *brilliant* | 1.5 | 26.3 (11; +4.15; 42.5) | 0 (0; −0.28; 1.2) |
+| *yeah* | 253.3 | 0 (0; −7.72; 211.4) | 24.4 (10; −3.37; 140.4) |
+| *you know* | 44.6 | 9.6 (4; −2.22; 17.0) | 14.7 (6; −1.61; 11.2) |
+| Tag questions | 23.5 | 2.4 (1; −3.30; 13.1) | 7.3 (3; −1.68; 6.3) |
+| *I think* | 34.4 | 2.4 (1; −3.84; 21.4) | 2.4 (1; −3.81; 20.8) |
+
+Log Ratios for zero counts use the existing 0.5 correction. With only four *lovely*
+uses, its apparent remaining excess has G² 2.6, below the script's .05 threshold;
+this is not proof of equivalence. *Yeah* is much less absent but still far below
+peer conversation. *I mean* remains absent, and *I think* does not increase in count.
+
+Mean/median reply length is **34.1/33.5 words**, versus v2's 34.8/35 and the corpus's
+8.7/5; v3 still has turns about four times the corpus mean. These token counts omit
+numbers, unlike the evaluation scorer (34.2 versus 34.9).
+
+AI is mentioned in **17/120 replies (14.2%)**, versus 19/120 (15.8%) in v2. The exact
+“since I'm an AI” phrase actually rises from **10/120 to 11/120** (8.3% → 9.2%).
+The formulaic explanation is therefore not fixed.
+
+**The lexical objective partly transfers, but overall performance does not improve.**
+Clean replies fall from 86.7% to 84.2%; too-long replies rise from 10% to 12.5%.
+The combined known-answer score rises from 9/12 to 10/12 because name recall improves
+(1/3 → 3/3), while the factual-question subset worsens (8/9 → 7/9). The 15-reply
+[paired review](../training/results/v3/sample-review.json) records both gains and
+uncaught problems. Keep v3 as an experiment; do not replace the existing demo model.
+See the [full comparison](../training/results/v3/comparison.json).
+
+The teacher judging its own rewrites can miss shared errors. Selection optimises aggregate
+features across both train and validation data, so validation is not an independent measure
+of the preprocessing objective. The fixed evaluation prompts remain held out, but have
+already informed development decisions; a new external test set would strengthen the result.
+
+## Further work suggested by the v2 study
 
 - **Use the corpus as the target, not intuition.** Score candidate training replies by how close
   their feature rates are to the Spoken BNC2014 (e.g. penalise *lovely* above a few per 10k, reward

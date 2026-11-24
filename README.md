@@ -106,7 +106,9 @@ phone and tablet layouts are tested too. Firefox is not yet covered by the autom
   she over-uses *lovely* 23× and lacks the *yeah*, *you know* and tag questions of real talk
   ([research/](research/README.md)).
 - **A LoRA fine-tune** of the model that behaves like Ellie with a one-line prompt instead of a
-  256-token one ([training/](training/README.md)).
+  256-token one ([training/](training/README.md)). **Compare models** shows the recorded 120-reply
+  results and sends the same new message to Standard and v2, with separate replies, timings and
+  playback in the selected voice. Choose matched one-line prompts or the app's normal prompts.
 - Light, dark and system themes; works on desktop, tablet and phone; keyboard accessible.
 - **Deployed** on Google Cloud Run + Vercel, with rate limits, a daily ceiling and security headers
   ([deployment](docs/DEPLOYMENT.md), [security](docs/SECURITY.md)).
@@ -237,7 +239,8 @@ The unit suites run on every push in [GitHub Actions](.github/workflows/ci.yml).
   spoken conversation, not factual accuracy.
 - The live demo runs on CPUs, not a GPU, so a long reply takes several seconds, and the first
   visit after a quiet spell waits for the model to load.
-- The fine-tuned model is available locally (the **Standard / Fine-tuned** switch). The live demo
-  runs the standard model only, to keep the server image small.
+- The live demo defaults to **Standard** and also offers the v2 **Fine-tuned** model. The fine-tune
+  improves style consistency but regresses on the small factual and name-recall checks; the
+  **Compare models** view shows both the gains and the trade-offs. Experimental v3 is not offered.
 - Piper reads most text well; unusual formats (some abbreviations or codes) can sound odd.
   Money, dates and URLs are handled in `backend/app/tts/normalise.py`.
