@@ -190,6 +190,9 @@ are in [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Repository layout
 
+To find the exact file and line behind a feature (the prompt, trimming, Piper voices, lip-sync…),
+see the **[code map](docs/CODE_MAP.md)**.
+
 ```text
 ├── backend/                 FastAPI app
 │   ├── app/
@@ -225,6 +228,7 @@ The unit suites run on every push in [GitHub Actions](.github/workflows/ci.yml).
 
 | Document | Contents |
 |---|---|
+| [docs/CODE_MAP.md](docs/CODE_MAP.md) | **Where each feature lives:** question → file and line, one chat turn traced file by file, and which test proves what |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design decisions, request flow, prompt design, context window, TTS, avatar, voice input |
 | [docs/INSTALL.md](docs/INSTALL.md) | Full local setup, configuration, tests and the HTTP API |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | How the live demo runs on Cloud Run + Vercel, cost, monitoring, redeploying |
